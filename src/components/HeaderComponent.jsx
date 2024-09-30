@@ -1,7 +1,14 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function HeaderComponent() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    setIsLoggedIn(false);
+    navigate("/");
+  };
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
     const handleScroll = () => {
@@ -165,6 +172,10 @@ function HeaderComponent() {
   };
   useEffect(() => {
     handleDarkMode();
+    const loginStatus = localStorage.getItem("isLoggedIn");
+    if (loginStatus === "true") {
+      setIsLoggedIn(true);
+    }
   }, []);
   return (
     <>
@@ -317,7 +328,7 @@ function HeaderComponent() {
               <div className="flex items-center justify-end pr-16 lg:pr-0">
                 <label
                   htmlFor="themeSwitcher"
-                  className="inline-flex cursor-pointer items-center"
+                  className="mr-4 inline-flex cursor-pointer items-center"
                   aria-label="themeSwitcher"
                   name="themeSwitcher"
                 >
@@ -371,18 +382,44 @@ function HeaderComponent() {
                   </span>
                 </label>
                 <div className="hidden sm:flex">
-                  <Link
-                    to="/login"
-                    className="loginBtn px-[22px] py-2 text-base font-medium text-white hover:opacity-70"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="signUpBtn rounded-md bg-white bg-opacity-20 px-6 py-2 text-base font-medium text-white duration-300 ease-in-out hover:bg-opacity-100 hover:text-dark"
-                  >
-                    Register
-                  </Link>
+                  {!isLoggedIn ? (
+                    <div className="">
+                      <Link
+                        to="/login"
+                        className="loginBtn px-[22px] py-2 text-base font-medium text-white hover:opacity-70"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="signUpBtn rounded-md bg-white bg-opacity-20 px-6 py-2 text-base font-medium text-white duration-300 ease-in-out hover:bg-opacity-100 hover:text-dark"
+                      >
+                        Register
+                      </Link>
+                    </div>
+                  ) : (
+                    <a className="submenu-item group relative">
+                      <img
+                        className="relative inline-block w-full rounded-full ring-2 ring-white"
+                        src="assets/images/navbar/avatar.jpg"
+                        alt=""
+                      />
+                      <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                        <Link
+                          to=""
+                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                        >
+                          Profile
+                        </Link>
+                        <Link
+                          onClick={handleLogout}
+                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                        >
+                          Logout
+                        </Link>
+                      </div>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

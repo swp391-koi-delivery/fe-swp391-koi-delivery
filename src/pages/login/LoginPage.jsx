@@ -18,6 +18,7 @@ function LoginPage() {
       //   navigate(/dashboard);
       // }
       toast.success("Successfully login to account");
+      localStorage.setItem("isLoggedIn", "true");
       navigate("/");
     } catch (err) {
       toast.error(err.response.data);
