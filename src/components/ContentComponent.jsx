@@ -478,7 +478,6 @@ function ContentComponent() {
           </span>
         </div>
       </section>
-      ;
     </>
   );
 }
