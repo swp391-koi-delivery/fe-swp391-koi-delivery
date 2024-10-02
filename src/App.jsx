@@ -4,7 +4,8 @@ import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import HomePage from "./pages/home/HomePage";
 import FeedbackPage from "./pages/feedback/FeedbackPage";
-
+import ResetPasswordPage from "./pages/reset-password/ResetPasswordPage";
+import RequestPasswordPage from "./pages/request-password/RequestPasswordPage";
 function App() {
   const router = createBrowserRouter([
     {
@@ -22,6 +23,14 @@ function App() {
     {
       path: "feedback",
       element: <FeedbackPage />,
+    },
+    {
+      path: "request-password",
+      element: <RequestPasswordPage />,
+    },
+    {
+      path: "reset-password",
+      element: <ResetPasswordPage />,
     },
   ]);
   return <RouterProvider router={router} />;

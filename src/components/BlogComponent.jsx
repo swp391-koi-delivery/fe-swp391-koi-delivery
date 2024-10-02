@@ -1,6 +1,89 @@
-import React from 'react'
+import { Button, Form, Input, Modal, Upload } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { useForm } from "antd/es/form/Form";
+import React, { useState } from "react";
+import axios from "axios";
+import api from "../config/axios";
+import { toast } from "react-toastify";
+import uploadFile from "../utils/file";
 
 function BlogComponent() {
+  const [form] = useForm();
+  const [posts, setPosts] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [fileList, setFileList] = useState([]);
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+  };
+  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+      }}
+      type="button"
+    >
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </button>
+  );
+
+  const fetchPosts = async () => {
+    const response = await axios.get(api);
+    console.log(response.data);
+    setPosts(response.data);
+  };
+
+  const handleSubmitPosts = async (student) => {
+    if (fileList.length > 0) {
+      const file = fileList[0];
+      console.log(file);
+      const url = await uploadFile(file.originFileObj);
+      student.image = url;
+    }
+    try {
+      setSubmitting(true);
+      const response = await axios.post(api, student);
+      toast.success("Sucessfully create a new post");
+      setOpenModal(false);
+      form.resetFields();
+      fetchPosts();
+    } catch (err) {
+      toast.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <>
       <section className="bg-white pb-10 pt-20 dark:bg-dark lg:pb-20 lg:pt-[120px]">
@@ -22,6 +105,42 @@ function BlogComponent() {
             </div>
           </div>
           <div className="-mx-4 flex flex-wrap">
+            <div className="mb-4 flex w-full items-center justify-end px-4">
+              <Button className="primaryButton" onClick={handleOpenModal}>Add Blog</Button>
+              <Modal
+                confirmLoading={submitting}
+                onOk={() => form.submit()}
+                title="Add Blog"
+                open={openModal}
+                onCancel={handleCloseModal}
+              >
+                <Form onFinish={handleSubmitPosts} form={form}>
+                  <Form.Item
+                    label="Blog post"
+                    name="post"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input blog's post!",
+                      },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item label="image" name="image">
+                    <Upload
+                      action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                      listType="picture-card"
+                      fileList={fileList}
+                      onPreview={handlePreview}
+                      onChange={handleChange}
+                    >
+                      {fileList.length >= 8 ? null : uploadButton}
+                    </Upload>
+                  </Form.Item>
+                </Form>
+              </Modal>
+            </div>
             <div className="w-full px-4 md:w-1/2 lg:w-1/3">
               <div className="wow fadeInUp group mb-10" data-wow-delay=".1s">
                 <div className="mb-8 overflow-hidden rounded-[5px]">
@@ -119,4 +238,4 @@ function BlogComponent() {
   );
 }
 
-export default BlogComponent
+export default BlogComponent;
