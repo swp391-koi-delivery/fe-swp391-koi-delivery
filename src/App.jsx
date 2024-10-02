@@ -4,6 +4,9 @@ import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import HomePage from "./pages/home/HomePage";
 import FeedbackPage from "./pages/feedback/FeedbackPage";
+import Dashboard from "./components/dashboard";
+import ManageUser from "./pages/admin/manage-user";
+import ManageOrder from "./pages/admin/manage-order";
 
 function App() {
   const router = createBrowserRouter([
@@ -23,6 +26,20 @@ function App() {
       path: "feedback",
       element: <FeedbackPage />,
     },
+    {
+      path: "dashboard",
+      element: <Dashboard/>,
+      children:[
+        {
+          path: "user",
+          element: <ManageUser/>,
+        },
+        {
+          path: "order",
+          element: <ManageOrder/>,
+        }
+      ]
+    }
   ]);
   return <RouterProvider router={router} />;
 }
