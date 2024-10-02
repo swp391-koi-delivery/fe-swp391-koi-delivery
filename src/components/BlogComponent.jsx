@@ -60,7 +60,7 @@ function BlogComponent() {
 
   const fetchPosts = async () => {
     const response = await axios.get(api);
-    console.log(response.data);
+    //console.log(response.data);
     setPosts(response.data);
   };
 
@@ -106,7 +106,9 @@ function BlogComponent() {
           </div>
           <div className="-mx-4 flex flex-wrap">
             <div className="mb-4 flex w-full items-center justify-end px-4">
-              <Button className="primaryButton" onClick={handleOpenModal}>Add Blog</Button>
+              <Button className="primaryButton" onClick={handleOpenModal}>
+                Add Blog
+              </Button>
               <Modal
                 confirmLoading={submitting}
                 onOk={() => form.submit()}
@@ -234,6 +236,19 @@ function BlogComponent() {
           </div>
         </div>
       </section>
+      {previewImage && (
+        <Image
+          wrapperStyle={{
+            display: "none",
+          }}
+          preview={{
+            visible: previewOpen,
+            onVisibleChange: (visible) => setPreviewOpen(visible),
+            afterOpenChange: (visible) => !visible && setPreviewImage(""),
+          }}
+          src={previewImage}
+        />
+      )}
     </>
   );
 }
