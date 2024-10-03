@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import { PlusOutlined } from "@ant-design/icons";
 import api from "../../../config/axios";
 import uploadFile from "../../../utils/file";
+import "boxicons";
 function ManageUser() {
   //const api = "https://66ebf57e2b6cf2b89c5c9df5.mockapi.io/User";
   const [users, setUsers] = useState([]);
@@ -240,17 +241,13 @@ function ManageUser() {
       render: (userId, record) => {
         return (
           <>
-            <Button type="primary" onClick={() => handleOpenModal(record)}>
-              Edit
-            </Button>{" "}
+            <Button type="primary" icon={<box-icon type='solid' name='edit-alt'></box-icon>} onClick={() => handleOpenModal(record)}/>{" "}
             <Popconfirm
               title="Delete"
               description="Are you sure want to delete?"
               onConfirm={() => handleDeleteUser(userId)}
             >
-              <Button type="primary" danger>
-                Delete
-              </Button>
+              <Button type="primary"  icon={<box-icon name='trash-alt' type='solid' ></box-icon>}danger />
             </Popconfirm>
           </>
         );
@@ -258,9 +255,9 @@ function ManageUser() {
     },
   ];
   return (
-    <div className="manageUser" style={{width: "100%"}}>
-      <h1>User Management</h1>
-      <div  style={{ marginBottom: 20, width: "500px" }}>
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-6">User Management</h1>
+      <div  className="mb-4" style={{width:"500px"}}>
 
       <Search
         placeholder="Search by username"
@@ -268,10 +265,10 @@ function ManageUser() {
         onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
         value={searchText}
         // Thêm style cho input search
-        
+        className="w-full max-w-md"
         />
         </div>
-      <Button onClick={() => setShowModal(true)}>Add</Button>
+      <Button icon={<PlusOutlined/>} onClick={() => setShowModal(true)} className="mb-4" style={{marginLeft:"20px"}}>Add</Button>
       <Table columns={columns} dataSource={filteredUsers} rowKey="userId" size="middle" />
       <Modal
         confirmLoading={submitting}

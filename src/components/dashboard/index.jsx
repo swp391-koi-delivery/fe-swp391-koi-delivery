@@ -17,7 +17,7 @@ function getItem(label, key, icon, children) {
     key,
     icon,
     children,
-    label: <Link to={`/dashboard/${key}`}>{label}</Link>
+    label: <Link to={`/dashboard/${key}`} className="text-gray-700 hover:text-blue-500">{label}</Link>
   };
 }
 const items = [
@@ -35,48 +35,33 @@ const Dashboard = () => {
     <Layout
       style={{
         minHeight: '100vh',
-      }}
+      }} className="min-h-screen"
     >
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className="bg-gray-800">
         <div className="demo-logo-vertical" />
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
-      <Layout>
+      <Layout className="bg-gray-100">
         <Header
-          style={{
-            padding: 0,
-            background: colorBgContainer,
-          }}
+          className="bg-white shadow-md"
         />
         <Content
-          style={{
-            margin: '0 16px',
-          }}
+          className="m-4"
         >
           <Breadcrumb
-            style={{
-              margin: '16px 0',
-            }}
+           className="mb-4"
           >
             {/* <Breadcrumb.Item>User</Breadcrumb.Item>
             <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
           </Breadcrumb>
           <div
-            style={{
-              width: "100%",
-              padding: 24,
-              minHeight: 360,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
+            className="bg-white rounded-lg shadow-md p-6"
           >
             <Outlet/>
           </div>
         </Content>
         <Footer
-          style={{
-            textAlign: 'center',
-          }}
+          className="text-center bg-gray-50 py-4"
         >
           Ant Design ©{new Date().getFullYear()} Created by Ant UED
         </Footer>
