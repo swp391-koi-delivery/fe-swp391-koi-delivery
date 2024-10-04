@@ -18,7 +18,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { render } from "react-dom";
 import { toast } from "react-toastify";
-import { PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
 import api from "../../../config/axios";
 import uploadFile from "../../../utils/file";
 import "boxicons";
@@ -241,13 +241,13 @@ function ManageUser() {
       render: (userId, record) => {
         return (
           <>
-            <Button type="primary" icon={<box-icon type='solid' name='edit-alt'></box-icon>} onClick={() => handleOpenModal(record)}/>{" "}
+            <Button icon={<EditTwoTone/>} onClick={() => handleOpenModal(record)}/>{" "}
             <Popconfirm
               title="Delete"
               description="Are you sure want to delete?"
               onConfirm={() => handleDeleteUser(userId)}
             >
-              <Button type="primary"  icon={<box-icon name='trash-alt' type='solid' ></box-icon>}danger />
+              <Button icon={<DeleteOutlined />}danger />
             </Popconfirm>
           </>
         );

@@ -18,7 +18,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { render } from "react-dom";
 import { toast } from "react-toastify";
-import { PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
 import Password from "antd/es/input/Password";
 import api from "../../config/axios";
 import uploadFile from "../../utils/file";
@@ -43,22 +43,18 @@ function CRUDTemplate({ columns, formItems, path }) {
       render: (id, record) => (
         <>
           <Button
-            type="primary"
+            icon={<EditTwoTone/>}
             onClick={() => {
               setOpenModal(true);
               form.setFieldsValue(record);
             }}
-          >
-            Edit
-          </Button>{" "}
+          />{" "}
           <Popconfirm
             title="Delete"
             description="Are you sure want to delete?"
             onConfirm={() => handleDelete(id)}
           >
-            <Button type="primary" danger>
-              Delete
-            </Button>
+            <Button icon={<DeleteOutlined/>} danger/>
           </Popconfirm>
         </>
       ),
@@ -277,14 +273,16 @@ function CRUDTemplate({ columns, formItems, path }) {
   //   ];
   return (
     <div>
+      <div style={{width:"500px"}}>    
       <Search
         placeholder="Search..."
         onSearch={handleSearch}
         onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
         value={searchText}
         style={{ marginBottom: 20, width: 300 }} // Thêm style cho input search
-      />
-      <Button onClick={() => setOpenModal(true)}>Add</Button>
+        />
+        </div>
+      <Button icon={<PlusOutlined/>} onClick={() => setOpenModal(true)} style={{marginLeft:"20px"}}>Add</Button>
       <Table columns={tableColumn} dataSource={filteredUsers} rowKey="userId" />
       <Modal
         confirmLoading={submitting}
