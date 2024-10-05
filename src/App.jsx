@@ -7,6 +7,7 @@ import FeedbackPage from "./pages/feedback/FeedbackPage";
 import Dashboard from "./components/dashboard";
 import ManageUser from "./pages/admin/manage-user";
 import ManageOrder from "./pages/admin/manage-order";
+import ManageStatistic from "./pages/admin/manage-statistic";
 
 function App() {
   const router = createBrowserRouter([
@@ -37,6 +38,10 @@ function App() {
         {
           path: "order",
           element: <ManageOrder/>,
+        },
+        {
+          path: "statistic",
+          element: <ManageStatistic/>,
         }
       ]
     }

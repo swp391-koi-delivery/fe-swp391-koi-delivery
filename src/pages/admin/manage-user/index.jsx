@@ -258,10 +258,10 @@ function ManageUser() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6">User Management</h1>
-      <div  className="mb-4" style={{width:"500px"}}>
+      <div  className="mb-4" style={{width:"350px"}}>
 
       <Search
-        placeholder="Search by username"
+        placeholder="Search by fullname"
         onSearch={handleSearch}
         onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
         value={searchText}

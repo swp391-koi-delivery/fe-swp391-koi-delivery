@@ -1,81 +1,87 @@
-/* General reset */
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f6f8; /* Light background */
+.ant-layout-sider-children{
+    background-color: white;
+}
+.ant-table-container {
+    margin: 20px auto;
+    width: 90%; /* Điều chỉnh độ rộng của bảng */
+    border-radius: 10px; /* Bo góc cho bảng */
+    overflow: hidden; /* Ẩn phần bị tràn */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho bảng */
   }
   
-  /* Ant Design Menu and Sidebar */
-  .ant-layout-sider {
-    background-color: #ffffff !important; /* Light color for sidebar */
+  /* Nội dung bảng */
+  .ant-table-content {
+    background-color: #fff; /* Màu nền trắng */
   }
   
-  .ant-menu-dark.ant-menu-inline {
-    background: #ffffff !important;
+  /* Tiêu đề bảng */
+  .ant-table-thead {
+    background-color: #f0f2f5; /* Màu nền cho tiêu đề */
+    border-bottom: 2px solid #e8e8e8; /* Đường viền dưới tiêu đề */
   }
   
-  .ant-menu-dark .ant-menu-item {
-    color: #444444 !important; /* Darker text */
+  .ant-table-cell {
+    padding: 15px; /* Khoảng cách bên trong ô */
+    font-size: 14px; /* Kích thước font chữ */
+    text-align: left; /* Canh trái cho văn bản */
+    color: #333; /* Màu chữ */
   }
   
-  .ant-menu-dark .ant-menu-item-selected {
-    background-color: #e6f7ff !important; /* Light blue selected item */
+  /* Hiệu ứng hover cho ô trong bảng */
+  .ant-table-tbody tr:hover {
+    background-color: #e6f7ff; /* Màu nền khi hover */
   }
   
-  .ant-menu-dark .ant-menu-item:hover {
-    background-color: #f0f0f0 !important;
-    color: #1890ff !important; /* Hover effect */
+  /* Hiệu ứng cho các cột có sorter */
+  .ant-table-column-sorters {
+    cursor: pointer; /* Con trỏ chuột khi hover */
   }
   
-  /* Header */
-  .ant-layout-header {
-    background-color: #ffffff !important;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+  /* Màu chữ cho cột sorter */
+  .ant-table-column-sorters:hover .ant-table-column-title {
+    color: #1890ff; /* Màu chữ khi hover */
   }
   
-  /* Breadcrumb */
-  .ant-breadcrumb {
-    font-size: 16px;
-    color: #888888;
+  /* Thiết lập cho các ô của dữ liệu */
+  .ant-table-tbody .ant-table-cell {
+    border-bottom: 1px solid #e8e8e8; /* Đường viền dưới mỗi ô */
   }
   
-  /* Content */
-  .ant-layout-content {
-    padding: 24px;
-    background-color: #f4f6f8; /* Very light background for content */
+  /* Màu nền cho dòng không có dữ liệu */
+  .ant-table-placeholder {
+    text-align: center; /* Canh giữa cho nội dung không có dữ liệu */
+    color: #999; /* Màu chữ cho nội dung không có dữ liệu */
   }
   
-  .bg-white {
-    background-color: #ffffff !important; /* Pure white content background */
+  /* Chỉnh sửa cho icon filter */
+  .ant-dropdown-trigger {
+    cursor: pointer; /* Con trỏ chuột khi hover */
   }
   
-  /* Footer */
-  .ant-layout-footer {
-    background-color: #fafafa !important;
-    font-size: 14px;
-    color: #888888;
+  /* Chỉnh sửa cho các biểu tượng trong tiêu đề */
+  .ant-table-column-sorter-up, .ant-table-column-sorter-down {
+    font-size: 16px; /* Kích thước icon */
+    color: #999; /* Màu icon */
+    margin-left: 5px; /* Khoảng cách giữa tiêu đề và icon */
   }
   
-  /* Rounded corners and shadows */
-  .rounded-lg {
-    border-radius: 10px !important;
+  /* Đổi màu cho icon khi hover */
+  .ant-table-column-sorters:hover .ant-table-column-sorter-up,
+  .ant-table-column-sorters:hover .ant-table-column-sorter-down {
+    color: #1890ff; /* Màu icon khi hover */
+  }
+  /* Thiết kế nút Add */
+button.ant-btn {
+    margin-left: 20px;
+    border-radius: 8px;
+    border: 1px solid #1890ff;
+    color: #1890ff;
+    font-weight: 500;
+    padding: 6px 20px;
+    transition: background-color 0.3s ease;
   }
   
-  .shadow-md {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  /* Text color */
-  .text-gray-700 {
-    color: #4a4a4a !important;
-  }
-  
-  .hover\\:text-blue-500:hover {
-    color: #1890ff !important; /* Hover blue color */
-  }
-  
-  /* Link hover styles */
-  a:hover {
-    color: #1890ff !important;
+  button.ant-btn:hover {
+    background-color: #e6f7ff;
+    border-color: #40a9ff;
   }
