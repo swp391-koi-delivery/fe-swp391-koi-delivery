@@ -287,7 +287,7 @@ function AuthenTemplate({ children }) {
                         </Link>
                         <Link
                           to="/login"
-                          className="block rounded px-4 py-[10px] text-sm text-primary hover:text-primary dark:hover:text-primary"
+                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
                           Login Page
                         </Link>
