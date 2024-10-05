@@ -1,12 +1,27 @@
-import React from "react";
-import AuthenTemplate from "../../components/AuthenTemplate/AuthenTemplate";
-import { Form, Input } from "antd";
+import React, { useState } from "react";
+import AuthenTemplate from "../../components/authen-template/AuthenTemplate";
+import { Form, Input, Image, Upload, Button } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
+import { PlusOutlined } from "@ant-design/icons";
+import uploadFile from "../../utils/file";
+import { useForm } from "antd/es/form/Form";
+
 function RegisterPage() {
+  const [form] = useForm();
   const navigate = useNavigate();
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [fileList, setFileList] = useState([]);
+
   const handleRegister = async (values) => {
+    if (fileList.length > 0) {
+      const file = fileList[0];
+      console.log(file);
+      const url = await uploadFile(file.originFileObj);
+      values.image = url;
+    }
     try {
       const response = await api.post("register", values);
       toast.success("Successfully register a new account");
@@ -15,6 +30,43 @@ function RegisterPage() {
       toast.error(err.response.data);
     }
   };
+
+  const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+  };
+
+  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+      }}
+      type="button"
+    >
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </button>
+  );
+
   return (
     <>
       <AuthenTemplate>
@@ -34,15 +86,16 @@ function RegisterPage() {
 
                   <ul className="flex items-center justify-center gap-[10px]">
                     <li>
-                      <a
-                        href="index.html"
+                      <Link
+                        to="/"
                         className="flex items-center gap-[10px] text-base font-medium text-dark dark:text-white"
                       >
                         Home
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
+                      <Link
+                        to="/register"
                         href="javascript:void(0)"
                         className="flex items-center gap-[10px] text-base font-medium text-body-color"
                       >
@@ -51,7 +104,7 @@ function RegisterPage() {
                           /{" "}
                         </span>
                         Register
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </div>
@@ -85,57 +138,166 @@ function RegisterPage() {
                       />
                     </a>
                   </div>
-                  <Form onFinish={handleRegister}>
-                    <Form.Item name="username" className="mb-[22px]">
+                  <Form onFinish={handleRegister} title="Register" form={form}>
+                    <Form.Item
+                      name="username"
+                      className="mb-[22px]"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input username",
+                        },
+                        {
+                          min: 6,
+                          message: "Username must be at least 6 characters!",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
                       <Input
                         required
                         placeholder="Username"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
-                    <Form.Item name="password" className="mb-[22px]">
+                    <Form.Item
+                      name="password"
+                      className="mb-[22px]"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input password",
+                        },
+                        {
+                          pattern: /.*[A-Z].*/,
+                          message:
+                            "Password must contain at least one uppercase letter!",
+                        },
+                        {
+                          min: 6,
+                          message: "Password must be at least 6 characters!",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
                       <Input.Password
                         required
                         placeholder="Password"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
-                    <Form.Item name="fullname" className="mb-[22px]">
+                    <Form.Item
+                      name="fullname"
+                      className="mb-[22px]"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input full name",
+                        },
+                        {
+                          min: 1,
+                          message: "Password must be at least 1 characters!",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
                       <Input
                         required
                         placeholder="Fullname"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
-                    <Form.Item name="address" className="mb-[22px]">
+                    <Form.Item
+                      name="address"
+                      className="mb-[22px]"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input address!",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
                       <Input
                         required
                         placeholder="Address"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
-                    <Form.Item name="phone" className="mb-[22px]">
+                    <Form.Item
+                      name="phone"
+                      className="mb-[22px]"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input phone number!",
+                        },
+                        {
+                          pattern: /(84|0[3|5|7|8|9])(\d{8})/,
+                          message:
+                            "Phone number must start with 84 or a valid Vietnamese mobile prefix (03, 05, 07, 08, 09) followed by 8 digits.",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
                       <Input
                         required
                         placeholder="Phone"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
-                    <Form.Item name="email" className="mb-[22px]">
+                    <Form.Item
+                      name="email"
+                      className="mb-[22px]"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input email!",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
                       <Input
                         required
                         placeholder="Email"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
+                    <Form.Item label="Image" name="image" className="mb-[22px]">
+                      <Upload
+                        action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                        listType="picture-card"
+                        fileList={fileList}
+                        onPreview={handlePreview}
+                        onChange={handleChange}
+                      >
+                        {fileList.length >= 8 ? null : uploadButton}
+                      </Upload>
+                    </Form.Item>
                     <Form.Item className="mb-[22px]">
-                      <Input
+                      <Button
                         type="submit"
-                        value="Register"
-                        className="primaryButton w-full cursor-pointer rounded-md px-5 py-3 text-base text-white transition duration-300 ease-in-out"
-                      />
+                        onClick={() => form.submit()}
+                        className="primaryButton w-full cursor-pointer rounded-md px-7 py-5 text-base text-white transition duration-300 ease-in-out"
+                      >
+                        Register
+                      </Button>
                     </Form.Item>
                   </Form>
+                  {previewImage && (
+                    <Image
+                      wrapperStyle={{
+                        display: "none",
+                      }}
+                      preview={{
+                        visible: previewOpen,
+                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                        afterOpenChange: (visible) =>
+                          !visible && setPreviewImage(""),
+                      }}
+                      src={previewImage}
+                    />
+                  )}
                   <span className="z-1 relative mb-7 block text-center">
                     <span className="-z-1 absolute left-0 top-1/2 block h-px w-full bg-stroke dark:bg-dark-3"></span>
                     <span className="relative z-10 inline-block bg-white px-3 text-base text-body-secondary dark:bg-dark-2">

@@ -1,29 +1,35 @@
 import React from "react";
-import AuthenTemplate from "../../components/AuthenTemplate/AuthenTemplate";
+import AuthenTemplate from "../../components/authen-template/AuthenTemplate";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
-import { Form, Input } from "antd";
+import { Button, Form, Input } from "antd";
 import { googleProvider } from "../../config/firebase";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/features/userSlice";
+import { useForm } from "antd/es/form/Form";
 function LoginPage() {
+  const [form] = useForm();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleLogin = async (values) => {
     try {
       const response = await api.post("login", values);
-      console.log(response);
-      // const {role, token} = response.data;
-      // localStorage.setItem("token", token);
-      // if (role === "AD") {
-      //   navigate(/dashboard);
-      // }
       toast.success("Successfully login to account");
-      localStorage.setItem("isLoggedIn", "true");
-      navigate("/");
+      console.log(response.data);
+      dispatch(login(response.data));
+      const { role, token } = response.data;
+      localStorage.setItem("token", token);
+      if (role === "CUSTOMER") {
+        navigate("/");
+      }
     } catch (err) {
       toast.error(err.response.data);
     }
   };
+
   const handleLoginGoogle = () => {
     const auth = getAuth();
     signInWithPopup(auth, googleProvider)
@@ -48,6 +54,7 @@ function LoginPage() {
         // ...
       });
   };
+
   return (
     <>
       <AuthenTemplate>
@@ -67,15 +74,16 @@ function LoginPage() {
 
                   <ul className="flex items-center justify-center gap-[10px]">
                     <li>
-                      <a
-                        href="index.html"
+                      <Link
+                        to="/"
                         className="flex items-center gap-[10px] text-base font-medium text-dark dark:text-white"
                       >
                         Home
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
+                      <Link
+                        to="/login"
                         href="javascript:void(0)"
                         className="flex items-center gap-[10px] text-base font-medium text-body-color"
                       >
@@ -84,7 +92,7 @@ function LoginPage() {
                           /{" "}
                         </span>
                         Login
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </div>
@@ -118,30 +126,69 @@ function LoginPage() {
                       />
                     </a>
                   </div>
-                  <Form onFinish={handleLogin}>
-                    <Form.Item name="username" className="mb-[22px]">
+                  <Form onFinish={handleLogin} title="Login" form={form}>
+                    <Form.Item
+                      name="username"
+                      className="mb-[22px]"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input username",
+                        },
+                        {
+                          min: 6,
+                          message: "Username must be at least 6 characters!",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
                       <Input
                         placeholder="Username"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
-                    <Form.Item name="password" className="mb-[14px]">
+                    <Form.Item
+                      name="password"
+                      className="mb-[14px]"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input password",
+                        },
+                        {
+                          pattern: /.*[A-Z].*/,
+                          message:
+                            "Password must contain at least one uppercase letter!",
+                        },
+                        {
+                          min: 6,
+                          message: "Password must be at least 6 characters!",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
                       <Input.Password
                         placeholder="Password"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
-                    <div className="flex justify-end mb-[14px]">
-                      {" "}
-                      <Link to="/request-password" className="text-base text-body-secondary">Forgot password</Link>
+                    <div className="mb-[14px] flex justify-end">
+                      <Link
+                        to="/request-password"
+                        className="text-base text-body-secondary"
+                      >
+                        Forgot password
+                      </Link>
                     </div>
 
                     <Form.Item className="mb-[22px]">
-                      <Input
+                      <Button
                         type="submit"
-                        value="Login"
-                        className="primaryButton w-full cursor-pointer rounded-md px-5 py-3 text-base text-white transition duration-300 ease-in-out"
-                      />
+                        onClick={() => form.submit()}
+                        className="primaryButton w-full cursor-pointer rounded-md px-7 py-5 text-base text-white transition duration-300 ease-in-out"
+                      >
+                        Login
+                      </Button>
                     </Form.Item>
                   </Form>
                   <span className="z-1 relative mb-7 block text-center">

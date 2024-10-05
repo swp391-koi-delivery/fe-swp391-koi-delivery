@@ -1,6 +1,48 @@
-import React from 'react'
+import { Button, Form, Input } from "antd";
+import { useForm } from "antd/es/form/Form";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import api from "../config/axios";
 
 function PricingComponent() {
+  const [form] = useForm();
+  const [data, setData] = useState({});
+  const fishSizes = [
+    { sizeCm: "19.9", sizeInch: "7.86" },
+    { sizeCm: "20-25", sizeInch: "7.87 - 9.84" },
+    { sizeCm: "25.1 - 30", sizeInch: "9.85 - 11.81" },
+    { sizeCm: "30.1 - 40", sizeInch: "11.82 - 15.75" },
+    { sizeCm: "40.1 - 44", sizeInch: "15.76 - 17.32" },
+    { sizeCm: "44.1 - 50", sizeInch: "17.33 - 19.6" },
+    { sizeCm: "50.1 - 55", sizeInch: "19.7 - 21.6" },
+    { sizeCm: "55.1 - 65", sizeInch: "21.7 - 25.5" },
+    { sizeCm: "50 - 60", sizeInch: "19.7 - 23.4" },
+    { sizeCm: "60.1 - 65", sizeInch: "23.5 - 25.5" },
+    { sizeCm: "65.1 - 73", sizeInch: "25.6 - 28.7" },
+    { sizeCm: "73.1 - 83", sizeInch: "28.8 - 32.6" },
+  ];
+
+  const handleEstimate = async (values) => {
+    console.log(values);
+    const submissionData = values.items
+      .filter((item) => item.quantities) // Filter out rows without quantity input
+      .map((item, index) => ({
+        fishSizes: parseFloat(fishSizes[index].sizeCm), // Convert fish size to number
+        quantities: item.quantities, // Use the correct field name
+      }));
+    try {
+      const response = await api.get(
+        `calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
+      );
+      toast.success("Price estimation successful!");
+      console.log(response.data);
+      setData(response.data);
+    } catch (err) {
+      toast.error("Failed to calculate the price. Please try again.");
+      console.error(err);
+    }
+  };
+
   return (
     <>
       <section
@@ -97,88 +139,99 @@ function PricingComponent() {
           </div>
           <div className="-mx-4 flex flex-wrap justify-center">
             <div className="h-full w-full px-4 lg:w-1/2">
-              <div className="mb-4 flex w-full items-center justify-center rounded-md shadow-pricing">
-                <table className="w-full overflow-hidden text-center text-sm">
-                  <thead className="">
-                    <tr>
-                      <th className="py-3">
-                        <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                          Product name
-                        </span>
-                      </th>
-                      <th className="py-3">
-                        <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                          Color
-                        </span>
-                      </th>
-                      <th className="py-3">
-                        <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                          Category
-                        </span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-base text-dark dark:text-white">
-                    <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-                      <td className="whitespace-nowrap px-6 py-3 font-medium">
-                        <span className="inline-block">Macbook pro</span>
-                      </td>
-                      <td className="px-6 py-3">
-                        <span className="inline-block">Silver</span>
-                      </td>
-                      <td className="px-8 py-3">
-                        <input
-                          className="rounded-sm border border-dark text-center focus:border-dark dark:bg-dark"
-                          type="number"
-                          min="1"
-                          step="1"
-                        />
-                      </td>
-                    </tr>
-                    <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-                      <td className="py3 whitespace-nowrap px-6 font-medium">
-                        <span className="inline-block">Macbook pro</span>
-                      </td>
-                      <td className="px-6 py-3">
-                        <span className="inline-block">Silver</span>
-                      </td>
-                      <td className="px-8 py-3">
-                        <input
-                          className="rounded-sm border border-dark text-center focus:border-dark dark:bg-dark"
-                          type="number"
-                          min="1"
-                          step="1"
-                        />
-                      </td>
-                    </tr>
-                    <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-                      <td className="py3 whitespace-nowrap px-6 font-medium">
-                        <span className="inline-block">Macbook pro</span>
-                      </td>
-                      <td className="px-6 py-3">
-                        <span className="inline-block">Silver</span>
-                      </td>
-                      <td className="px-8 py-3">
-                        <input
-                          className="rounded-sm border border-dark text-center focus:border-dark dark:bg-dark"
-                          type="number"
-                          min="1"
-                          step="1"
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <Form
+                onFinish={handleEstimate}
+                title="Estimate price"
+                form={form}
+              >
+                <div className="mb-4 flex w-full items-center justify-center rounded-md shadow-pricing">
+                  <table className="w-full overflow-hidden text-center text-sm">
+                    <thead>
+                      <tr>
+                        <th className="py-3">
+                          <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                            Fish Size (cm)
+                          </span>
+                        </th>
+                        <th className="py-3">
+                          <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                            Fish Size (inch)
+                          </span>
+                        </th>
+                        <th className="py-3">
+                          <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                            Quantity
+                          </span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-base text-dark dark:text-white">
+                      <Form.List name="items">
+                        {() => (
+                          <>
+                            {fishSizes.map((item, index) => (
+                              <tr
+                                key={index}
+                                className="w-full text-center hover:table-row hover:scale-105"
+                              >
+                                <td className="whitespace-nowrap px-6 py-3 font-medium">
+                                  <span className="inline-block">
+                                    {item.sizeCm}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-3">
+                                  <span className="inline-block">
+                                    {item.sizeInch}
+                                  </span>
+                                </td>
+                                <td className="px-8 py-3">
+                                  <Form.Item
+                                    name={[index, "quantities"]}
+                                    rules={[
+                                      {
+                                        validator: (_, value) => {
+                                          if (value >= 0) {
+                                            return Promise.resolve();
+                                          }
+                                          if (value < 1) {
+                                            return Promise.reject(
+                                              new Error(
+                                                "Quantity must be greater than or equal to 1!",
+                                              ),
+                                            );
+                                          }
+                                          return Promise.resolve(); // No error if value is valid
+                                        },
+                                      },
+                                    ]}
+                                  >
+                                    <Input
+                                      className="rounded-sm border border-dark text-center focus:border-dark dark:bg-dark"
+                                      type="number"
+                                      step="1"
+                                      min="1"
+                                    />
+                                  </Form.Item>
+                                </td>
+                              </tr>
+                            ))}
+                          </>
+                        )}
+                      </Form.List>
+                    </tbody>
+                  </table>
+                </div>
 
-              <div className="flex justify-end">
-                <a
-                  href="javascript:void(0)"
-                  className="primaryButton rounded-y inline-flex items-center justify-center px-7 py-3 text-center text-base font-medium transition duration-300"
-                >
-                  Know More
-                </a>
-              </div>
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    onClick={() => form.submit()}
+                    className="primaryButton rounded-y inline-flex items-center justify-center px-7 py-5 text-center text-base font-medium transition duration-300"
+                  >
+                    Estimate
+                  </Button>
+                </div>
+              </Form>
             </div>
 
             <div className="w-full px-4 lg:w-1/2">
@@ -194,8 +247,8 @@ function PricingComponent() {
                   </span>
                   <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
                     <span className="-ml-1 -tracking-[2px]">
-                      0 large boxes , 0 medium boxes, 12 extra large boxes and 0
-                      special large boxes
+                      {data?.smallBoxCount} small boxs, {data?.mediumBoxCount}{" "}
+                      medium boxes, {data?.largeBoxCount} large boxes
                     </span>
                   </h2>
                 </div>
@@ -209,7 +262,9 @@ function PricingComponent() {
                     Total shipping cost
                   </span>
                   <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
-                    <span className="-ml-1 -tracking-[2px]">$3,720.00</span>
+                    <span className="-ml-1 -tracking-[2px]">
+                      {data?.remainingVolume}
+                    </span>
                   </h2>
                 </div>
                 <div className="z-10 mb-10 flex w-full flex-col items-center overflow-hidden rounded-xl bg-white px-6 py-6 shadow-pricing dark:bg-dark-2 sm:p-12 lg:px-6 lg:py-10 xl:p-14">
@@ -222,48 +277,19 @@ function PricingComponent() {
                     You can purchase this many more koi, of each size, to fit in
                     the same size box shown above.
                   </span>
-                  <div className="flex w-full flex-col items-start justify-start text-start">
-                    <h2 className="mb-2 text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
-                      <p className="-ml-1 -tracking-[2px]">
-                        0
-                        <span className="text-xl font-medium text-dark dark:text-white md:text-3xl">
-                          of 19 CM (7.86 Inch) or,
-                        </span>
-                      </p>
-                    </h2>
-                    <h2 className="mb-2 text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
-                      <p className="-ml-1 -tracking-[2px]">
-                        0
-                        <span className="text-xl font-medium text-dark dark:text-white md:text-3xl">
-                          of 20-25 CM (7.87 - 9.84 Inch) or,
-                        </span>
-                      </p>
-                    </h2>
-                    <h2 className="mb-2 text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
-                      <p className="-ml-1 -tracking-[2px]">
-                        0
-                        <span className="text-xl font-medium text-dark dark:text-white md:text-3xl">
-                          25.5 - 30 CM (9.85 - 11.81 Inch) or,
-                        </span>
-                      </p>
-                    </h2>
-                    <h2 className="mb-2 text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
-                      <p className="-ml-1 -tracking-[2px]">
-                        0
-                        <span className="text-xl font-medium text-dark dark:text-white md:text-3xl">
-                          of 30.5 - 40 CM (11.82 - 15.75 Inch) or,
-                        </span>
-                      </p>
-                    </h2>
-                    <h2 className="mb-2 text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
-                      <p className="-ml-1 -tracking-[2px]">
-                        0
-                        <span className="text-xl font-medium text-dark dark:text-white md:text-3xl">
-                          of 40.5 - 44 CM (15.76 - 17.32 Inch)
-                        </span>
-                      </p>
-                    </h2>
-                  </div>
+                  {data?.suggestions?.map((item) => (
+                    <>
+                      <div className="flex w-full flex-col items-start justify-start text-start">
+                        <h2 className="mb-2 text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
+                          <p className="-ml-1 -tracking-[2px]">
+                            <span className="text-xl font-medium text-dark dark:text-white md:text-3xl">
+                              {item}
+                            </span>
+                          </p>
+                        </h2>
+                      </div>
+                    </>
+                  ))}
                 </div>
               </div>
             </div>
@@ -274,4 +300,4 @@ function PricingComponent() {
   );
 }
 
-export default PricingComponent
+export default PricingComponent;

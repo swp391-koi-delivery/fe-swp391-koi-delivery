@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { logout } from "../../src/redux/features/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 function HeaderComponent() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    setIsLoggedIn(false);
-    navigate("/");
-  };
-  const handleDarkMode = () => {
+  const user = useSelector((store) => store.user);
+  const dispatch = useDispatch();
+
+  const handleDarkMode = async (values) => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
     const handleScroll = () => {
       const ud_header = document.querySelector(".ud-header");
@@ -170,6 +167,7 @@ function HeaderComponent() {
       );
     };
   };
+
   useEffect(() => {
     handleDarkMode();
     const loginStatus = localStorage.getItem("isLoggedIn");
@@ -177,6 +175,7 @@ function HeaderComponent() {
       setIsLoggedIn(true);
     }
   }, []);
+
   return (
     <>
       <div className="ud-header absolute left-0 top-0 z-40 flex w-full items-center bg-transparent">
@@ -207,12 +206,12 @@ function HeaderComponent() {
                 >
                   <ul className="blcok lg:flex 2xl:ml-20">
                     <li className="group relative">
-                      <a
-                        href="#home"
+                      <Link
+                        to="/"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70"
                       >
                         Home
-                      </a>
+                      </Link>
                     </li>
                     <li className="group relative">
                       <a
@@ -248,7 +247,7 @@ function HeaderComponent() {
                     </li>
                     <li className="group relative">
                       <a
-                        href="#"
+                        href="#blog"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10"
                       >
                         Blog
@@ -276,32 +275,14 @@ function HeaderComponent() {
                           href="#"
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
-                          About Page
+                          Home Page
                         </a>
-                        <a
-                          href="#"
+                        <Link
+                          to="/order-page"
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
-                          Pricing Page
-                        </a>
-                        <a
-                          href="#"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Contact Page
-                        </a>
-                        <a
-                          href="#"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Blog Grid Page
-                        </a>
-                        <a
-                          href="#"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Blog Details Page
-                        </a>
+                          Order Page
+                        </Link>
                         <Link
                           to="register"
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
@@ -314,12 +295,6 @@ function HeaderComponent() {
                         >
                           Login Page
                         </Link>
-                        <a
-                          href="#"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          404 Page
-                        </a>
                       </div>
                     </li>
                   </ul>
@@ -382,7 +357,7 @@ function HeaderComponent() {
                   </span>
                 </label>
                 <div className="hidden sm:flex">
-                  {!isLoggedIn ? (
+                  {user == null ? (
                     <div className="">
                       <Link
                         to="/login"
@@ -400,11 +375,17 @@ function HeaderComponent() {
                   ) : (
                     <a className="submenu-item group relative">
                       <img
-                        className="relative inline-block w-full rounded-full ring-2 ring-white"
-                        src="assets/images/navbar/avatar.jpg"
+                        className="relative inline-block w-full rounded-full ring-1 ring-white"
+                        src={
+                          user?.image ||
+                          "assets/images/navbar/default-avatar.jpg"
+                        }
                         alt=""
                       />
                       <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                        <span className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary text-base">
+                          {user?.username}
+                        </span>
                         <Link
                           to=""
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
@@ -412,7 +393,7 @@ function HeaderComponent() {
                           Profile
                         </Link>
                         <Link
-                          onClick={handleLogout}
+                          onClick={() => dispatch(logout())}
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
                           Logout

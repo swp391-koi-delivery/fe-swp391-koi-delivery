@@ -1,5 +1,5 @@
 import React from "react";
-import AuthenTemplate from "../../components/AuthenTemplate/AuthenTemplate";
+import AuthenTemplate from "../../components/authen-template/AuthenTemplate";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Form, Input } from "antd";
@@ -37,7 +37,7 @@ function RequestPasswordPage() {
                   <ul className="flex items-center justify-center gap-[10px]">
                     <li>
                       <Link
-                       to="/"
+                        to="/"
                         className="flex items-center gap-[10px] text-base font-medium text-dark dark:text-white"
                       >
                         Home
@@ -45,7 +45,7 @@ function RequestPasswordPage() {
                     </li>
                     <li>
                       <Link
-                      to="/request-password"
+                        to="/request-password"
                         href="javascript:void(0)"
                         className="flex items-center gap-[10px] text-base font-medium text-body-color"
                       >
@@ -53,7 +53,7 @@ function RequestPasswordPage() {
                           {" "}
                           /{" "}
                         </span>
-                       Request Password
+                        Request Password
                       </Link>
                     </li>
                   </ul>

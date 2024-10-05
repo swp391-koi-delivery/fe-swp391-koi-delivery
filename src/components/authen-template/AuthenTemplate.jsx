@@ -202,12 +202,12 @@ function AuthenTemplate({ children }) {
                 >
                   <ul className="blcok lg:flex 2xl:ml-20">
                     <li className="group relative">
-                      <a
-                        href="#home"
+                      <Link
+                        to="/"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-body-color dark:lg:text-dark-6"
                       >
                         Home
-                      </a>
+                      </Link>
                     </li>
                     <li className="group relative">
                       <a
@@ -267,55 +267,30 @@ function AuthenTemplate({ children }) {
                         </svg>
                       </a>
                       <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
-                        <a
-                          href="#"
+                        <Link
+                          to="/"
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
-                          About Page
-                        </a>
-                        <a
-                          href="#"
+                          Home Page
+                        </Link>
+                        <Link
+                          to="/order-page"
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
-                          Pricing Page
-                        </a>
-                        <a
-                          href="#"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Contact Page
-                        </a>
-                        <a
-                          href="#"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Blog Grid Page
-                        </a>
-                        <a
-                          href="#"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Blog Details Page
-                        </a>
-
+                          Order Page
+                        </Link>
                         <Link
                           to="/register"
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
-                         Register Page
+                          Register Page
                         </Link>
                         <Link
                           to="/login"
                           className="block rounded px-4 py-[10px] text-sm text-primary hover:text-primary dark:hover:text-primary"
                         >
-                         Login Page
+                          Login Page
                         </Link>
-                        <a
-                          href="404.html"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          404 Page
-                        </a>
                       </div>
                     </li>
                   </ul>

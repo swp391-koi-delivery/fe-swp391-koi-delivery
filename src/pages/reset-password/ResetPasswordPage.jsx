@@ -1,5 +1,5 @@
 import React from "react";
-import AuthenTemplate from "../../components/AuthenTemplate/AuthenTemplate";
+import AuthenTemplate from "../../components/authen-template/AuthenTemplate";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Form, Input } from "antd";
