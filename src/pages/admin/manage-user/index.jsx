@@ -22,6 +22,7 @@ import { DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
 import api from "../../../config/axios";
 import uploadFile from "../../../utils/file";
 import "boxicons";
+import "../index.css";
 function ManageUser() {
   //const api = "https://66ebf57e2b6cf2b89c5c9df5.mockapi.io/User";
   const [users, setUsers] = useState([]);

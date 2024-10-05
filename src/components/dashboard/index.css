@@ -1,0 +1,81 @@
+/* General reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f8; /* Light background */
+  }
+  
+  /* Ant Design Menu and Sidebar */
+  .ant-layout-sider {
+    background-color: #ffffff !important; /* Light color for sidebar */
+  }
+  
+  .ant-menu-dark.ant-menu-inline {
+    background: #ffffff !important;
+  }
+  
+  .ant-menu-dark .ant-menu-item {
+    color: #444444 !important; /* Darker text */
+  }
+  
+  .ant-menu-dark .ant-menu-item-selected {
+    background-color: #e6f7ff !important; /* Light blue selected item */
+  }
+  
+  .ant-menu-dark .ant-menu-item:hover {
+    background-color: #f0f0f0 !important;
+    color: #1890ff !important; /* Hover effect */
+  }
+  
+  /* Header */
+  .ant-layout-header {
+    background-color: #ffffff !important;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+  }
+  
+  /* Breadcrumb */
+  .ant-breadcrumb {
+    font-size: 16px;
+    color: #888888;
+  }
+  
+  /* Content */
+  .ant-layout-content {
+    padding: 24px;
+    background-color: #f4f6f8; /* Very light background for content */
+  }
+  
+  .bg-white {
+    background-color: #ffffff !important; /* Pure white content background */
+  }
+  
+  /* Footer */
+  .ant-layout-footer {
+    background-color: #fafafa !important;
+    font-size: 14px;
+    color: #888888;
+  }
+  
+  /* Rounded corners and shadows */
+  .rounded-lg {
+    border-radius: 10px !important;
+  }
+  
+  .shadow-md {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Text color */
+  .text-gray-700 {
+    color: #4a4a4a !important;
+  }
+  
+  .hover\\:text-blue-500:hover {
+    color: #1890ff !important; /* Hover blue color */
+  }
+  
+  /* Link hover styles */
+  a:hover {
+    color: #1890ff !important;
+  }
