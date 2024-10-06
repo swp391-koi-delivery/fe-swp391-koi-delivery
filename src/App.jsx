@@ -39,7 +39,7 @@ function App() {
       path: "reset-password",
       element: <ResetPasswordPage />,
     },
-
+    {
       path: "dashboard",
       element: <Dashboard/>,
       children:[
@@ -50,9 +50,9 @@ function App() {
         {
           path: "order",
           element: <ManageOrder/>,
-        }
+        },
       ]
-    }
+    },
 
   ]);
   return <RouterProvider router={router} />;
