@@ -10,9 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+
     "@reduxjs/toolkit": "^2.2.7",
+
+
+    "@ant-design/icons": "^5.5.1",
+    "@mapbox/polyline": "^1.2.1",
+
+    "@react-leaflet/core": "^2.1.0",
+
     "antd": "^5.21.1",
     "axios": "^1.7.7",
+    "boxicons": "^2.1.4",
     "firebase": "^10.13.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
