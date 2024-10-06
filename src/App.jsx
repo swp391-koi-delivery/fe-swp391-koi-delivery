@@ -11,24 +11,14 @@ import ResetPasswordPage from "./pages/reset-password/ResetPasswordPage";
 import RequestPasswordPage from "./pages/request-password/RequestPasswordPage";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-<<<<<<< HEAD
-import OrderPage from "./pages/order/OrderPage";
-import Dashboard from "./components/dashboard/Dashboard";
-import ManageOrder from "./pages/manager/manage-order";
-import ManageFeedback from "./pages/manager/manage-feedback";
-import ManageCustomer from "./pages/manager/manage-user";
-import ManageStatistic from "./pages/manager/manage-statistic";
-
-=======
 import Dashboard from "./components/dashboard/Dashboard";
 import OrderPage from "./pages/order/OrderPage";
 import ManageUser from "./pages/manager/manage-user";
->>>>>>> a707f0c (update)
 function App() {
   const ProtectRouteAuth = ({ children }) => {
     const user = useSelector((store) => store);
     console.log(user);
-    if (user && user?.role === "ADMIN") {
+    if (user && user?.role === "MANAGER") {
       return children;
     }
     toast.error("You are not allow to access this");
@@ -56,7 +46,6 @@ function App() {
       path: "reset-password",
       element: <ResetPasswordPage />,
     },
-
     {
       path: "order",
       element: <OrderPage />,
@@ -66,25 +55,8 @@ function App() {
       element: <Dashboard />,
       children: [
         {
-<<<<<<< HEAD
-          path: "order",
-          element: <ManageOrder />,
-        },
-        {
-          path: "statistic",
-          element: <ManageStatistic />,
-        },
-        {
-          path: "customer",
-          element: <ManageCustomer />,
-        },
-        {
-          path: "feedback",
-          element: <ManageFeedback />,
-=======
           path: "user",
           element: <ManageUser />,
->>>>>>> a707f0c (update)
         },
       ],
     },

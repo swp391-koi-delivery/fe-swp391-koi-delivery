@@ -11,16 +11,7 @@ function getItem(label, key, icon, children) {
     label: <Link to={`/dashboard/${key}`}>{label}</Link>,
   };
 }
-const items = [
-  getItem("Manage Order", "order", <PieChartOutlined />),
-  getItem("Manage FeedBack", "feedback", <PieChartOutlined />),
-<<<<<<< HEAD
-  getItem("Manage Statistic", "statistic", <PieChartOutlined />),
-  getItem("Manage Customer", "customer", <PieChartOutlined />),
-=======
-  getItem("Manage User", "user", <PieChartOutlined />),
->>>>>>> a707f0c (update)
-];
+const items = [getItem("Manage User", "user", <PieChartOutlined />)];
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
@@ -46,9 +37,7 @@ const Dashboard = () => {
         />
       </Sider>
       <Layout>
-        <Content
-
-        >
+        <Content>
           <div
             style={{
               padding: 24,
