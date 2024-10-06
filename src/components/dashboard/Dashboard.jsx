@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { PieChartOutlined } from "@ant-design/icons";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Layout, Menu, theme } from "antd";
 import { Link, Outlet } from "react-router-dom";
-const { Header, Content, Footer, Sider } = Layout;
+const { Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -14,6 +14,8 @@ function getItem(label, key, icon, children) {
 const items = [
   getItem("Manage Order", "order", <PieChartOutlined />),
   getItem("Manage FeedBack", "feedback", <PieChartOutlined />),
+  getItem("Manage Statistic", "statistic", <PieChartOutlined />),
+  getItem("Manage Customer", "customer", <PieChartOutlined />),
 ];
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -40,31 +42,16 @@ const Dashboard = () => {
         />
       </Sider>
       <Layout>
-        <Header
-          style={{
-            padding: 0,
-            background: colorBgContainer,
-          }}
-        />
         <Content
-          style={{
-            margin: "0 16px",
-          }}
+
         >
-          <Breadcrumb
-            style={{
-              margin: "16px 0",
-            }}
-          >
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
           <div
             style={{
               padding: 24,
-              minHeight: 360,
+              minHeight: 500,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
+              width: "120vw",
             }}
           >
             <Outlet />
@@ -73,6 +60,7 @@ const Dashboard = () => {
         <Footer
           style={{
             textAlign: "center",
+            width: "120vw",
           }}
         >
           Ant Design ©{new Date().getFullYear()} Created by Ant UED
