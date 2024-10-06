@@ -7,7 +7,7 @@ import api from "../config/axios";
 function PricingComponent() {
   const [form] = useForm();
   const [data, setData] = useState({});
-  const fishSizes = [
+  const Size = [
     { sizeCm: "19.9", sizeInch: "7.86" },
     { sizeCm: "20-25", sizeInch: "7.87 - 9.84" },
     { sizeCm: "25.1 - 30", sizeInch: "9.85 - 11.81" },
@@ -25,14 +25,14 @@ function PricingComponent() {
   const handleEstimate = async (values) => {
     console.log(values);
     const submissionData = values.items
-      .filter((item) => item.quantities) // Filter out rows without quantity input
+      .filter((item) => item.Quantity) // Filter out rows without quantity input
       .map((item, index) => ({
-        fishSizes: parseFloat(fishSizes[index].sizeCm), // Convert fish size to number
-        quantities: item.quantities, // Use the correct field name
+        Size: parseFloat(Size[index].sizeCm), // Convert fish size to number
+        Quantity: item.Quantity, // Use the correct field name
       }));
     try {
       const response = await api.get(
-        `calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
+        `calculateBoxAndSuggestFishSizes?Quantity=${submissionData.map((item) => item.Quantity)}&Size=${submissionData.map((item) => item.Size)}`,
       );
       toast.success("Price estimation successful!");
       console.log(response.data);
@@ -169,7 +169,7 @@ function PricingComponent() {
                       <Form.List name="items">
                         {() => (
                           <>
-                            {fishSizes.map((item, index) => (
+                            {Size.map((item, index) => (
                               <tr
                                 key={index}
                                 className="w-full text-center hover:table-row hover:scale-105"
@@ -186,7 +186,7 @@ function PricingComponent() {
                                 </td>
                                 <td className="px-8 py-3">
                                   <Form.Item
-                                    name={[index, "quantities"]}
+                                    name={[index, "Quantity"]}
                                     rules={[
                                       {
                                         validator: (_, value) => {
