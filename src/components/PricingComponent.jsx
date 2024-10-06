@@ -9,7 +9,7 @@ function PricingComponent() {
   const [data, setData] = useState({});
   const fishSizes = [
     { sizeCm: "19.9", sizeInch: "7.86" },
-    { sizeCm: "20-25", sizeInch: "7.87 - 9.84" },
+    { sizeCm: "20 - 25", sizeInch: "7.87 - 9.84" },
     { sizeCm: "25.1 - 30", sizeInch: "9.85 - 11.81" },
     { sizeCm: "30.1 - 40", sizeInch: "11.82 - 15.75" },
     { sizeCm: "40.1 - 44", sizeInch: "15.76 - 17.32" },
@@ -28,7 +28,11 @@ function PricingComponent() {
       .filter((item) => item.quantities) // Filter out rows without quantity input
       .map((item, index) => ({
         fishSizes: parseFloat(fishSizes[index].sizeCm), // Convert fish size to number
+<<<<<<< HEAD
         quantities: item.quantities, // Use the correct field name
+=======
+        quantities: item.quantities ? item.quantities : 0, // Use the correct field name
+>>>>>>> a707f0c (update)
       }));
     try {
       const response = await api.get(
@@ -186,6 +190,10 @@ function PricingComponent() {
                                 </td>
                                 <td className="px-8 py-3">
                                   <Form.Item
+<<<<<<< HEAD
+=======
+                                    initialValue={0}
+>>>>>>> a707f0c (update)
                                     name={[index, "quantities"]}
                                     rules={[
                                       {

@@ -14,8 +14,12 @@ function getItem(label, key, icon, children) {
 const items = [
   getItem("Manage Order", "order", <PieChartOutlined />),
   getItem("Manage FeedBack", "feedback", <PieChartOutlined />),
+<<<<<<< HEAD
   getItem("Manage Statistic", "statistic", <PieChartOutlined />),
   getItem("Manage Customer", "customer", <PieChartOutlined />),
+=======
+  getItem("Manage User", "user", <PieChartOutlined />),
+>>>>>>> a707f0c (update)
 ];
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
