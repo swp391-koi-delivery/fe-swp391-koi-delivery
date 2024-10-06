@@ -28,11 +28,7 @@ function PricingComponent() {
       .filter((item) => item.quantities) // Filter out rows without quantity input
       .map((item, index) => ({
         fishSizes: parseFloat(fishSizes[index].sizeCm), // Convert fish size to number
-<<<<<<< HEAD
-        quantities: item.quantities, // Use the correct field name
-=======
         quantities: item.quantities ? item.quantities : 0, // Use the correct field name
->>>>>>> a707f0c (update)
       }));
     try {
       const response = await api.get(
@@ -190,10 +186,7 @@ function PricingComponent() {
                                 </td>
                                 <td className="px-8 py-3">
                                   <Form.Item
-<<<<<<< HEAD
-=======
                                     initialValue={0}
->>>>>>> a707f0c (update)
                                     name={[index, "quantities"]}
                                     rules={[
                                       {
