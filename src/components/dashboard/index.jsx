@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "./index.css";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -21,7 +22,7 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem('Analytics', '1', <BarChartOutlined />),
+  getItem('Analytics', 'statistic', <BarChartOutlined />),
   getItem('Manage User', 'user', <UserOutlined />),
   getItem('Manage Order', 'order', <ProductOutlined />),
   getItem('Log out', '', <LogoutOutlined />),
@@ -39,7 +40,7 @@ const Dashboard = () => {
     >
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className="bg-gray-800">
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+        <Menu theme="light" defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
       <Layout className="bg-gray-100">
         <Header
