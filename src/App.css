@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
-
 *,
 ::before,
 ::after {
@@ -2153,14 +2152,14 @@ body {
   color: rgb(234 88 12 / var(--tw-text-opacity));
 }
 
-.sticky .signUpBtn{
+.sticky .signUpBtn {
   --tw-bg-opacity: 1;
   background-color: rgb(249 115 22 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.sticky .signUpBtn:hover{
+.sticky .signUpBtn:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(234 88 12 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
@@ -2639,7 +2638,6 @@ body {
   .sm\:items-start {
     align-items: center;
   }
-
 }
 
 @media (min-width: 720px) {
@@ -2692,7 +2690,7 @@ body {
   }
 
   .md\:pr-10 {
-    padding-right: 2.5rem ;
+    padding-right: 2.5rem;
   }
 
   .md\:text-start {
@@ -2778,9 +2776,9 @@ body {
   }
 
   .md\:text-3xl {
-        font-size: 1.875rem /* 30px */;
-        line-height: 2.25rem /* 36px */;
-    }
+    font-size: 1.875rem /* 30px */;
+    line-height: 2.25rem /* 36px */;
+  }
 }
 
 @media (min-width: 960px) {
@@ -3218,7 +3216,6 @@ body {
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------ */
 
-
 /* Custom Start */
 .bg-image {
   --tw-bg-opacity: 1;
@@ -3233,8 +3230,6 @@ body {
   color: rgb(234 88 12 / var(--tw-text-opacity));
 }
 
-
-
 .primaryButton {
   --tw-bg-opacity: 1;
   background-color: rgb(249 115 22 / var(--tw-bg-opacity));
@@ -3244,26 +3239,26 @@ body {
 
 .primaryButton:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(234 88 12 / var(--tw-bg-opacity));;
+  background-color: rgb(234 88 12 / var(--tw-bg-opacity));
 }
 
 /* For dark mode */
 :is(.dark .primaryButton:hover) {
- --tw-bg-opacity: 1;
+  --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: rgb(17 25 40 / var(--tw-text-opacity));
 }
 
 :is(.dark .dark\:hover\:border-dark:hover) {
-    --tw-border-opacity: 1;
-    border-color: rgb(17 25 40 / var(--tw-border-opacity));
+  --tw-border-opacity: 1;
+  border-color: rgb(17 25 40 / var(--tw-border-opacity));
 }
 
 .hover\:table-row:hover {
   cursor: pointer;
   transition-duration: 300ms;
-   background-color: rgb(229 231 235/ var(--tw-bg-opacity));
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
 }
 
 :is(.dark .dark\:hover\:table-row:hover) {
@@ -3271,9 +3266,11 @@ body {
 }
 
 .hover\:scale-105:hover {
-    --tw-scale-x: 1.05;
-    --tw-scale-y: 1.05;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  --tw-scale-x: 1.05;
+  --tw-scale-y: 1.05;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
+    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 a.back-to-top:hover span {
@@ -3284,6 +3281,9 @@ a.back-to-top:hover span {
   border-color: rgb(17 25 40); /* dark color equivalent */
 }
 
+.sticky\:text-dark:is(.sticky *) {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity)) /* #9ca3af */;
+}
+
 /* Custom End */
-
-

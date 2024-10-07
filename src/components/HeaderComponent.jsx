@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { logout } from "../../src/redux/features/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { ShoppingCartOutlined } from "@ant-design/icons";
+import { Badge } from "antd";
 function HeaderComponent() {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
@@ -170,10 +172,6 @@ function HeaderComponent() {
 
   useEffect(() => {
     handleDarkMode();
-    const loginStatus = localStorage.getItem("isLoggedIn");
-    if (loginStatus === "true") {
-      setIsLoggedIn(true);
-    }
   }, []);
 
   return (
@@ -206,12 +204,12 @@ function HeaderComponent() {
                 >
                   <ul className="blcok lg:flex 2xl:ml-20">
                     <li className="group relative">
-                      <Link
-                        to="/"
-                        className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70"
+                      <a
+                        href="#home"
+                        className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70"
                       >
                         Home
-                      </Link>
+                      </a>
                     </li>
                     <li className="group relative">
                       <a
@@ -231,10 +229,10 @@ function HeaderComponent() {
                     </li>
                     <li className="group relative">
                       <a
-                        href="#team"
+                        href="#estimate"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10"
                       >
-                        Team
+                        Estimate
                       </a>
                     </li>
                     <li className="group relative">
@@ -355,6 +353,14 @@ function HeaderComponent() {
                       </defs>
                     </svg>
                   </span>
+                  <span className="block text-white">
+                    <Badge count={10}>
+                      <ShoppingCartOutlined
+                        className="text-white sticky:text-dark"
+                        style={{ fontSize: 28 }}
+                      />
+                    </Badge>
+                  </span>
                 </label>
                 <div className="hidden sm:flex">
                   {user == null ? (
@@ -383,7 +389,7 @@ function HeaderComponent() {
                         alt=""
                       />
                       <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
-                        <span className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary text-base">
+                        <span className="block rounded px-4 py-[10px] text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
                           {user?.username}
                         </span>
                         <Link

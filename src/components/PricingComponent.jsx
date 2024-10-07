@@ -32,13 +32,15 @@ function PricingComponent() {
       }));
     try {
       const response = await api.get(
-        `calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
+        `saleStaff/calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
       );
-      toast.success("Price estimation successful!");
+      toast.success("Successfully estimate prices and boxes!");
       console.log(response.data);
       setData(response.data);
     } catch (err) {
-      toast.error("Failed to calculate the price. Please try again.");
+      toast.error(
+        "Failed to calculate the prices and boxes. Please try again.",
+      );
       console.error(err);
     }
   };
@@ -66,7 +68,7 @@ function PricingComponent() {
               </div>
             </div>
           </div>
-          <div className="-mx-4 mb-[60px] flex flex-wrap justify-center">
+          <div className="-mx-4 flex flex-wrap justify-center">
             <div className="relative flex w-full items-center justify-center rounded-md shadow-pricing">
               <table className="w-full overflow-hidden text-center text-sm">
                 <thead className="">
@@ -137,6 +139,29 @@ function PricingComponent() {
               </table>
             </div>
           </div>
+        </div>
+      </section>
+      <section
+        id="estimate"
+        className="relative z-20 overflow-hidden bg-white pb-12 pt-20 dark:bg-dark lg:pb-[90px] lg:pt-[120px]"
+      >
+        <div className="container mx-auto">
+          <div className="-mx-4 flex flex-wrap">
+            <div className="w-full px-4">
+              <div className="mx-auto mb-[60px] max-w-[510px] text-center">
+                <span className="mb-2 block text-lg font-semibold text-primary">
+                  Pricing Table
+                </span>
+                <h2 className="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+                  Awesome Pricing Plan
+                </h2>
+                <p className="text-base text-body-color dark:text-dark-6">
+                  There are many variations of passages of Lorem Ipsum available
+                  but the majority have suffered alteration in some form.
+                </p>
+              </div>
+            </div>
+          </div>
           <div className="-mx-4 flex flex-wrap justify-center">
             <div className="h-full w-full px-4 lg:w-1/2">
               <Form
@@ -172,7 +197,7 @@ function PricingComponent() {
                             {fishSizes.map((item, index) => (
                               <tr
                                 key={index}
-                                className="w-full text-center hover:table-row hover:scale-105"
+                                className="w-full text-center hover:table-row hover:scale-105 dark:hover:table-row"
                               >
                                 <td className="whitespace-nowrap px-6 py-3 font-medium">
                                   <span className="inline-block">
@@ -207,7 +232,7 @@ function PricingComponent() {
                                     ]}
                                   >
                                     <Input
-                                      className="rounded-sm border border-dark text-center focus:border-dark dark:bg-dark"
+                                      className="rounded-sm border border-dark text-center focus:border-dark dark:bg-dark dark:text-white"
                                       type="number"
                                       step="1"
                                       min="1"

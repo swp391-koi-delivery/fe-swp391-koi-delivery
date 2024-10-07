@@ -8,12 +8,13 @@ import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import HomePage from "./pages/home/HomePage";
 import ResetPasswordPage from "./pages/reset-password/ResetPasswordPage";
-import RequestPasswordPage from "./pages/request-password/RequestPasswordPage";
+import VerifyEmailPage from "./pages/verify-email/VerifyEmailPage";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Dashboard from "./components/dashboard/Dashboard";
 import OrderPage from "./pages/order/OrderPage";
 import ManageUser from "./pages/manager/manage-user";
+import LayoutTemplate from "./components/layout/LayoutTemplate";
 function App() {
   const ProtectRouteAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -31,25 +32,32 @@ function App() {
       element: <HomePage />,
     },
     {
-      path: "login",
-      element: <LoginPage />,
+      path: "",
+      element: <LayoutTemplate />,
+      children: [
+        {
+          path: "login",
+          element: <LoginPage />,
+        },
+        {
+          path: "register",
+          element: <RegisterPage />,
+        },
+        {
+          path: "verify-email",
+          element: <VerifyEmailPage />,
+        },
+        {
+          path: "reset-password",
+          element: <ResetPasswordPage />,
+        },
+        {
+          path: "order",
+          element: <OrderPage />,
+        },
+      ],
     },
-    {
-      path: "register",
-      element: <RegisterPage />,
-    },
-    {
-      path: "request-password",
-      element: <RequestPasswordPage />,
-    },
-    {
-      path: "reset-password",
-      element: <ResetPasswordPage />,
-    },
-    {
-      path: "order",
-      element: <OrderPage />,
-    },
+
     {
       path: "dashboard",
       element: <Dashboard />,
