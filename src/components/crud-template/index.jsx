@@ -38,9 +38,9 @@ function CRUDTemplate({ columns, formItems, path }) {
     ...columns,
     {
       title: "Action",
-      dataIndex: "id",
-      key: "id",
-      render: (id, record) => (
+      dataIndex: "orderId",
+      key: "orderId",
+      render: (orderId, record) => (
         <>
           <Button
             icon={<EditTwoTone/>}
@@ -52,7 +52,7 @@ function CRUDTemplate({ columns, formItems, path }) {
           <Popconfirm
             title="Delete"
             description="Are you sure want to delete?"
-            onConfirm={() => handleDelete(id)}
+            onConfirm={() => handleDelete(orderId)}
           >
             <Button icon={<DeleteOutlined/>} danger/>
           </Popconfirm>
@@ -95,7 +95,7 @@ function CRUDTemplate({ columns, formItems, path }) {
       }
       toast.success("Submit successfully");
       form.resetFields();
-      setShowModal(false);
+      setOpenModal(false);
       fetchData();
     } catch (error) {
       toast.error(error.response.data);

@@ -8,6 +8,7 @@ import Dashboard from "./components/dashboard";
 import ManageUser from "./pages/admin/manage-user";
 import ManageOrder from "./pages/admin/manage-order";
 import ManageStatistic from "./pages/admin/manage-statistic";
+import OrderList from "./pages/salesstaff";
 
 function App() {
   const router = createBrowserRouter([
@@ -26,6 +27,10 @@ function App() {
     {
       path: "feedback",
       element: <FeedbackPage />,
+    },
+    {
+      path: "orderList",
+      element: <OrderList />,
     },
     {
       path: "dashboard",
