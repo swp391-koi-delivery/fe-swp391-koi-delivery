@@ -1,0 +1,96 @@
+/* OrderDetails.css */
+
+.order-details-container {
+  background-color: #1e1e2f; 
+  color: #fff; /* White text */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h2, h3 {
+  color: #fff; /* White text for headings */
+}
+
+.field-label {
+  color: #b0b0b0; /* Slightly lighter color for field labels */
+}
+
+.icon {
+  font-size: 24px;
+  color: #4ADE80; /* Green color for icons */
+}
+
+.d-flex {
+  display: flex;
+  justify-content: start;
+}
+
+.mr-2 {
+  margin-right: 8px;
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.col-md-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+  padding: 10px;
+}
+
+/* New class for field spacing */
+.field-item {
+  margin-bottom: 1.5rem; /* Increase this value for more space */
+}
+
+/* More specific selector for Steps titles */
+.custom-steps .ant-steps-item-title {
+  color: #fff !important; /* White text for step titles */
+}
+
+/* Ensure that the step icons are colored */
+.custom-steps .ant-steps-item-icon > .anticon {
+  color: rgb(73, 220, 73) !important; /* Green color for step icons */
+}
+
+/* Ensure that the progress percentage text is white */
+.ant-progress-text {
+  color: #fff !important; /* White progress percentage */
+}
+
+/* Override button margin */
+.d-flex.justify-content-between .ant-btn {
+  margin: 5px;
+}
+
+.ant-btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.ant-btn-danger {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+  color: white;
+}
+
+/* Alert warning */
+.ant-alert-warning .ant-alert-icon {
+  color: #ffae42; /* Yellow for warning icon */
+}
+
+/* Progress bar color */
+.ant-progress-bg {
+  background-color: rgb(73, 220, 73) !important; /* Green progress bar */
+}

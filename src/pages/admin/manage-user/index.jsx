@@ -256,7 +256,7 @@ function ManageUser() {
   ];
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">User Management</h1>
+      {/* <h1 className="text-2xl font-bold mb-6">User Management</h1> */}
       <div  className="mb-4" style={{width:"500px"}}>
 
       <Search

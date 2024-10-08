@@ -1,0 +1,97 @@
+body {
+  background-color: #111928;
+  /* Dark background for the body */
+  color: white;
+  /* Set default text color to white */
+  font-family: Arial, sans-serif;
+  /* Choose a default font */
+}
+
+
+.avatar-container {
+  position: relative;
+  /* Position relative for absolute positioning of overlay */
+  display: inline-block;
+  /* Allow overlay to fit tightly to the image */
+}
+
+.avatar-image {
+  transition: 0.3s ease;
+  /* Smooth transition for the image */
+}
+
+.avatar-container:hover .avatar-image {
+  filter: grayscale(100%);
+  /* Grayscale effect on hover */
+}
+
+.avatar-overlay {
+  position: absolute;
+  /* Position overlay over the avatar */
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Full width of the avatar */
+  height: 100%;
+  /* Full height of the avatar */
+  background-color: rgba(255, 255, 255, 0.7);
+  /* Light background for the overlay */
+  display: flex;
+  /* Center content */
+  align-items: center;
+  /* Center vertically */
+  justify-content: center;
+  /* Center horizontally */
+  opacity: 0;
+  /* Initially hidden */
+  transition: opacity 0.3s ease;
+  /* Smooth transition for the overlay */
+}
+
+.avatar-container:hover .avatar-overlay {
+  opacity: 1;
+  /* Show overlay on hover */
+}
+
+.btn-save {
+  background-color: #28a745 !important;
+  /* Green button for save */
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #218838 !important;
+  /* Darker green on hover */
+}
+
+.btn-cancel {
+  background-color: #dc3545 !important;
+  /* Red button for cancel */
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #d42234 !important;
+}
+
+.btn-edit {
+  background-color: #007bff !important;
+  /* Blue button for edit */
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #0168d5 !important;
+}
+
+/* Make text bold */
+h4,
+.ant-form-item-label>span {
+  font-weight: bold;
+}
+
+/* Adjust margins between buttons */
+.d-flex {
+  margin-top: 20px;
+  /* Space between buttons */
+}

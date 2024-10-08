@@ -9,7 +9,10 @@ function HeaderComponent() {
     setIsLoggedIn(false);
     navigate("/");
   };
+
   const handleDarkMode = () => {
+
+    
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
     const handleScroll = () => {
       const ud_header = document.querySelector(".ud-header");
@@ -175,7 +178,7 @@ function HeaderComponent() {
     const loginStatus = localStorage.getItem("isLoggedIn");
     if (loginStatus === "true") {
       setIsLoggedIn(true);
-    }
+    };   
   }, []);
   return (
     <>
@@ -406,7 +409,7 @@ function HeaderComponent() {
                       />
                       <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
                         <Link
-                          to=""
+                          to="/profileUser"
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
                           Profile

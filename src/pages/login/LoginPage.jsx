@@ -12,14 +12,19 @@ function LoginPage() {
     try {
       const response = await api.post("login", values);
       console.log(response);
-      // const {role, token} = response.data;
-      // localStorage.setItem("token", token);
-      // if (role === "AD") {
-      //   navigate(/dashboard);
-      // }
+      const {role, token} = response.data;
+      localStorage.setItem("token", token);    
+      if (role === "MANAGER") {
+        navigate("/dashboard");
+      }else if(role === "DELIVERINGSTAFF"){
+        navigate("/deliveryStaff");
+      }else{
+        navigate("/");
+      }
       toast.success("Successfully login to account");
       localStorage.setItem("isLoggedIn", "true");
-      navigate("/");
+      console.log(token)
+      //navigate("/");
     } catch (err) {
       toast.error(err.response.data);
     }
