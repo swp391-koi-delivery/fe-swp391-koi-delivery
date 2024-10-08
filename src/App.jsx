@@ -76,12 +76,21 @@ function App() {
         },
         {
           path: "order",
+
           element: <ManageOrder />,
         },
         {
           path: "statistic",
           element: <ManageStatistic />,
         },
+
+          element: <ManageOrder/>,
+        },
+        {
+          path: "statistic",
+          element: <ManageStatistic/>,
+        }
+
       ],
     },
   ]);
