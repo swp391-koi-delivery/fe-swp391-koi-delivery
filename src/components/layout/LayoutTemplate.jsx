@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import FooterComponent from "../FooterComponent";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
-function AuthenTemplate({ children }) {
+function LayoutTemplate() {
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
     const handleScroll = () => {
@@ -227,10 +227,10 @@ function AuthenTemplate({ children }) {
                     </li>
                     <li className="group relative">
                       <a
-                        href="/#team"
+                        href="/#estimate"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-body-color dark:lg:text-dark-6 xl:ml-10"
                       >
-                        Team
+                        Estimate
                       </a>
                     </li>
                     <li className="group relative">
@@ -371,10 +371,10 @@ function AuthenTemplate({ children }) {
           </div>
         </div>
       </div>
-      {children}
+        <Outlet />
       <FooterComponent />
     </>
   );
 }
 
-export default AuthenTemplate;
+export default LayoutTemplate;

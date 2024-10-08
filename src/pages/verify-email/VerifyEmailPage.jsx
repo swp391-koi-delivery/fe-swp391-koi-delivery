@@ -1,16 +1,16 @@
 import React from "react";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
-import { Form, Input } from "antd";
-import { Link, useNavigate } from "react-router-dom";
-function ResetPasswordPage() {
-  const navigate = useNavigate();
-  const handleResetPassword = async (values) => {
+import { Button, Form, Input } from "antd";
+import { Link } from "react-router-dom";
+import { useForm } from "antd/es/form/Form";
+function VerifyPasswordPAge() {
+  const [form] = useForm();
+  const handleVerifyEmail = async (value) => {
     try {
-      const response = await api.post("reset", values);
+      const response = await api.get("verify", value);
       console.log(response);
-      toast.success("Successfully reset password");
-      navigate("/login");
+      toast.success("Successfully verify email");
     } catch (err) {
       toast.error(err.response.data);
     }
@@ -24,7 +24,7 @@ function ResetPasswordPage() {
             <div className="w-full px-4">
               <div className="text-center">
                 <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Reset Password Page
+                  Verify Email Page
                 </h1>
                 <p className="mb-5 text-base text-body-color dark:text-dark-6">
                   There are many variations of passages of Lorem Ipsum
@@ -42,7 +42,7 @@ function ResetPasswordPage() {
                   </li>
                   <li>
                     <Link
-                      to="/reset-password"
+                      to="/request-password"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -50,7 +50,7 @@ function ResetPasswordPage() {
                         {" "}
                         /{" "}
                       </span>
-                      Reset Password
+                      Verify Email
                     </Link>
                   </li>
                 </ul>
@@ -85,31 +85,32 @@ function ResetPasswordPage() {
                     />
                   </a>
                 </div>
-                <Form onFinish={handleResetPassword}>
-                  <Form.Item name="email" className="mb-[22px]">
+                <Form onFinish={handleVerifyEmail} title="Verify" form={form}>
+                  <Form.Item
+                    name="email"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input email!",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
                     <Input
-                      placeholder="Email"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item name="email" className="mb-[22px]">
-                    <Input
-                      placeholder="Email"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item name="email" className="mb-[22px]">
-                    <Input
+                      required
                       placeholder="Email"
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
-                    <Input
+                    <Button
                       type="submit"
-                      value="Reset"
-                      className="primaryButton w-full cursor-pointer rounded-md px-5 py-3 text-base text-white transition duration-300 ease-in-out"
-                    />
+                      onClick={() => form.submit()}
+                      className="primaryButton w-full cursor-pointer rounded-md px-7 py-5 text-base text-white transition duration-300 ease-in-out"
+                    >
+                      Verify
+                    </Button>
                   </Form.Item>
                 </Form>
                 <div>
@@ -339,4 +340,4 @@ function ResetPasswordPage() {
   );
 }
 
-export default ResetPasswordPage;
+export default VerifyPasswordPAge;

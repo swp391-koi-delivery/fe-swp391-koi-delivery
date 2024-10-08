@@ -4,6 +4,7 @@ function Footer() {
   return (
     <>
       <footer
+        id="contact"
         className="wow fadeInUp relative z-10 bg-[#090E34] pt-20 lg:pt-[100px]"
         data-wow-delay=".15s"
       >
@@ -22,8 +23,8 @@ function Footer() {
                   />
                 </a>
                 <p className="mb-8 max-w-[270px] text-base text-gray-7">
-                  We create digital experiences for brands and companies by
-                  using technology.
+                  We create satisfied experiences for individuals and companies
+                  by transporting koi fish abroad.
                 </p>
                 <div className="-mx-3 flex items-center">
                   <a
@@ -110,7 +111,7 @@ function Footer() {
                       href="javascript:void(0)"
                       className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                     >
-                      Features
+                      Pricing
                     </a>
                   </li>
                   <li>
@@ -126,7 +127,7 @@ function Footer() {
                       href="javascript:void(0)"
                       className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                     >
-                      Testimonial
+                      Estimate
                     </a>
                   </li>
                 </ul>
@@ -176,7 +177,7 @@ function Footer() {
             <div className="w-full px-4 sm:w-1/2 md:w-1/2 lg:w-3/12 xl:w-2/12">
               <div className="mb-10 w-full">
                 <h4 className="mb-9 text-lg font-semibold text-white">
-                  Our Products
+                  Our Services
                 </h4>
                 <ul>
                   <li>
@@ -184,7 +185,7 @@ function Footer() {
                       href="javascript:void(0)"
                       className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                     >
-                      LineIcons
+                      Cuttlebrook Koi Farm
                     </a>
                   </li>
                   <li>
@@ -192,7 +193,7 @@ function Footer() {
                       href="javascript:void(0)"
                       className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                     >
-                      Ecommerce HTML
+                      Aquatics to Your Door
                     </a>
                   </li>
                   <li>
@@ -200,7 +201,7 @@ function Footer() {
                       href="javascript:void(0)"
                       className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                     >
-                      TailAdmin
+                      Next Day Koi
                     </a>
                   </li>
                   <li>
@@ -208,7 +209,7 @@ function Footer() {
                       href="javascript:void(0)"
                       className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                     >
-                      PlainAdmin
+                      Cuttlebrook Koi Farm
                     </a>
                   </li>
                 </ul>
@@ -284,7 +285,7 @@ function Footer() {
               <div className="w-full px-4 md:w-1/3 lg:w-1/2">
                 <div className="my-1 flex justify-center md:justify-end">
                   <p className="text-base text-gray-7">
-                    Designed and Developed by
+                    Precision delivery by
                     <a
                       href="https://tailgrids.com"
                       rel="nofollow noopner"
@@ -292,7 +293,7 @@ function Footer() {
                       className="text-gray-1 hover:underline"
                     >
                       {" "}
-                      TailGrids and UIdeck
+                      Play Delivery Company
                     </a>
                   </p>
                 </div>

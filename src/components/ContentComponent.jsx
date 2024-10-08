@@ -392,20 +392,19 @@ function ContentComponent() {
               <div className="w-full px-4">
                 <div className="mx-auto max-w-[570px] text-center">
                   <h2 className="mb-2.5 text-3xl font-bold text-white md:text-[38px] md:leading-[1.44]">
-                    <span>What Are You Looking For?</span>
+                    <span>Are You Looking For Delivery Service ?</span>
                     <span className="text-3xl font-normal md:text-[40px]">
-                      Get Started Now
+                      {" "}Get Started Now
                     </span>
                   </h2>
                   <p className="mx-auto mb-6 max-w-[515px] text-base leading-[1.5] text-white">
-                    There are many variations of passages of Lorem Ipsum but the
-                    majority have suffered in some form.
+                    There are many variations of delivery methods you can choose to tranport your koi fish
                   </p>
                   <a
                     href="javascript:void(0)"
                     className="inline-flex items-center justify-center rounded-md bg-white px-7 py-[14px] text-center text-base font-medium text-dark shadow-1 transition duration-300 ease-in-out hover:bg-gray-2 hover:text-body-color"
                   >
-                    Start using Play
+                    Start using our service
                   </a>
                 </div>
               </div>
