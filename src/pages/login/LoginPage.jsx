@@ -23,6 +23,8 @@ function LoginPage() {
       localStorage.setItem("token", token);
       if (role === "CUSTOMER") {
         navigate("/");
+      } else if (role === "MANAGER") {
+        navigate("/dashboard");
       }
     } catch (err) {
       toast.error(err.response.data);

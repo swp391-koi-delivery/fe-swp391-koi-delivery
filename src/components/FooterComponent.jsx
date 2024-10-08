@@ -221,13 +221,10 @@ function Footer() {
                   Latest blog
                 </h4>
                 <div className="flex flex-col gap-8">
-                  <a
-                    href="blog-details.html"
-                    className="group flex items-center gap-[22px]"
-                  >
+                  <a className="group flex items-center gap-[22px]">
                     <div className="overflow-hidden rounded">
                       <img
-                        src="./assets/images/blog/blog-footer-01.jpg"
+                        src="./assets/images/blog/blog-footer-02.jpg"
                         alt="blog"
                       />
                     </div>
@@ -235,13 +232,10 @@ function Footer() {
                       I think really important to design with...
                     </span>
                   </a>
-                  <a
-                    href="blog-details.html"
-                    className="group flex items-center gap-[22px]"
-                  >
+                  <a className="group flex items-center gap-[22px]">
                     <div className="overflow-hidden rounded">
                       <img
-                        src="./assets/images/blog/blog-footer-02.jpg"
+                        src="./assets/images/blog/blog-footer-01.jpg"
                         alt="blog"
                       />
                     </div>
