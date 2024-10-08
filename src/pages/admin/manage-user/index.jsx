@@ -216,10 +216,10 @@ function ManageUser() {
       title: "Userstatus",
       dataIndex: "userstatus",
       key: "userstatus",
-      render: (userstatus) => (userstatus ? "True" : "False"),
+      render: (userstatus) => (userstatus ? "Inactive" : "Active"),
       filters: [
-        { text: "True", value: true },
-        { text: "False", value: false },
+        { text: "Inactive", value: true },
+        { text: "Active", value: false },
       ],
       onFilter: (value, record) => record.status === value, // Lọc theo status
     },
@@ -383,8 +383,8 @@ function ManageUser() {
           </Form.Item>
           <Form.Item name="userstatus" label="Userstatus">
             <Select>
-              <Select.Option value={true}>True</Select.Option>
-              <Select.Option value={false}>False</Select.Option>
+              <Select.Option value={true}>Inactive</Select.Option>
+              <Select.Option value={false}>Active</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item name="role" label="Role">
@@ -520,8 +520,8 @@ function ManageUser() {
           </Form.Item>
           <Form.Item name="userstatus" label="Userstatus">
             <Select>
-              <Select.Option value={true}>True</Select.Option>
-              <Select.Option value={false}>False</Select.Option>
+              <Select.Option value={true}>Inactive</Select.Option>
+              <Select.Option value={false}>Active</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item

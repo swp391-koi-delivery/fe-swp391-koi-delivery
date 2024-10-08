@@ -16,7 +16,10 @@ function LoginPage() {
       localStorage.setItem("token", token);
       if (role === "MANAGER") {
         navigate("/dashboard");
-      }else{
+      }else if(role ==="SALESSTAFF"){
+        navigate("/orderList");
+      }
+      else{
         navigate("/");
       }
       toast.success("Successfully login to account");
