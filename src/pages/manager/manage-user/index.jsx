@@ -6,6 +6,8 @@ import {
   Modal,
   Form,
   Select,
+  Switch,
+  message,
   InputNumber,
   Upload,
   Image,
@@ -14,43 +16,52 @@ import { useForm } from "antd/es/form/Form";
 import Search from "antd/es/transfer/search";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { render } from "react-dom";
 import { toast } from "react-toastify";
 import { DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
 import api from "../../../config/axios";
 import uploadFile from "../../../utils/file";
-
+import "boxicons";
+import "../index.css";
 function ManageUser() {
+  //const api = "https://66ebf57e2b6cf2b89c5c9df5.mockapi.io/User";
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [openModal, setOpenModal] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [form] = Form.useForm();
-  const [submitting, setSubmitting] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null); //Lưu người dùng đang chỉnh sửa
+  const [form] = Form.useForm(); //Sử dụng Ant Design form
+  const [formAdd] = Form.useForm(); //Sử dụng Ant Design form
+  const [submitting, setSubmitting] = useState(false); // tạo khoảng chờ khi nhấn submit
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
   const fetchUser = async () => {
+    // const response = await axios.get(api);
     try {
       const response = await api.get("manager");
+      //lấy dữ liệu từ BE và set nó
       setUsers(response.data);
-      setFilteredUsers(response.data);
+      setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
     } catch (error) {
       toast.error(error.response.data);
     }
+    //console.log(response.data);
   };
   useEffect(() => {
+    // chạy sự kiện fetchUser
     fetchUser();
   }, []);
-
+  //tìm kiếm user
   const handleSearch = (value) => {
-    setSearchText(value);
-    const filteredData = users.filter((user) =>
-      user.fullname.toLowerCase().includes(value.toLowerCase()),
+    setSearchText(value); // Cập nhật giá trị search text
+    const filteredData = users.filter(
+      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()) // Lọc theo tên người dùng
     );
-    setFilteredUsers(filteredData);
+    setFilteredUsers(filteredData); // Cập nhật danh sách đã lọc
   };
-
+  //tạo user
   const handleSubmitUser = async (user) => {
     if (fileList.length > 0) {
       const file = fileList[0];
@@ -60,15 +71,15 @@ function ManageUser() {
     }
     try {
       setSubmitting(true);
-      const response = await api.post("manager", user);
+      const response = await api.post("manager",user);
       toast.success("Submit successfully");
-      setFileList([]);
-      form.resetFields();
-      setOpenModal(false);
+      setFileList([])
+      formAdd.resetFields();
+      setShowModal(false);
       fetchUser();
     } catch (error) {
       toast.error(error.response.data);
-    } finally {
+    }finally{
       setSubmitting(false);
     }
   };
@@ -103,7 +114,7 @@ function ManageUser() {
       toast.success("Updated successfully");
       fetchUser(); // Cập nhật lại danh sách sau khi sửa
       handleCloseModal();
-      setFileList([]);
+      setFileList([])
     } catch (error) {
       toast.error("Failed to update!");
     } finally {
@@ -156,11 +167,13 @@ function ManageUser() {
   );
   const columns = [
     {
+      
       title: "UserId",
       dataIndex: "userId",
       key: "userId",
     },
     {
+      
       title: "Image",
       dataIndex: "image",
       key: "image",
@@ -203,10 +216,10 @@ function ManageUser() {
       title: "Userstatus",
       dataIndex: "userstatus",
       key: "userstatus",
-      render: (userstatus) => (userstatus ? "True" : "False"),
+      render: (userstatus) => (userstatus ? "Inactive" : "Active"),
       filters: [
-        { text: "True", value: true },
-        { text: "False", value: false },
+        { text: "Inactive", value: true },
+        { text: "Active", value: false },
       ],
       onFilter: (value, record) => record.status === value, // Lọc theo status
     },
@@ -229,16 +242,13 @@ function ManageUser() {
       render: (userId, record) => {
         return (
           <>
-            <Button
-              icon={<EditTwoTone />}
-              onClick={() => handleOpenModal(record)}
-            />{" "}
+            <Button icon={<EditTwoTone/>} onClick={() => handleOpenModal(record)}/>{" "}
             <Popconfirm
               title="Delete"
               description="Are you sure want to delete?"
               onConfirm={() => handleDeleteUser(userId)}
             >
-              <Button icon={<DeleteOutlined />} danger />
+              <Button icon={<DeleteOutlined />}danger />
             </Popconfirm>
           </>
         );
@@ -247,31 +257,20 @@ function ManageUser() {
   ];
   return (
     <div className="p-8">
-      <h1 className="mb-6 text-2xl font-bold">User Management</h1>
-      <div className="mb-4" style={{ width: "350px" }}>
-        <Search
-          placeholder="Search by fullname"
-          onSearch={handleSearch}
-          onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
-          value={searchText}
-          // Thêm style cho input search
-          className="w-full max-w-md"
+      <h1 className="text-2xl font-bold mb-6">User Management</h1>
+      <div  className="mb-4" style={{width:"350px"}}>
+
+      <Search
+        placeholder="Search by fullname"
+        onSearch={handleSearch}
+        onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
+        value={searchText}
+        // Thêm style cho input search
+        className="w-full max-w-md"
         />
-      </div>
-      <Button
-        icon={<PlusOutlined />}
-        onClick={() => setOpenModal(true)}
-        className="mb-4"
-        style={{ marginLeft: "20px" }}
-      >
-        Add
-      </Button>
-      <Table
-        columns={columns}
-        dataSource={filteredUsers}
-        rowKey="userId"
-        size="middle"
-      />
+        </div>
+      <Button icon={<PlusOutlined/>} onClick={() => setShowModal(true)} className="mb-4" style={{marginLeft:"20px"}}>Add</Button>
+      <Table columns={columns} dataSource={filteredUsers} rowKey="userId" size="middle" />
       <Modal
         confirmLoading={submitting}
         open={openModal}
@@ -280,6 +279,90 @@ function ManageUser() {
         title="Update User"
       >
         <Form form={form} layout="vertical">
+          {/* <Form.Item
+            name="username"
+            label="UserName"
+            rules={[
+              {
+                required: true,
+                message: "Please imput username!",
+              },
+              {
+                min: 6,
+                message: "Username must be at least 6 characters",
+              },
+            ]}
+          >
+            <AntInput />
+          </Form.Item> */}
+          {/* <Form.Item
+            name="password"
+            label="Password"
+            rules={[
+              {
+                required: true,
+                message: "Please imput username!",
+              },
+            ]}
+          >
+            <AntInput />
+          </Form.Item> */}
+          {/* <Form.Item
+            name="fullname"
+            label="FullName"
+            rules={[
+              {
+                required: true,
+                message: "Please imput fullname!",
+              },
+            ]}
+          >
+            <AntInput />
+          </Form.Item> */}
+          {/* <Form.Item
+            name="address"
+            label="Address"
+            rules={[
+              {
+                required: true,
+                message: "Please input address!",
+              },
+            ]}
+          >
+            <AntInput />
+          </Form.Item> */}
+          {/* <Form.Item
+            name="phone"
+            label="Phone"
+            rules={[
+              {
+                required: true,
+                message: "Please input phone number!",
+              },
+              {
+                pattern: "^0[0-9]{9}$",
+                message: "Invalid format!(0*********)",
+              },
+            ]}
+          >
+            <AntInput />
+          </Form.Item> */}
+          {/* <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              {
+                required: true,
+                message: "Please input email!",
+              },
+              {
+                type: "email",
+                message: "Invalid email's format!",
+              },
+            ]}
+          >
+            <AntInput />
+          </Form.Item> */}
           <Form.Item
             name="loyaltyPoint"
             label="LoyaltyPoint"
@@ -300,8 +383,8 @@ function ManageUser() {
           </Form.Item>
           <Form.Item name="userstatus" label="Userstatus">
             <Select>
-              <Select.Option value={true}>True</Select.Option>
-              <Select.Option value={false}>False</Select.Option>
+              <Select.Option value={true}>Inactive</Select.Option>
+              <Select.Option value={false}>Active</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item name="role" label="Role">
@@ -327,12 +410,12 @@ function ManageUser() {
       </Modal>
       <Modal
         confirmLoading={submitting}
-        open={openModal}
-        onCancel={() => setOpenModal(false)}
-        onOk={() => form.submit()}
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        onOk={() => formAdd.submit()}
         title="Submit User"
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmitUser}>
+        <Form form={formAdd} layout="vertical" onFinish={handleSubmitUser}>
           <Form.Item
             name="username"
             label="UserName"
@@ -437,8 +520,8 @@ function ManageUser() {
           </Form.Item>
           <Form.Item name="userstatus" label="Userstatus">
             <Select>
-              <Select.Option value={true}>True</Select.Option>
-              <Select.Option value={false}>False</Select.Option>
+              <Select.Option value={true}>Inactive</Select.Option>
+              <Select.Option value={false}>Active</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item
