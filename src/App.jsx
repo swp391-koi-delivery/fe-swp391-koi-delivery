@@ -5,9 +5,9 @@ import RegisterPage from "./pages/register/RegisterPage";
 import HomePage from "./pages/home/HomePage";
 import FeedbackPage from "./pages/feedback/FeedbackPage";
 import Dashboard from "./components/dashboard";
-import ManageUser from "./pages/admin/manage-user";
-import ManageOrder from "./pages/admin/manage-order";
-import ManageStatistic from "./pages/admin/manage-statistic";
+import ManageUser from "./pages/manager/manage-user";
+import ManageOrder from "./pages/manager/manage-order";
+import ManageStatistic from "./pages/manager/manage-statistic";
 import OrderList from "./pages/salesstaff";
 
 function App() {
