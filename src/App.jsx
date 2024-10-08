@@ -18,6 +18,8 @@ import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
 import OrderList from "./pages/salesstaff";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
+import "./index.css";
+import "./App.css";
 function App() {
   const ProtectRouteAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -74,12 +76,21 @@ function App() {
         },
         {
           path: "order",
+
+          element: <ManageOrder />,
+        },
+        {
+          path: "statistic",
+          element: <ManageStatistic />,
+        },
+
           element: <ManageOrder/>,
         },
         {
           path: "statistic",
           element: <ManageStatistic/>,
         }
+
       ],
     },
   ]);

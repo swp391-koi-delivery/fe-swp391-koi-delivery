@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Popconfirm, Upload } from "antd";
+import { Button, Form, Image, Input, Modal, Popconfirm, Upload } from "antd";
 import { PlusOutlined, DeleteOutlined, EditTwoTone } from "@ant-design/icons";
 import { useForm } from "antd/es/form/Form";
 import React, { useEffect, useState } from "react";
@@ -126,7 +126,30 @@ function BlogComponent() {
           </div>
           <div className="-mx-4 flex flex-wrap">
             <div className="mb-4 flex w-full items-center justify-end px-4">
-              <Button className="primaryButton" onClick={handleOpenModal}>
+              <Button
+                style={{
+                  color: "#fff",
+                  border: "none",
+                  padding: "1.25rem 1.75rem",
+                  fontSize: "1rem",
+                  lineHeight: "1.5rem",
+                  transitionDuration: "300ms",
+                  fontWeight: "500",
+                  transitionProperty:
+                    "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                  transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(234, 88, 12, 1)"; // Hover background color
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(249, 115, 22, 1)"; // Revert to original background color
+                }}
+                className="primaryButton"
+                onClick={handleOpenModal}
+              >
                 Add Blog
               </Button>
               <Modal

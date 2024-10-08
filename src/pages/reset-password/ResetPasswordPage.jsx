@@ -1,9 +1,11 @@
 import React from "react";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
-import { Form, Input } from "antd";
+import { Button, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "antd/es/form/Form";
 function ResetPasswordPage() {
+    const [form] = useForm();
   const navigate = useNavigate();
   const handleResetPassword = async (values) => {
     try {
@@ -92,24 +94,89 @@ function ResetPasswordPage() {
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
-                  <Form.Item name="email" className="mb-[22px]">
-                    <Input
-                      placeholder="Email"
+                  <Form.Item
+                    name="password"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input password",
+                      },
+                      {
+                        pattern: /.*[A-Z].*/,
+                        message:
+                          "Password must contain at least one uppercase letter!",
+                      },
+                      {
+                        min: 6,
+                        message: "Password must be at least 6 characters!",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input.Password
+                      required
+                      placeholder="Password"
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
-                  <Form.Item name="email" className="mb-[22px]">
-                    <Input
-                      placeholder="Email"
+                  <Form.Item
+                    name="passwordConfirm"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input password",
+                      },
+                      {
+                        pattern: /.*[A-Z].*/,
+                        message:
+                          "Password must contain at least one uppercase letter!",
+                      },
+                      {
+                        min: 6,
+                        message: "Password must be at least 6 characters!",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input.Password
+                      required
+                      placeholder="Password Confirm"
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
-                    <Input
+                    <Button
+                      style={{
+                        margin: "0px",
+                        width: "100%",
+                        color: "#fff",
+                        border: "none",
+                        padding: "1.25rem 1.75rem",
+                        fontSize: "1rem",
+                        lineHeight: "1.5rem",
+                        transitionDuration: "300ms",
+                        fontWeight: "500",
+                        transitionProperty:
+                          "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                        transitionTimingFunction:
+                          "cubic-bezier(0.4, 0, 0.2, 1)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(234, 88, 12, 1)"; // Hover background color
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(249, 115, 22, 1)"; // Revert to original background color
+                      }}
                       type="submit"
-                      value="Reset"
-                      className="primaryButton w-full cursor-pointer rounded-md px-5 py-3 text-base text-white transition duration-300 ease-in-out"
-                    />
+                      onClick={() => form.submit()}
+                      className="primaryButton"
+                    >
+                      Reset
+                    </Button>
                   </Form.Item>
                 </Form>
                 <div>
