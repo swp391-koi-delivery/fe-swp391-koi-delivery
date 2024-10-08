@@ -14,6 +14,9 @@ import { toast } from "react-toastify";
 import Dashboard from "./components/dashboard/Dashboard";
 import OrderPage from "./pages/order/OrderPage";
 import ManageUser from "./pages/manager/manage-user";
+import ManageOrder from "./pages/manager/manage-order";
+import ManageStatistic from "./pages/manager/manage-statistic";
+import OrderList from "./pages/salesstaff";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
 function App() {
   const ProtectRouteAuth = ({ children }) => {
@@ -57,7 +60,10 @@ function App() {
         },
       ],
     },
-
+    {
+      path: "orderList",
+      element: <OrderList />,
+    },
     {
       path: "dashboard",
       element: <Dashboard />,
@@ -66,6 +72,14 @@ function App() {
           path: "user",
           element: <ManageUser />,
         },
+        {
+          path: "order",
+          element: <ManageOrder/>,
+        },
+        {
+          path: "statistic",
+          element: <ManageStatistic/>,
+        }
       ],
     },
   ]);
