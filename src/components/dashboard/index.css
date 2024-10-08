@@ -1,0 +1,87 @@
+.ant-layout-sider-children{
+    background-color: white;
+}
+.ant-table-container {
+    margin: 20px auto;
+    width: 90%; /* Điều chỉnh độ rộng của bảng */
+    border-radius: 10px; /* Bo góc cho bảng */
+    overflow: hidden; /* Ẩn phần bị tràn */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho bảng */
+  }
+  
+  /* Nội dung bảng */
+  .ant-table-content {
+    background-color: #fff; /* Màu nền trắng */
+  }
+  
+  /* Tiêu đề bảng */
+  .ant-table-thead {
+    background-color: #f0f2f5; /* Màu nền cho tiêu đề */
+    border-bottom: 2px solid #e8e8e8; /* Đường viền dưới tiêu đề */
+  }
+  
+  .ant-table-cell {
+    padding: 15px; /* Khoảng cách bên trong ô */
+    font-size: 14px; /* Kích thước font chữ */
+    text-align: left; /* Canh trái cho văn bản */
+    color: #333; /* Màu chữ */
+  }
+  
+  /* Hiệu ứng hover cho ô trong bảng */
+  .ant-table-tbody tr:hover {
+    background-color: #e6f7ff; /* Màu nền khi hover */
+  }
+  
+  /* Hiệu ứng cho các cột có sorter */
+  .ant-table-column-sorters {
+    cursor: pointer; /* Con trỏ chuột khi hover */
+  }
+  
+  /* Màu chữ cho cột sorter */
+  .ant-table-column-sorters:hover .ant-table-column-title {
+    color: #1890ff; /* Màu chữ khi hover */
+  }
+  
+  /* Thiết lập cho các ô của dữ liệu */
+  .ant-table-tbody .ant-table-cell {
+    border-bottom: 1px solid #e8e8e8; /* Đường viền dưới mỗi ô */
+  }
+  
+  /* Màu nền cho dòng không có dữ liệu */
+  .ant-table-placeholder {
+    text-align: center; /* Canh giữa cho nội dung không có dữ liệu */
+    color: #999; /* Màu chữ cho nội dung không có dữ liệu */
+  }
+  
+  /* Chỉnh sửa cho icon filter */
+  .ant-dropdown-trigger {
+    cursor: pointer; /* Con trỏ chuột khi hover */
+  }
+  
+  /* Chỉnh sửa cho các biểu tượng trong tiêu đề */
+  .ant-table-column-sorter-up, .ant-table-column-sorter-down {
+    font-size: 16px; /* Kích thước icon */
+    color: #999; /* Màu icon */
+    margin-left: 5px; /* Khoảng cách giữa tiêu đề và icon */
+  }
+  
+  /* Đổi màu cho icon khi hover */
+  .ant-table-column-sorters:hover .ant-table-column-sorter-up,
+  .ant-table-column-sorters:hover .ant-table-column-sorter-down {
+    color: #1890ff; /* Màu icon khi hover */
+  }
+  /* Thiết kế nút Add */
+button.ant-btn {
+    margin-left: 20px;
+    border-radius: 8px;
+    border: 1px solid #1890ff;
+    color: #1890ff;
+    font-weight: 500;
+    padding: 6px 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  button.ant-btn:hover {
+    background-color: #e6f7ff;
+    border-color: #40a9ff;
+  }

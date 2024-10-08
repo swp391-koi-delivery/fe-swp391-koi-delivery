@@ -356,7 +356,7 @@ function HeaderComponent() {
                   <span className="block text-white">
                     <Badge count={10}>
                       <ShoppingCartOutlined
-                        className="text-white sticky:text-dark"
+                        className="cart"
                         style={{ fontSize: 28 }}
                       />
                     </Badge>
@@ -381,12 +381,12 @@ function HeaderComponent() {
                   ) : (
                     <a className="submenu-item group relative">
                       <img
-                        className="relative inline-block w-full rounded-full ring-1 ring-white"
+                        className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
                         src={
                           user?.image ||
                           "assets/images/navbar/default-avatar.jpg"
                         }
-                        alt=""
+                        alt="default-avatar"
                       />
                       <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
                         <span className="block rounded px-4 py-[10px] text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">

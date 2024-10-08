@@ -105,9 +105,32 @@ function VerifyPasswordPAge() {
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
                     <Button
+                      style={{
+                        margin: "0px",
+                        width: "100%",
+                        color: "#fff",
+                        border: "none",
+                        padding: "1.25rem 1.75rem",
+                        fontSize: "1rem",
+                        lineHeight: "1.5rem",
+                        transitionDuration: "300ms",
+                        fontWeight: "500",
+                        transitionProperty:
+                          "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                        transitionTimingFunction:
+                          "cubic-bezier(0.4, 0, 0.2, 1)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(234, 88, 12, 1)"; // Hover background color
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(249, 115, 22, 1)"; // Revert to original background color
+                      }}
                       type="submit"
                       onClick={() => form.submit()}
-                      className="primaryButton w-full cursor-pointer rounded-md px-7 py-5 text-base text-white transition duration-300 ease-in-out"
+                      className="primaryButton"
                     >
                       Verify
                     </Button>

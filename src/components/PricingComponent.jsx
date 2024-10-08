@@ -70,20 +70,20 @@ function PricingComponent() {
           </div>
           <div className="-mx-4 flex flex-wrap justify-center">
             <div className="relative flex w-full items-center justify-center rounded-md shadow-pricing">
-              <table className="w-full overflow-hidden text-center text-sm">
+              <table className="table-container w-full overflow-hidden text-center text-sm">
                 <thead className="">
                   <tr>
-                    <th className="py-3">
+                    <th className="py-2">
                       <span className="block py-4 text-xl font-medium text-dark dark:text-white">
                         Product name
                       </span>
                     </th>
-                    <th className="py-3">
+                    <th className="py-2">
                       <span className="block py-4 text-xl font-medium text-dark dark:text-white">
                         Color
                       </span>
                     </th>
-                    <th className="py-3">
+                    <th className="py-2">
                       <span className="block py-4 text-xl font-medium text-dark dark:text-white">
                         Category
                       </span>
@@ -199,18 +199,19 @@ function PricingComponent() {
                                 key={index}
                                 className="w-full text-center hover:table-row hover:scale-105 dark:hover:table-row"
                               >
-                                <td className="whitespace-nowrap px-6 py-3 font-medium">
+                                <td className="whitespace-nowrap px-6 py-2 font-medium">
                                   <span className="inline-block">
                                     {item.sizeCm}
                                   </span>
                                 </td>
-                                <td className="px-6 py-3">
+                                <td className="px-6 py-2">
                                   <span className="inline-block">
                                     {item.sizeInch}
                                   </span>
                                 </td>
-                                <td className="px-8 py-3">
+                                <td className="px-8 py-2 flex items-center justify-center">
                                   <Form.Item
+                                  style={{paddingTop: "22px"}}
                                     initialValue={0}
                                     name={[index, "quantities"]}
                                     rules={[
@@ -250,9 +251,29 @@ function PricingComponent() {
 
                 <div className="flex justify-end">
                   <Button
+                    style={{
+                      color: "#fff",
+                      border: "none",
+                      padding: "1.25rem 1.75rem",
+                      fontSize: "1rem",
+                      lineHeight: "1.5rem",
+                      transitionDuration: "300ms",
+                      fontWeight: "500",
+                      transitionProperty:
+                        "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "rgba(234, 88, 12, 1)"; // Hover background color
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "rgba(249, 115, 22, 1)"; // Revert to original background color
+                    }}
                     type="submit"
                     onClick={() => form.submit()}
-                    className="primaryButton rounded-y inline-flex items-center justify-center px-7 py-5 text-center text-base font-medium transition duration-300"
+                    className="primaryButton"
                   >
                     Estimate
                   </Button>

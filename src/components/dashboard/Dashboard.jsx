@@ -1,17 +1,32 @@
-import React, { useState } from "react";
-import { PieChartOutlined } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
-import { Link, Outlet } from "react-router-dom";
-const { Content, Footer, Sider } = Layout;
+import React, { useState } from 'react';
+import "./index.css";
+import {
+  DesktopOutlined,
+  FileOutlined,
+  PieChartOutlined,
+  BarChartOutlined,
+  TeamOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  ProductOutlined
+} from '@ant-design/icons';
+import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import { Link, Outlet } from 'react-router-dom';
+const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
     key,
     icon,
     children,
-    label: <Link to={`/dashboard/${key}`}>{label}</Link>,
+    label: <Link to={`/dashboard/${key}`} className="text-gray-700 hover:text-blue-500">{label}</Link>
   };
 }
-const items = [getItem("Manage User", "user", <PieChartOutlined />)];
+const items = [
+  getItem('Analytics', 'statistic', <BarChartOutlined />),
+  getItem('Manage User', 'user', <UserOutlined />),
+  getItem('Manage Order', 'order', <ProductOutlined />),
+  getItem('Log out', '', <LogoutOutlined />),
+];
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
@@ -20,41 +35,34 @@ const Dashboard = () => {
   return (
     <Layout
       style={{
-        minHeight: "100vh",
-      }}
+        minHeight: '100vh',
+      }} className="min-h-screen"
     >
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-      >
+      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className="bg-gray-800">
         <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={["1"]}
-          mode="inline"
-          items={items}
-        />
+        <Menu theme="light" defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
-      <Layout>
-        <Content>
-          <div
-            style={{
-              padding: 24,
-              minHeight: 500,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-              width: "120vw",
-            }}
+      <Layout className="bg-gray-100">
+        <Header
+          className="bg-white shadow-md"
+        />
+        <Content
+          className="m-4"
+        >
+          <Breadcrumb
+           className="mb-4"
           >
-            <Outlet />
+            {/* <Breadcrumb.Item>User</Breadcrumb.Item>
+            <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
+          </Breadcrumb>
+          <div
+            className="bg-white rounded-lg shadow-md p-6"
+          >
+            <Outlet/>
           </div>
         </Content>
         <Footer
-          style={{
-            textAlign: "center",
-            width: "120vw",
-          }}
+          className="text-center bg-gray-50 py-4"
         >
           Ant Design ©{new Date().getFullYear()} Created by Ant UED
         </Footer>
