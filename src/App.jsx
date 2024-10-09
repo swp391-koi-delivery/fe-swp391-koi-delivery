@@ -8,7 +8,7 @@ import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import HomePage from "./pages/home/HomePage";
 import ResetPasswordPage from "./pages/reset-password/ResetPasswordPage";
-import VerifyEmailPage from "./pages/verify-email/VerifyEmailPage";
+import ForgotPasswordPage from "./pages/forgot-password/ForgotPasswordPage";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Dashboard from "./components/dashboard/Dashboard";
@@ -49,8 +49,8 @@ function App() {
           element: <RegisterPage />,
         },
         {
-          path: "verify-email",
-          element: <VerifyEmailPage />,
+          path: "forgot-password",
+          element: <ForgotPasswordPage />,
         },
         {
           path: "reset-password",
