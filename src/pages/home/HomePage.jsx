@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import "../../App.css";
 import HeaderComponent from "../../components/HeaderComponent";
 import BannerComponent from "../../components/BannerComponent";
 import ContentComponent from "../../components/ContentComponent";

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import "./index.css";
+import "./Dashboard.css";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -24,7 +24,7 @@ function getItem(label, key, icon, children) {
 const items = [
   getItem('Analytics', 'statistic', <BarChartOutlined />),
   getItem('Manage User', 'user', <UserOutlined />),
-  getItem('Manage Order', 'order', <ProductOutlined />),
+  getItem('Manage Feedback', 'order', <ProductOutlined />),
   getItem('Log out', '', <LogoutOutlined />),
 ];
 const Dashboard = () => {

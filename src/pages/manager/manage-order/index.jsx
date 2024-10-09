@@ -1,72 +1,134 @@
-import React from 'react'
-import CRUDTemplate from '../../../components/crud-template'
-import { Form, Input, InputNumber } from 'antd'
+import React, { useEffect, useState } from 'react';
+import { Space, Switch, Table } from 'antd';
+const columns = [
+  {
+    title: 'Rating score',
+    dataIndex: 'ratingscore',
+    key: 'ratingscore',
+  },
+  {
+    title: 'Comment',
+    dataIndex: 'comment',
+    key: 'comment',
+    width: '12%',
+  },
+];
+const data = [
+  {
+    key: 1,
+    name: 'John Brown sr.',
+    age: 60,
+    address: 'New York No. 1 Lake Park',
+    children: [
+      {
+        key: 11,
+        name: 'John Brown',
+        age: 42,
+        address: 'New York No. 2 Lake Park',
+      },
+      {
+        key: 12,
+        name: 'John Brown jr.',
+        age: 30,
+        address: 'New York No. 3 Lake Park',
+        children: [
+          {
+            key: 121,
+            name: 'Jimmy Brown',
+            age: 16,
+            address: 'New York No. 3 Lake Park',
+          },
+        ],
+      },
+      {
+        key: 13,
+        name: 'Jim Green sr.',
+        age: 72,
+        address: 'London No. 1 Lake Park',
+        children: [
+          {
+            key: 131,
+            name: 'Jim Green',
+            age: 42,
+            address: 'London No. 2 Lake Park',
+            children: [
+              {
+                key: 1311,
+                name: 'Jim Green jr.',
+                age: 25,
+                address: 'London No. 3 Lake Park',
+              },
+              {
+                key: 1312,
+                name: 'Jimmy Green sr.',
+                age: 18,
+                address: 'London No. 4 Lake Park',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    key: 2,
+    name: 'Joe Black',
+    age: 32,
+    address: 'Sydney No. 1 Lake Park',
+  },
+];
+
+// rowSelection objects indicates the need for row selection
+const rowSelection = {
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+  },
+  onSelect: (record, selected, selectedRows) => {
+    console.log(record, selected, selectedRows);
+  },
+  onSelectAll: (selected, selectedRows, changeRows) => {
+    console.log(selected, selectedRows, changeRows);
+  },
+};
 function ManageOrder() {
-  // const columns =[
-  //   {title:"OrderId",dataIndex:"orderId",key:"orderId"},
-  //   {title:"Describe Order",dataIndex:"describeOrder",key:"describeOrder"},
-  //   {title:"Order Date",dataIndex:"orderDate",key:"orderDate"},
-  //   {title:"Origin Location",dataIndex:"originLocation",key:"originLocation"},
-  //   {title:"Destination Location",dataIndex:"destinationLocation",key:"destinationLocation"},
-  //   {title:"Total Price",dataIndex:"totalPrice",key:"totalPrice"},
-  //   {title:"Payment",dataIndex:"payment",key:"payment"},
-  //   {title:"Size",dataIndex:"size",key:"size"},
-  //   {title:"Quantity",dataIndex:"quantity",key:"quantity"},
-  //   {title:"Volume",dataIndex:"volume",key:"volume"},
-  //   {title:"Order Status",dataIndex:"orderStatus",key:"orderStatus"},
-  //   {title:"Payment Status",dataIndex:"paymentStatus",key:"paymentStatus"},
-  //   {title:"Health Fish Status",dataIndex:"healthFishStatus",key:"healthFishStatus"},
-  // ]
-  // const formItems = (
-  //   <>
-  //     <Form.Item name="orderId" hidden>
-  //       <Input/>
-  //     </Form.Item>
-  //     <Form.Item name="userId" label="UserId">
-  //       <InputNumber/>
-  //     </Form.Item>
-  //     <Form.Item name="describeOrder" label="Describe Order">
-  //     <Select>
-  //             <Select.Option value="WHOLESALEORDER">WHOLESALEORDER</Select.Option>
-  //             <Select.Option value="RETAILORDER">
-  //               RETAILORDER
-  //             </Select.Option>
-  //           </Select>
-  //     </Form.Item>
-  //     <Form.Item name="orderDate" label="Order Date">
-  //       {new Date(order.orderDate).toLocaleDateString()}
-  //     </Form.Item>
-  //     <Form.Item name="originLocation" label="Origin Location">
-  //       <Input/>
-  //     </Form.Item>
-  //     <Form.Item name="destinationLocation" label="Destination Location">
-  //       <Input/>
-  //     </Form.Item>
-  //     <Form.Item name="size" label="Size">
-  //       <Input/>
-  //     </Form.Item>
-  //     <Form.Item name="quantity" label="Quantity">
-  //       <InputNumber/>
-  //     </Form.Item>
-  //     <Form.Item name="volume" label="Volume">
-  //       <InputNumber/>
-  //     </Form.Item>
-  //     <Form.Item name="totalPrice" label="Total Price">
-  //       <InputNumber/>
-  //     </Form.Item>
-  //     <Form.Item name="payment" label="Payment">
-  //       <Input/>
-  //     </Form.Item>
-  //     <Form.Item name="vat" label="Vat">
-  //       <InputNumber/>
-  //     </Form.Item>
-  //   </>
-  // )
+  const [checkStrictly, setCheckStrictly] = useState(false);
+  const [feedbacks,setFeedBacks] = useState([]);
+  const fetchFeedBack = async () => {
+    // const response = await axios.get(api);
+    try {
+      const response = await axios.get(api);
+      // const response = await api.get("manager");
+      //lấy dữ liệu từ BE và set nó
+      setFeedBacks(response.data);
+    } catch (error) {
+      toast.error(error.response.data);
+    }
+    //console.log(response.data);
+  };
+  useEffect(() => {
+    // chạy sự kiện fetchUser
+    fetchFeedBack();
+  }, []);
   return (
-    <div>
-      {/* <CRUDTemplate columns={columns}/> */}hello
-    </div>
-  )
+    <>
+      <Space
+        align="center"
+        style={{
+          marginBottom: 16,
+        }}
+      >
+        CheckStrictly: <Switch checked={checkStrictly} onChange={setCheckStrictly} />
+      </Space>
+      <Table
+        columns={columns}
+        rowSelection={{
+          ...rowSelection,
+          checkStrictly,
+        }}
+        dataSource={feedbacks}
+      />
+    </>
+  );
 }
 
 export default ManageOrder
