@@ -32,17 +32,130 @@ function PricingComponent() {
       }));
     try {
       const response = await api.get(
-        `saleStaff/calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
+        `calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
       );
       toast.success("Successfully estimate prices and boxes!");
       console.log(response.data);
       setData(response.data);
     } catch (err) {
-      toast.error(
-        "Failed to calculate the prices and boxes. Please try again.",
-      );
+      toast.error(err.response.data);
       console.error(err);
     }
+  };
+
+  const transportPrices = [
+    {
+      detail: "Fuel Price",
+      vndValue: "17,400 VND/L",
+      usdValue: "0.7 USD/L",
+      notes: "",
+    },
+    {
+      detail: "Vehicle Consumption",
+      vndValue: "9L/100km",
+      usdValue: "-",
+      notes: "",
+    },
+    {
+      detail: "Fuel Tank Capacity",
+      vndValue: "65L",
+      usdValue: "-",
+      notes: "",
+    },
+    {
+      detail: "Vehicle Volume",
+      vndValue: "10,680 cm³",
+      usdValue: "-",
+      notes: "",
+    },
+    {
+      detail: "Maintenance Costs",
+      vndValue: "5,000,000 VND/year",
+      usdValue: "201.23 USD/year",
+      notes: "417,000 VND/month = 16.78 USD/month",
+    },
+    {
+      detail: "Incidental Costs",
+      vndValue: "400,000 VND",
+      usdValue: "16.10 USD",
+      notes: "",
+    },
+    {
+      detail: "Route (Ha Noi → Sai Gon)",
+      vndValue: "-",
+      usdValue: "-",
+      notes: "1,700 km",
+    },
+    {
+      detail: "Monthly Trips",
+      vndValue: "2 trips",
+      usdValue: "5,400,000 VND = 217.33 USD",
+      notes: "2,700,000 VND/trip = 108.66 USD/trip",
+    },
+    {
+      detail: "Care Costs",
+      vndValue: "100,000 VND/bin",
+      usdValue: "4.02 USD",
+      notes: "",
+    },
+    {
+      detail: "Product Costs (Large box)",
+      vndValue: "200,000 VND/box",
+      usdValue: "8.05USD",
+      notes: "",
+    },
+    {
+      detail: "Product Costs (Medium box)",
+      vndValue: "100,000 VND/box",
+      usdValue: "4.02 USD",
+      notes: "",
+    },
+    {
+      detail: "Product Costs (Small box)",
+      vndValue: "50,000 VND/box",
+      usdValue: "2.01 USD",
+      notes: "",
+    },
+    {
+      detail: "Other Costs (Travel cost)",
+      vndValue: "5,000 VND/km",
+      usdValue: "0.2 USD/km",
+      notes: "",
+    },
+    {
+      detail: "Tax",
+      vndValue: "5%",
+      usdValue: "-",
+      notes: "",
+    },
+    {
+      detail: "Total Monthly Cost",
+      vndValue: "6,220,000 VND",
+      usdValue: "250.33 USD",
+      notes: "",
+    },
+  ];
+
+  const generateTableRows = (transportPrices) => {
+    return transportPrices.map((transportPrice, index) => (
+      <tr
+        key={index}
+        className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
+      >
+        <td className="whitespace-nowrap px-6 py-3 font-medium">
+          <span className="inline-block">{transportPrice.detail}</span>
+        </td>
+        <td className="px-6 py-3">
+          <span className="inline-block">{transportPrice.vndValue}</span>
+        </td>
+        <td className="px-6 py-3">
+          <span className="inline-block">{transportPrice.usdValue}</span>
+        </td>
+        <td className="px-6 py-3">
+          <span className="inline-block">{transportPrice.notes}</span>
+        </td>
+      </tr>
+    ));
   };
 
   return (
@@ -75,66 +188,28 @@ function PricingComponent() {
                   <tr>
                     <th className="py-2">
                       <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                        Product name
+                        Detail
                       </span>
                     </th>
                     <th className="py-2">
                       <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                        Color
+                        Value (VND)
                       </span>
                     </th>
                     <th className="py-2">
                       <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                        Category
+                        Value (USD)
+                      </span>
+                    </th>
+                    <th className="py-2">
+                      <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                        Notes
                       </span>
                     </th>
                   </tr>
                 </thead>
                 <tbody className="text-base text-dark dark:text-white">
-                  <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-                    <td className="py3 whitespace-nowrap px-6 font-medium">
-                      <span className="inline-block">Macbook pro</span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="inline-block">Silver</span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="inline-block">Laptop</span>
-                    </td>
-                  </tr>
-                  <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-                    <td className="py3 whitespace-nowrap px-6 font-medium">
-                      <span className="inline-block">Macbook pro</span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="inline-block">Silver</span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="inline-block">Laptop</span>
-                    </td>
-                  </tr>
-                  <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-                    <td className="py3 whitespace-nowrap px-6 font-medium">
-                      <span className="inline-block">Macbook pro</span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="inline-block">Silver</span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="inline-block">Laptop</span>
-                    </td>
-                  </tr>
-                  <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-                    <td className="py3 whitespace-nowrap px-6 font-medium">
-                      <span className="inline-block">Macbook pro</span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="inline-block">Silver</span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="inline-block">Laptop</span>
-                    </td>
-                  </tr>
+                  {generateTableRows(transportPrices)}
                 </tbody>
               </table>
             </div>
@@ -209,21 +284,18 @@ function PricingComponent() {
                                     {item.sizeInch}
                                   </span>
                                 </td>
-                                <td className="px-8 py-2 flex items-center justify-center">
+                                <td className="flex items-center justify-center px-8 py-2">
                                   <Form.Item
-                                  style={{paddingTop: "22px"}}
+                                    style={{ paddingTop: "22px" }}
                                     initialValue={0}
                                     name={[index, "quantities"]}
                                     rules={[
                                       {
                                         validator: (_, value) => {
-                                          if (value >= 0) {
-                                            return Promise.resolve();
-                                          }
-                                          if (value < 1) {
+                                          if (value < 0) {
                                             return Promise.reject(
                                               new Error(
-                                                "Quantity must be greater than or equal to 1!",
+                                                "Quantity must be greater than or equal to 0!",
                                               ),
                                             );
                                           }
@@ -233,10 +305,10 @@ function PricingComponent() {
                                     ]}
                                   >
                                     <Input
-                                      className="rounded-sm border border-dark text-center focus:border-dark dark:bg-dark dark:text-white"
+                                      className="rounded-sm border border-dark text-center outline-1 outline focus:border-dark dark:bg-dark dark:text-white"
                                       type="number"
                                       step="1"
-                                      min="1"
+                                      min="0"
                                     />
                                   </Form.Item>
                                 </td>
@@ -294,7 +366,7 @@ function PricingComponent() {
                   </span>
                   <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
                     <span className="-ml-1 -tracking-[2px]">
-                      {data?.smallBoxCount} small boxs, {data?.mediumBoxCount}{" "}
+                      {data?.smallBoxCount} small boxes, {data?.mediumBoxCount}{" "}
                       medium boxes, {data?.largeBoxCount} large boxes
                     </span>
                   </h2>

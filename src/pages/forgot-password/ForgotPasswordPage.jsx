@@ -4,11 +4,11 @@ import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
 import { Link } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
-function VerifyPasswordPAge() {
+function ForgotPasswordPage() {
   const [form] = useForm();
-  const handleVerifyEmail = async (value) => {
+  const handleForgotPassword = async (values) => {
     try {
-      const response = await api.get("verify", value);
+      const response = await api.post("forgot-password", values);
       console.log(response);
       toast.success("Successfully verify email");
     } catch (err) {
@@ -42,7 +42,7 @@ function VerifyPasswordPAge() {
                   </li>
                   <li>
                     <Link
-                      to="/request-password"
+                      to="/forgot-password"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -50,7 +50,7 @@ function VerifyPasswordPAge() {
                         {" "}
                         /{" "}
                       </span>
-                      Verify Email
+                      Forgot Password
                     </Link>
                   </li>
                 </ul>
@@ -85,7 +85,11 @@ function VerifyPasswordPAge() {
                     />
                   </a>
                 </div>
-                <Form onFinish={handleVerifyEmail} title="Verify" form={form}>
+                <Form
+                  onFinish={handleForgotPassword}
+                  title="Forgot Password"
+                  form={form}
+                >
                   <Form.Item
                     name="email"
                     className="mb-[22px]"
@@ -363,4 +367,4 @@ function VerifyPasswordPAge() {
   );
 }
 
-export default VerifyPasswordPAge;
+export default ForgotPasswordPage;

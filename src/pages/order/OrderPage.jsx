@@ -86,10 +86,15 @@ function OrderPage() {
                   value={value}
                   className="mb-[22px]"
                 >
-                  <Radio value={"Individual shipment"}>
+                  <Radio
+                    value={"Individual shipment"}
+                    className="dark:text-white"
+                  >
                     Individual shipment
                   </Radio>
-                  <Radio value={"Bulk shipment"}>Bulk shipment</Radio>
+                  <Radio value={"Bulk shipment"} className="dark:text-white">
+                    Bulk shipment
+                  </Radio>
                 </Radio.Group>
                 {value === "Individual shipment" && (
                   <Form title="Order" form={form}>
