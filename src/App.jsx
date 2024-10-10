@@ -23,8 +23,14 @@ import "./App.css";
 function App() {
   const ProtectRouteAuth = ({ children }) => {
     const user = useSelector((store) => store);
-    console.log(user);
-    if (user && user?.role === "MANAGER") {
+    // console.log(user);
+    console.log(user.user);
+    if (
+      user.user &&
+      (user.user?.role === "MANAGER" ||
+        user.user?.role === "SALES_STAFF" ||
+        user.user?.role === "DELIVERY_STAFF")
+    ) {
       return children;
     }
     toast.error("You are not allow to access this");
@@ -68,7 +74,11 @@ function App() {
     },
     {
       path: "dashboard",
-      element: <Dashboard />,
+      element: (
+        <ProtectRouteAuth>
+          <Dashboard />
+        </ProtectRouteAuth>
+      ),
       children: [
         {
           path: "user",
