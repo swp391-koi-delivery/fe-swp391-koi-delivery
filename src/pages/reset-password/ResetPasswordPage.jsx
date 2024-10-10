@@ -5,16 +5,20 @@ import { Button, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
 function ResetPasswordPage() {
-    const [form] = useForm();
+  const [loading, setLoading] = useState(false);
+  const [form] = useForm();
   const navigate = useNavigate();
   const handleResetPassword = async (values) => {
     try {
+      setLoading(true);
       const response = await api.post("reset", values);
       console.log(response);
       toast.success("Successfully reset password");
       navigate("/login");
     } catch (err) {
       toast.error(err.response.data);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -148,6 +152,10 @@ function ResetPasswordPage() {
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
                     <Button
+                      type="submit"
+                      onClick={() => form.submit()}
+                      className="primaryButton"
+                      loading={loading}
                       style={{
                         margin: "0px",
                         width: "100%",
@@ -171,9 +179,6 @@ function ResetPasswordPage() {
                         e.currentTarget.style.backgroundColor =
                           "rgba(249, 115, 22, 1)"; // Revert to original background color
                       }}
-                      type="submit"
-                      onClick={() => form.submit()}
-                      className="primaryButton"
                     >
                       Reset
                     </Button>

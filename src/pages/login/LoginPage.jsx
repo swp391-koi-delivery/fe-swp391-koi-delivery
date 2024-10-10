@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
@@ -9,12 +9,14 @@ import { useDispatch } from "react-redux";
 import { login } from "../../redux/features/userSlice";
 import { useForm } from "antd/es/form/Form";
 function LoginPage() {
+  const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async (values) => {
     try {
+      setLoading(true);
       const response = await api.post("login", values);
       toast.success("Successfully login to account");
       console.log(response.data);
@@ -28,6 +30,8 @@ function LoginPage() {
       }
     } catch (err) {
       toast.error(err.response.data);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -174,7 +178,7 @@ function LoginPage() {
                   </Form.Item>
                   <div className="mb-[14px] flex justify-end">
                     <Link
-                      to="/request-password"
+                      to="/forgot-password"
                       className="text-base text-body-secondary"
                     >
                       Forgot password
@@ -182,6 +186,10 @@ function LoginPage() {
                   </div>
                   <Form.Item className="mb-[22px]">
                     <Button
+                      type="submit"
+                      onClick={() => form.submit()}
+                      className="primaryButton"
+                      loading={loading}
                       style={{
                         margin: "0px",
                         width: "100%",
@@ -205,9 +213,6 @@ function LoginPage() {
                         e.currentTarget.style.backgroundColor =
                           "rgba(249, 115, 22, 1)"; // Revert to original background color
                       }}
-                      type="submit"
-                      onClick={() => form.submit()}
-                      className="primaryButton"
                     >
                       Login
                     </Button>

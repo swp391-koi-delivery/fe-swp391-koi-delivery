@@ -229,7 +229,7 @@ function Footer() {
                       />
                     </div>
                     <span className="max-w-[180px] text-base text-gray-7 group-hover:text-white">
-                      I think really important to design with...
+                     Koi fish shipping progcess...
                     </span>
                   </a>
                   <a className="group flex items-center gap-[22px]">
@@ -240,7 +240,7 @@ function Footer() {
                       />
                     </div>
                     <span className="max-w-[180px] text-base text-gray-7 group-hover:text-white">
-                      Recognizing the need is the primary...
+                     Feedback for us to improve our service...
                     </span>
                   </a>
                 </div>

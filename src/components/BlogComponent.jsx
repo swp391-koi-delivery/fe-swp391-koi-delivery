@@ -118,8 +118,7 @@ function BlogComponent() {
                   Our Recent News
                 </h2>
                 <p className="text-base text-body-color dark:text-dark-6">
-                  There are many variations of passages of Lorem Ipsum available
-                  but the majority have suffered alteration in some form.
+                  There are many variations of experiences and feedbacks of customers who use our delivery service
                 </p>
               </div>
             </div>

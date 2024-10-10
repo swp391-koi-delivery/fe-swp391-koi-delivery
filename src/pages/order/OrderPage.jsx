@@ -4,6 +4,7 @@ import { Button, Form, Input, Radio } from "antd";
 import { Link } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
 function OrderPage() {
+  const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const [value, setValue] = useState("Individual shipment");
   const onChange = (e) => {
@@ -124,6 +125,10 @@ function OrderPage() {
                     </Form.Item>
                     <Form.Item className="mb-[22px]">
                       <Button
+                        type="submit"
+                        onClick={() => form.submit()}
+                        className="primaryButton"
+                        loading={loading}
                         style={{
                           margin: "0px",
                           width: "100%",
@@ -141,15 +146,12 @@ function OrderPage() {
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor =
-                            "rgba(234, 88, 12, 1)"; // Hover background color
+                            "rgba(234, 88, 12, 1)";
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.backgroundColor =
-                            "rgba(249, 115, 22, 1)"; // Revert to original background color
+                            "rgba(249, 115, 22, 1)";
                         }}
-                        type="submit"
-                        onClick={() => form.submit()}
-                        className="primaryButton"
                       >
                         Order
                       </Button>
@@ -184,6 +186,10 @@ function OrderPage() {
                     </Form.Item>
                     <Form.Item className="mb-[22px]">
                       <Button
+                        type="submit"
+                        onClick={() => form.submit()}
+                        className="primaryButton"
+                        loading={loading}
                         style={{
                           margin: "0px",
                           width: "100%",
@@ -201,15 +207,12 @@ function OrderPage() {
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor =
-                            "rgba(234, 88, 12, 1)"; // Hover background color
+                            "rgba(234, 88, 12, 1)";
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.backgroundColor =
-                            "rgba(249, 115, 22, 1)"; // Revert to original background color
+                            "rgba(249, 115, 22, 1)";
                         }}
-                        type="submit"
-                        onClick={() => form.submit()}
-                        className="primaryButton"
                       >
                         Order
                       </Button>
