@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import api from "../config/axios";
 
 function PricingComponent() {
+  const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const [data, setData] = useState({});
   const fishSizes = [
@@ -24,13 +25,26 @@ function PricingComponent() {
 
   const handleEstimate = async (values) => {
     console.log(values);
-    const submissionData = values.items
-      .filter((item) => item.quantities) // Filter out rows without quantity input
-      .map((item, index) => ({
-        fishSizes: parseFloat(fishSizes[index].sizeCm), // Convert fish size to number
-        quantities: item.quantities ? item.quantities : 0, // Use the correct field name
-      }));
+    let submissionData = values.items
+      .map((item, index) => {
+        return {
+          fishSizes: parseFloat(fishSizes[index].sizeCm), // Convert fish size to number
+          quantities: item.quantities == 0 ? null : item.quantities, // Use the correct field name
+        };
+      })
+      .filter((item) => item.quantities); // Filter out rows without quantity input
+    if (submissionData.length === 0) {
+      submissionData = [
+        {
+          fishSizes: 0, // Convert fish size to number
+          quantities: 0, // Use the correct field name
+        },
+      ];
+    }
+    console.log(submissionData);
+
     try {
+      setLoading(true);
       const response = await api.get(
         `calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
       );
@@ -40,99 +54,36 @@ function PricingComponent() {
     } catch (err) {
       toast.error(err.response.data);
       console.error(err);
+      setData(null);
+    } finally {
+      setLoading(false);
     }
   };
 
   const transportPrices = [
     {
-      detail: "Fuel Price",
-      vndValue: "17,400 VND/L",
-      usdValue: "0.7 USD/L",
-      notes: "",
-    },
-    {
-      detail: "Vehicle Consumption",
-      vndValue: "9L/100km",
-      usdValue: "-",
-      notes: "",
-    },
-    {
-      detail: "Fuel Tank Capacity",
-      vndValue: "65L",
-      usdValue: "-",
-      notes: "",
-    },
-    {
-      detail: "Vehicle Volume",
-      vndValue: "10,680 cm³",
-      usdValue: "-",
-      notes: "",
-    },
-    {
-      detail: "Maintenance Costs",
-      vndValue: "5,000,000 VND/year",
-      usdValue: "201.23 USD/year",
-      notes: "417,000 VND/month = 16.78 USD/month",
-    },
-    {
-      detail: "Incidental Costs",
-      vndValue: "400,000 VND",
-      usdValue: "16.10 USD",
-      notes: "",
-    },
-    {
-      detail: "Route (Ha Noi → Sai Gon)",
-      vndValue: "-",
-      usdValue: "-",
-      notes: "1,700 km",
-    },
-    {
-      detail: "Monthly Trips",
-      vndValue: "2 trips",
-      usdValue: "5,400,000 VND = 217.33 USD",
-      notes: "2,700,000 VND/trip = 108.66 USD/trip",
-    },
-    {
       detail: "Care Costs",
       vndValue: "100,000 VND/bin",
       usdValue: "4.02 USD",
-      notes: "",
+      notes: "-",
     },
     {
       detail: "Product Costs (Large box)",
       vndValue: "200,000 VND/box",
       usdValue: "8.05USD",
-      notes: "",
+      notes: "-",
     },
     {
       detail: "Product Costs (Medium box)",
       vndValue: "100,000 VND/box",
       usdValue: "4.02 USD",
-      notes: "",
+      notes: "-",
     },
     {
       detail: "Product Costs (Small box)",
       vndValue: "50,000 VND/box",
       usdValue: "2.01 USD",
-      notes: "",
-    },
-    {
-      detail: "Other Costs (Travel cost)",
-      vndValue: "5,000 VND/km",
-      usdValue: "0.2 USD/km",
-      notes: "",
-    },
-    {
-      detail: "Tax",
-      vndValue: "5%",
-      usdValue: "-",
-      notes: "",
-    },
-    {
-      detail: "Total Monthly Cost",
-      vndValue: "6,220,000 VND",
-      usdValue: "250.33 USD",
-      notes: "",
+      notes: "-",
     },
   ];
 
@@ -172,11 +123,11 @@ function PricingComponent() {
                   Pricing Table
                 </span>
                 <h2 className="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Awesome Pricing Plan
+                  Detail Price Table
                 </h2>
                 <p className="text-base text-body-color dark:text-dark-6">
-                  There are many variations of passages of Lorem Ipsum available
-                  but the majority have suffered alteration in some form.
+                  There are many types of costs incurred when transporting koi
+                  fish from Japan to Vietnam
                 </p>
               </div>
             </div>
@@ -305,7 +256,7 @@ function PricingComponent() {
                                     ]}
                                   >
                                     <Input
-                                      className="rounded-sm border border-dark text-center outline-1 outline focus:border-dark dark:bg-dark dark:text-white"
+                                      className="rounded-sm border border-dark text-center outline outline-1 focus:border-dark dark:bg-dark dark:text-white"
                                       type="number"
                                       step="1"
                                       min="0"
@@ -323,6 +274,10 @@ function PricingComponent() {
 
                 <div className="flex justify-end">
                   <Button
+                    type="submit"
+                    onClick={() => form.submit()}
+                    className="primaryButton"
+                    loading={loading}
                     style={{
                       color: "#fff",
                       border: "none",
@@ -337,15 +292,12 @@ function PricingComponent() {
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor =
-                        "rgba(234, 88, 12, 1)"; // Hover background color
+                        "rgba(234, 88, 12, 1)";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor =
-                        "rgba(249, 115, 22, 1)"; // Revert to original background color
+                        "rgba(249, 115, 22, 1)";
                     }}
-                    type="submit"
-                    onClick={() => form.submit()}
-                    className="primaryButton"
                   >
                     Estimate
                   </Button>

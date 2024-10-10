@@ -12,7 +12,7 @@ function ContentComponent() {
                   Benefits
                 </span>
                 <h2 className="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Main Benefits Of Play
+                  Main Benefits Of Our Company
                 </h2>
                 <p className="text-base text-body-color dark:text-dark-6">
                   We offer multiple advantages to ensure the best shipping
@@ -211,18 +211,62 @@ function ContentComponent() {
               <div className="w-full px-4 lg:w-1/2">
                 <div className="mb-12 max-w-[540px] lg:mb-0">
                   <h2 className="mb-5 text-3xl font-bold leading-tight text-dark dark:text-white sm:text-[40px] sm:leading-[1.2]">
-                    Brilliant Toolkit to Build Nextgen Website Faster.
+                    KOI FISH SHIPPING PROCESS FROM JAPAN TO VIETNAM.
                   </h2>
                   <p className="mb-10 text-base leading-relaxed text-body-color dark:text-dark-6">
-                    The main `thrust` is to focus on educating attendees on how
-                    to best protect highly vulnerable business applications with
-                    interactive panel discussions and roundtables led by subject
-                    matter experts.
+                    <span className="font-semibold dark:text-white">
+                      1. Order Confirmation:
+                    </span>{" "}
+                    Order Confirmation: Place your order online or through sales
+                    staff, who will confirm details like fish type, quantity,
+                    and delivery address. Once confirmed, we notify logistics to
+                    start processing.
                     <br />
                     <br />
-                    The main `thrust` is to focus on educating attendees on how
-                    to best protect highly vulnerable business applications with
-                    interactive panel.
+                    <span className="font-semibold dark:text-white">
+                      2. Fish Health Check:
+                    </span>{" "}
+                    Our team in Japan inspects the fish to ensure they’re
+                    healthy and ready for transport. Any fish needing care will
+                    be treated before shipping.
+                    <br />
+                    <br />
+                    <span className="font-semibold dark:text-white">
+                      3. Size & Weight Check:
+                    </span>{" "}
+                    We measure the fish and calculate shipping costs based on
+                    size, weight, distance, and conditions.
+                    <br />
+                    <br />
+                    <span className="font-semibold dark:text-white">
+                      4. Packing:
+                    </span>{" "}
+                    Fish are packed in oxygenated boxes optimized for safety and
+                    cost-effectiveness.
+                    <br />
+                    <br />
+                    <span className="font-semibold dark:text-white">
+                      5. International Transport:
+                    </span>{" "}
+                    Fish are flown from Japan to Vietnam. After arrival, they
+                    are rechecked before being loaded onto trucks for domestic
+                    delivery.
+                    <br />
+                    <br />
+                    <span className="font-semibold dark:text-white">
+                      6. Domestic Delivery:
+                    </span>{" "}
+                    Fish are transported from Ho Chi Minh to provincial
+                    warehouses and then to your specific address. You`ll receive
+                    updates along the way.
+                    <br />
+                    <br />
+                    <span className="font-semibold dark:text-white">
+                      7. Cost & Payment:
+                    </span>{" "}
+                    We provide a detailed invoice including international and
+                    domestic shipping fees. Once payment is confirmed, the order
+                    status is updated, and you can leave feedback.
                   </p>
 
                   <a
@@ -236,10 +280,22 @@ function ContentComponent() {
 
               <div className="w-full px-4 lg:w-1/2">
                 <div className="-mx-2 flex flex-wrap sm:-mx-4 lg:-mx-2 xl:-mx-4">
+                  <div className="w-full px-2 sm:px-4 lg:px-2 xl:px-4">
+                    <div className="mb-4 w-full sm:mb-8 sm:h-[400px] md:h-[540px] lg:h-[400px] xl:h-[500px]">
+                      <img
+                        src="./assets/images/about/about-image-03.jpg"
+                        alt="about image"
+                        className="h-full w-full object-cover object-center"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="-mx-2 flex flex-wrap sm:-mx-4 lg:-mx-2 xl:-mx-4">
                   <div className="w-full px-2 sm:w-1/2 sm:px-4 lg:px-2 xl:px-4">
                     <div className="mb-4 sm:mb-8 sm:h-[400px] md:h-[540px] lg:h-[400px] xl:h-[500px]">
                       <img
-                        src="./assets/images/about/about-image-01.jpg"
+                        src="./assets/images/about/about-image-05.jpg"
                         alt="about image"
                         className="h-full w-full object-cover object-center"
                       />
@@ -249,7 +305,7 @@ function ContentComponent() {
                   <div className="w-full px-2 sm:w-1/2 sm:px-4 lg:px-2 xl:px-4">
                     <div className="mb-4 sm:mb-8 sm:h-[220px] md:h-[346px] lg:mb-4 lg:h-[225px] xl:mb-8 xl:h-[310px]">
                       <img
-                        src="./assets/images/about/about-image-02.jpg"
+                        src="./assets/images/about/about-image-04.jpg"
                         alt="about image"
                         className="h-full w-full object-cover object-center"
                       />
@@ -394,11 +450,13 @@ function ContentComponent() {
                   <h2 className="mb-2.5 text-3xl font-bold text-white md:text-[38px] md:leading-[1.44]">
                     <span>Are You Looking For Delivery Service ?</span>
                     <span className="text-3xl font-normal md:text-[40px]">
-                      {" "}Get Started Now
+                      {" "}
+                      Get Started Now
                     </span>
                   </h2>
                   <p className="mx-auto mb-6 max-w-[515px] text-base leading-[1.5] text-white">
-                    There are many variations of delivery methods you can choose to tranport your koi fish
+                    There are many variations of delivery methods you can choose
+                    to tranport your koi fish
                   </p>
                   <a
                     href="javascript:void(0)"

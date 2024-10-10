@@ -1,18 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
 import { Link } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
 function ForgotPasswordPage() {
+  const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const handleForgotPassword = async (values) => {
     try {
+      setLoading(true);
       const response = await api.post("forgot-password", values);
       console.log(response);
       toast.success("Successfully verify email");
     } catch (err) {
       toast.error(err.response.data);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -24,7 +28,7 @@ function ForgotPasswordPage() {
             <div className="w-full px-4">
               <div className="text-center">
                 <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Verify Email Page
+                  Forgot Password Page
                 </h1>
                 <p className="mb-5 text-base text-body-color dark:text-dark-6">
                   There are many variations of passages of Lorem Ipsum
@@ -109,6 +113,10 @@ function ForgotPasswordPage() {
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
                     <Button
+                      type="submit"
+                      onClick={() => form.submit()}
+                      className="primaryButton"
+                      loading={loading}
                       style={{
                         margin: "0px",
                         width: "100%",
@@ -126,15 +134,12 @@ function ForgotPasswordPage() {
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor =
-                          "rgba(234, 88, 12, 1)"; // Hover background color
+                          "rgba(234, 88, 12, 1)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor =
-                          "rgba(249, 115, 22, 1)"; // Revert to original background color
+                          "rgba(249, 115, 22, 1)";
                       }}
-                      type="submit"
-                      onClick={() => form.submit()}
-                      className="primaryButton"
                     >
                       Verify
                     </Button>

@@ -8,6 +8,7 @@ import uploadFile from "../../utils/file";
 import { useForm } from "antd/es/form/Form";
 
 function RegisterPage() {
+  const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const navigate = useNavigate();
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -22,11 +23,14 @@ function RegisterPage() {
       values.image = url;
     }
     try {
+      setLoading(true);
       const response = await api.post("register", values);
       toast.success("Successfully register a new account");
       navigate("/login");
     } catch (err) {
       toast.error(err.response.data);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -274,6 +278,10 @@ function RegisterPage() {
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
                     <Button
+                      type="submit"
+                      onClick={() => form.submit()}
+                      className="primaryButton"
+                      loading={loading}
                       style={{
                         margin: "0px",
                         width: "100%",
@@ -297,9 +305,6 @@ function RegisterPage() {
                         e.currentTarget.style.backgroundColor =
                           "rgba(249, 115, 22, 1)"; // Revert to original background color
                       }}
-                      type="submit"
-                      onClick={() => form.submit()}
-                      className="primaryButton"
                     >
                       Register
                     </Button>
