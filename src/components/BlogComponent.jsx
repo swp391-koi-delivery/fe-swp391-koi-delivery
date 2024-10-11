@@ -72,7 +72,7 @@ function BlogComponent() {
       const file = fileList[0];
       //console.log(file);
       const url = await uploadFile(file.originFileObj);
-      blog.image = url;
+      blog.img = url;
     }
     try {
       setSubmitting(true);
@@ -149,7 +149,7 @@ function BlogComponent() {
                   >
                     <Input />
                   </Form.Item>
-                  <Form.Item label="image" name="image">
+                  <Form.Item label="image" name="img">
                     <Upload
                       action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                       listType="picture-card"
