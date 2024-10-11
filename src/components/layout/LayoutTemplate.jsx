@@ -233,20 +233,21 @@ function LayoutTemplate() {
                         Estimate
                       </a>
                     </li>
+
+                    <li className="group relative">
+                      <a
+                        href="#blog"
+                        className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-body-color dark:lg:text-dark-6 xl:ml-10"
+                      >
+                        Blog
+                      </a>
+                    </li>
                     <li className="group relative">
                       <a
                         href="/#contact"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-body-color dark:lg:text-dark-6 xl:ml-10"
                       >
                         Contact
-                      </a>
-                    </li>
-                    <li className="group relative">
-                      <a
-                        href="blog-grids.html"
-                        className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-body-color dark:lg:text-dark-6 xl:ml-10"
-                      >
-                        Blog
                       </a>
                     </li>
                     <li className="submenu-item group relative">
@@ -371,7 +372,7 @@ function LayoutTemplate() {
           </div>
         </div>
       </div>
-        <Outlet />
+      <Outlet />
       <FooterComponent />
     </>
   );

@@ -2,21 +2,31 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
 function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // Get URL params
+  const token = searchParams.get("token");
   const handleResetPassword = async (values) => {
+    if (!token) {
+      toast.error("Invalid or missing token.");
+      return;
+    }
     try {
       setLoading(true);
-      const response = await api.post("reset", values);
+      const payload = {
+        ...values,
+        token, // Include the token in the request
+      };
+      const response = await api.post("reset-password", payload);
       console.log(response);
       toast.success("Successfully reset password");
       navigate("/login");
     } catch (err) {
-      toast.error(err.response.data);
+      toast.error(err.response?.data || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -92,12 +102,6 @@ function ResetPasswordPage() {
                   </a>
                 </div>
                 <Form onFinish={handleResetPassword}>
-                  <Form.Item name="email" className="mb-[22px]">
-                    <Input
-                      placeholder="Email"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
                   <Form.Item
                     name="password"
                     className="mb-[22px]"
@@ -124,13 +128,15 @@ function ResetPasswordPage() {
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
+
                   <Form.Item
                     name="passwordConfirm"
                     className="mb-[22px]"
+                    dependencies={["password"]}
                     rules={[
                       {
                         required: true,
-                        message: "Please input password",
+                        message: "Please confirm your password",
                       },
                       {
                         pattern: /.*[A-Z].*/,
@@ -141,12 +147,22 @@ function ResetPasswordPage() {
                         min: 6,
                         message: "Password must be at least 6 characters!",
                       },
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (!value || getFieldValue("password") === value) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            new Error("The two passwords do not match!"),
+                          );
+                        },
+                      }),
                     ]}
                     style={{ textAlign: "left" }}
                   >
                     <Input.Password
                       required
-                      placeholder="Password Confirm"
+                      placeholder="Confirm Password"
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
