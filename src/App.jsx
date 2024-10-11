@@ -20,10 +20,11 @@ import OrderList from "./pages/salesstaff";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
 import "./index.css";
 import "./App.css";
+import CartPage from "./pages/cart/CartPage";
 function App() {
   const ProtectRouteAuth = ({ children }) => {
     const user = useSelector((store) => store);
-    // console.log(user);
+    console.log(user);
     console.log(user.user);
     if (
       user.user &&
@@ -62,11 +63,15 @@ function App() {
           path: "reset-password",
           element: <ResetPasswordPage />,
         },
-        {
-          path: "order",
-          element: <OrderPage />,
-        },
       ],
+    },
+    {
+      path: "cart",
+      element: <CartPage />,
+    },
+    {
+      path: "order",
+      element: <OrderPage />,
     },
     {
       path: "orderList",
