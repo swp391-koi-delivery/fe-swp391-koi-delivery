@@ -1,21 +1,15 @@
-import { Badge, Button, Table } from "antd";
+import { Badge } from "antd";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { clearAll } from "../../redux/features/cartSlice";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
 import { ShoppingCartOutlined } from "@ant-design/icons";
+import { useSelector } from "react-redux";
 
 function CartPage() {
   const navigate = useNavigate();
-  const cart = useSelector((store) => store.cart);
-  const data = useSelector((store) => store.cart);
   const user = useSelector((store) => store.user);
-  const dispatch = useDispatch();
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
@@ -183,59 +177,6 @@ function CartPage() {
     handleDarkMode();
   }, []);
 
-  const columns = [
-    {
-      title: "Origin Location",
-      dataIndex: "originLocation",
-    },
-    {
-      title: "Destination Location",
-      dataIndex: "destinationLocation",
-    },
-    {
-      title: "Fish Size",
-      dataIndex: "fishSize",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-    },
-  ];
-  console.log(data);
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const handleBuy = async () => {
-    try {
-      console.log(setSelectedRowKeys);
-      const selectedItems = data.filter((koi) =>
-        selectedRowKeys.includes(koi.id),
-      );
-      console.log(selectedItems);
-      const detail = selectedItems.map((koi) => ({
-        koiId: koi.id,
-        quantity: koi.quantity,
-      }));
-      console.log(detail);
-      const response = await api.post("order", { detail });
-      dispatch(clearAll());
-      toast.success("successfully order");
-    } catch (error) {
-      toast.error("failed to order");
-    }
-  };
-
-   const handleLogout = () => {
-     dispatch(logout());
-     navigate("/login");
-   };
   return (
     <>
       <div className="ud-header absolute left-0 top-0 z-40 flex w-full items-center bg-transparent">
@@ -526,16 +467,7 @@ function CartPage() {
           </div>
         </div>
       </div>
-      <div style={{ padding: "80px", backgroundColor: "#F4F7FF" }}>
-        <Button onClick={() => dispatch(clearAll())}>Clear All</Button>
-        <Table
-          rowKey="id"
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={data}
-        />
-        <Button onClick={handleBuy}>Buy</Button>
-      </div>
+      <h1>hrllo</h1>
       <FooterComponent />
     </>
   );

@@ -2,31 +2,22 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
+import { Link, useNavigate } from "react-router-dom";
 function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams(); // Get URL params
-  const token = searchParams.get("token");
+
   const handleResetPassword = async (values) => {
-    if (!token) {
-      toast.error("Invalid or missing token.");
-      return;
-    }
     try {
       setLoading(true);
-      const payload = {
-        ...values,
-        token, // Include the token in the request
-      };
-      const response = await api.post("reset-password", payload);
+      const response = await api.post("reset-password", { password: values.password });
       console.log(response);
-      toast.success("Successfully reset password");
+      toast.success("Password reset successfully");
       navigate("/login");
     } catch (err) {
-      toast.error(err.response?.data || "Something went wrong.");
+      toast.error(err.response.data);
     } finally {
       setLoading(false);
     }
@@ -101,7 +92,11 @@ function ResetPasswordPage() {
                     />
                   </a>
                 </div>
-                <Form onFinish={handleResetPassword}>
+                <Form
+                  onFinish={handleResetPassword}
+                  title="Reset Password"
+                  form={form}
+                >
                   <Form.Item
                     name="password"
                     className="mb-[22px]"

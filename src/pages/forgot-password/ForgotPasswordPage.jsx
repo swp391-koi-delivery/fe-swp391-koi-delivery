@@ -12,7 +12,7 @@ function ForgotPasswordPage() {
       setLoading(true);
       const response = await api.post("forgot-password", values);
       console.log(response);
-      toast.success("Successfully verify email");
+      toast.success(response.data);
     } catch (err) {
       toast.error(err.response.data);
     } finally {

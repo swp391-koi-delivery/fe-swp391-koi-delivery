@@ -6,7 +6,6 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { Badge } from "antd";
 function HeaderComponent() {
   const navigate = useNavigate();
-  const cart = useSelector((store) => store.cart);
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
 
@@ -409,16 +408,6 @@ function HeaderComponent() {
                     </svg>
                   </span>
                 </label>
-                {user && (
-                  <Link to="/cart" className="block pt-[2px]">
-                    <Badge count={cart.length}>
-                      <ShoppingCartOutlined
-                        className="cart"
-                        style={{ fontSize: 28 }}
-                      />
-                    </Badge>
-                  </Link>
-                )}
                 <div className="hidden sm:flex">
                   {user == null ? (
                     <div className="">
