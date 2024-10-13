@@ -38,7 +38,7 @@ const OrderList = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await api.get("orders");
+      const response = await api.get("order");
       setOrders(response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -109,9 +109,9 @@ const OrderList = () => {
     try {
       setSubmitting(true);
       if (values.id) {
-        const response = await api.put(`orders/${values.id}`, values);
+        const response = await api.put(`order/${values.id}`, values);
       } else {
-        const response = await api.post("orders", values);
+        const response = await api.post("order", values);
       }
       toast.success("Submit successfully");
       form.resetFields();
@@ -127,7 +127,7 @@ const OrderList = () => {
   const handleDelete = async (id) => {
     try {
       //await axios.delete(`${api}/${userId}`);
-      await api.delete(`orders/${id}`);
+      await api.delete(`order/${id}`);
       toast.success("Deleted successfully");
       fetchOrders();
     } catch (error) {
@@ -145,7 +145,7 @@ const OrderList = () => {
 
   return (
     <div className="container mx-auto bg-gray-50 px-4 py-8">
-      <h1 className="mb-8 text-center text-4xl font-bold text-indigo-700">
+      <h1 className="mb-8 text-center text-4xl font-bold text-orange-500">
         Order List
       </h1>
       <div className="mb-6 flex flex-wrap items-center justify-between rounded-lg bg-white p-6 shadow-md">
@@ -154,7 +154,7 @@ const OrderList = () => {
             <input
               type="text"
               placeholder="Search orders..."
-              className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500"
               value={searchTerm}
               onChange={handleSearch}
             />
@@ -163,7 +163,7 @@ const OrderList = () => {
         </div>
         <div className="flex w-full flex-wrap justify-end md:w-2/3">
           <select
-            className="mb-2 mr-2 rounded-lg border border-gray-300 p-2 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400 md:mb-0"
+            className="mb-2 mr-2 rounded-lg border border-gray-300 p-2 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 md:mb-0"
             onChange={(e) => handleFilter("orderStatus", e.target.value)}
             value={filterConfig.orderStatus}
           >
@@ -174,7 +174,7 @@ const OrderList = () => {
             <option value="Delivered">Delivered</option>
           </select>
           <select
-            className="mb-2 mr-2 rounded-lg border border-gray-300 p-2 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400 md:mb-0"
+            className="mb-2 mr-2 rounded-lg border border-gray-300 p-2 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 md:mb-0"
             onChange={(e) => handleFilter("paymentStatus", e.target.value)}
             value={filterConfig.paymentStatus}
           >
@@ -184,7 +184,7 @@ const OrderList = () => {
           </select>
           <input
             type="date"
-            className="mb-2 mr-2 rounded-lg border border-gray-300 p-2 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400 md:mb-0"
+            className="mb-2 mr-2 rounded-lg border border-gray-300 p-2 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 md:mb-0"
             onChange={(e) =>
               handleFilter("dateRange", {
                 ...filterConfig.dateRange,
@@ -195,7 +195,7 @@ const OrderList = () => {
           />
           <input
             type="date"
-            className="rounded-lg border border-gray-300 p-2 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="rounded-lg border border-gray-300 p-2 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500"
             onChange={(e) =>
               handleFilter("dateRange", {
                 ...filterConfig.dateRange,
@@ -308,10 +308,11 @@ const OrderList = () => {
               <tbody>
                 {currentOrders.map((order) => (
                   <tr
-                    key={order.orderId}
+                    key={order.id}
                     className="transition-colors duration-200 ease-in-out hover:bg-gray-50"
                   >
-                    <td className="border-t px-4 py-3">{order.orderId}</td>
+                    <td className="border-t px-4 py-3">{order.id}</td>
+                    <td className="border-t px-4 py-3">{order.trackingOrder}</td>
                     <td className="border-t px-4 py-3">
                       {order.describeOrder}
                     </td>
@@ -326,12 +327,10 @@ const OrderList = () => {
                       {new Date(order.orderDate).toLocaleDateString()}
                     </td>
                     <td className="border-t px-4 py-3">
-                      ${order.totalPrice.toFixed(2)}
+                      ${order.price.toFixed(2)}
                     </td>
                     <td className="border-t px-4 py-3">{order.payment}</td>
-                    <td className="border-t px-4 py-3">{order.size}</td>
-                    <td className="border-t px-4 py-3">${order.quantity}</td>
-                    <td className="border-t px-4 py-3">${order.volume}</td>
+                    <td className="border-t px-4 py-3">${order.totalquantity}</td>
                     <td className="border-t px-4 py-3">
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-semibold ${

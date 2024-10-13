@@ -24,13 +24,13 @@ const ManageStatistic = () => {
   const processChartData = () => {
     const chartData = orderData.map(order => ({
       orderDate: new Date(order.orderDate).toLocaleDateString(),
-      totalPrice: order.totalPrice
+      price: order.price
     }));
     return chartData.sort((a, b) => new Date(a.orderDate) - new Date(b.orderDate));
   };
 
   const calculateTotalRevenue = () => {
-    return orderData.reduce((sum, order) => sum + order.totalPrice, 0).toFixed(2);
+    return orderData.reduce((sum, order) => sum + order.price, 0).toFixed(2);
   };
 
   const calculateAverageOrderValue = () => {
@@ -49,7 +49,7 @@ const ManageStatistic = () => {
             <XAxis dataKey="orderDate" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="totalPrice" stroke="#8884d8" activeDot={{ r: 8 }} />
+            <Line type="monotone" dataKey="price" stroke="#8884d8" activeDot={{ r: 8 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -93,7 +93,7 @@ const ManageStatistic = () => {
         <div className="flex justify-between items-center">
           <span>Highest Order Value:</span>
           <span className="font-bold">
-            ${Math.max(...orderData.map(order => order.totalPrice)).toFixed(2)}
+            ${Math.max(...orderData.map(order => order.price)).toFixed(2)}
           </span>
         </div>
       </div>
