@@ -73,7 +73,6 @@ const Dashboard = () => {
   } else if (role === "SALESSTAFF") {
     items = [getItem("Manage Order", "orderList", <ProductOutlined />)];
   }
-
   return (
     <Layout
       style={{

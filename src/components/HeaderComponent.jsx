@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../src/redux/features/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { Badge } from "antd";
 function HeaderComponent() {
+  const navigate = useNavigate();
+  const cart = useSelector((store) => store.cart);
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
 
@@ -174,6 +176,11 @@ function HeaderComponent() {
     handleDarkMode();
   }, []);
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
+
   return (
     <>
       <div className="ud-header absolute left-0 top-0 z-40 flex w-full items-center bg-transparent">
@@ -202,7 +209,7 @@ function HeaderComponent() {
                   id="navbarCollapse"
                   className="absolute right-4 top-full hidden w-full max-w-[250px] rounded-lg bg-white py-5 shadow-lg dark:bg-dark-2 lg:static lg:block lg:w-full lg:max-w-full lg:bg-transparent lg:px-4 lg:py-0 lg:shadow-none dark:lg:bg-transparent xl:px-6"
                 >
-                  <ul className="blcok lg:flex 2xl:ml-20">
+                  <ul className="block lg:flex 2xl:ml-20">
                     <li className="submenu-item group relative md:hidden">
                       <a
                         href="javascript:void(0)"
@@ -247,7 +254,7 @@ function HeaderComponent() {
                             Profile
                           </Link>
                           <Link
-                            onClick={() => dispatch(logout())}
+                            onClick={handleLogout}
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Logout
@@ -289,18 +296,18 @@ function HeaderComponent() {
                     </li>
                     <li className="group relative">
                       <a
-                        href="#contact"
-                        className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10"
-                      >
-                        Contact
-                      </a>
-                    </li>
-                    <li className="group relative">
-                      <a
                         href="#blog"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10"
                       >
                         Blog
+                      </a>
+                    </li>
+                    <li className="group relative">
+                      <a
+                        href="#contact"
+                        className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10"
+                      >
+                        Contact
                       </a>
                     </li>
                     <li className="submenu-item group relative">
@@ -320,32 +327,28 @@ function HeaderComponent() {
                           <path d="M7.99999 14.9C7.84999 14.9 7.72499 14.85 7.59999 14.75L1.84999 9.10005C1.62499 8.87505 1.62499 8.52505 1.84999 8.30005C2.07499 8.07505 2.42499 8.07505 2.64999 8.30005L7.99999 13.525L13.35 8.25005C13.575 8.02505 13.925 8.02505 14.15 8.25005C14.375 8.47505 14.375 8.82505 14.15 9.05005L8.39999 14.7C8.27499 14.825 8.14999 14.9 7.99999 14.9Z" />
                         </svg>
                       </a>
-                      <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
-                        <a
-                          href="#"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Home Page
-                        </a>
-                        <Link
-                          to="/order-page"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Order Page
-                        </Link>
-                        <Link
-                          to="register"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Register Page
-                        </Link>
-                        <Link
-                          to="/login"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Login Page
-                        </Link>
-                      </div>
+                      {user && (
+                        <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                          <Link
+                            to="/order"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order Page
+                          </Link>
+                          <Link
+                            to="order-history"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order History Page
+                          </Link>
+                          <Link
+                            to="/order-tracking"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order Tracking Page
+                          </Link>
+                        </div>
+                      )}
                     </li>
                   </ul>
                 </nav>
@@ -406,14 +409,16 @@ function HeaderComponent() {
                     </svg>
                   </span>
                 </label>
-                <span className="block pt-[2px]">
-                  <Badge count={10}>
-                    <ShoppingCartOutlined
-                      className="cart"
-                      style={{ fontSize: 28 }}
-                    />
-                  </Badge>
-                </span>
+                {user && (
+                  <Link to="/cart" className="block pt-[2px]">
+                    <Badge count={cart.length}>
+                      <ShoppingCartOutlined
+                        className="cart"
+                        style={{ fontSize: 28 }}
+                      />
+                    </Badge>
+                  </Link>
+                )}
                 <div className="hidden sm:flex">
                   {user == null ? (
                     <div className="">
@@ -454,7 +459,7 @@ function HeaderComponent() {
                           Profile
                         </Link>
                         <Link
-                          onClick={() => dispatch(logout())}
+                          onClick={handleLogout}
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >
                           Logout
