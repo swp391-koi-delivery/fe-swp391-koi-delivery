@@ -31,6 +31,8 @@ function LoginPage() {
         role === "DELIVERY_STAFF"
       ) {
         navigate("/dashboard");
+      }else if (role === "SALESSTAFF") {
+        navigate("/dashboard");
       }
     } catch (err) {
       toast.error(err.response.data);

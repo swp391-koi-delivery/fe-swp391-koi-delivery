@@ -29,7 +29,7 @@ function App() {
     if (
       user.user &&
       (user.user?.role === "MANAGER" ||
-        user.user?.role === "SALES_STAFF" ||
+        user.user?.role === "SALESSTAFF" ||
         user.user?.role === "DELIVERY_STAFF")
     ) {
       return children;
@@ -86,6 +86,20 @@ function App() {
       ),
       children: [
         {
+          path: "orderList",
+          element: <OrderList />,
+        },
+      ],
+    },
+    {
+      path: "dashboard",
+      element: (
+        <ProtectRouteAuth>
+          <Dashboard />
+        </ProtectRouteAuth>
+      ),
+      children: [
+        {
           path: "user",
           element: <ManageUser />,
         },
@@ -98,14 +112,6 @@ function App() {
           path: "statistic",
           element: <ManageStatistic />,
         },
-
-          element: <ManageOrder/>,
-        },
-        {
-          path: "statistic",
-          element: <ManageStatistic/>,
-        }
-
       ],
     },
   ]);
