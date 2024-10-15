@@ -5,10 +5,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
+import { toast } from "react-toastify";
 function OrderPage() {
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
+  const [orders, setOrders] = useState([]);
 
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
@@ -174,6 +176,7 @@ function OrderPage() {
 
   useEffect(() => {
     handleDarkMode();
+    fetchOrder();
   }, []);
 
   const handleLogout = () => {
@@ -192,6 +195,15 @@ function OrderPage() {
       {dot}
     </Popover>
   );
+
+  const fetchOrder = async () => {
+    try {
+      const response = await api.get("order");
+      setOrders(response.data);
+    } catch (err) {
+      console.log("Failed to fetch order", err);
+    }
+  };
 
   const steps = [
     {
@@ -319,6 +331,58 @@ function OrderPage() {
                   className="absolute right-4 top-full hidden w-full max-w-[250px] rounded-lg bg-white py-5 shadow-lg dark:bg-dark-2 lg:static lg:block lg:w-full lg:max-w-full lg:bg-transparent lg:px-4 lg:py-0 lg:shadow-none dark:lg:bg-transparent xl:px-6"
                 >
                   <ul className="blcok lg:flex 2xl:ml-20">
+                    <li className="submenu-item group relative md:hidden">
+                      <a
+                        href="javascript:void(0)"
+                        className="relative mx-8 flex items-center justify-between py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-8 lg:mr-0 lg:inline-flex lg:py-6 lg:pl-0 lg:pr-4 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10"
+                      >
+                        Account
+                        <svg
+                          className="ml-2 fill-current"
+                          width="16"
+                          height="20"
+                          viewBox="0 0 16 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M7.99999 14.9C7.84999 14.9 7.72499 14.85 7.59999 14.75L1.84999 9.10005C1.62499 8.87505 1.62499 8.52505 1.84999 8.30005C2.07499 8.07505 2.42499 8.07505 2.64999 8.30005L7.99999 13.525L13.35 8.25005C13.575 8.02505 13.925 8.02505 14.15 8.25005C14.375 8.47505 14.375 8.82505 14.15 9.05005L8.39999 14.7C8.27499 14.825 8.14999 14.9 7.99999 14.9Z" />
+                        </svg>
+                      </a>
+                      {user == null ? (
+                        <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                          <Link
+                            to="/login"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Login
+                          </Link>
+                          <Link
+                            to="/register"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Register
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                          <span className="block rounded px-4 text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
+                            {user?.username}
+                          </span>
+                          <Link
+                            to=""
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Profile
+                          </Link>
+                          <Link
+                            onClick={handleLogout}
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Logout
+                          </Link>
+                        </div>
+                      )}
+                    </li>
                     <li className="group relative">
                       <Link
                         to="/"
@@ -388,10 +452,22 @@ function OrderPage() {
                       {user && (
                         <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
                           <Link
+                            to="/"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Home Page
+                          </Link>
+                          <Link
                             to="/order"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Order Page
+                          </Link>
+                          <Link
+                            to="/order-list"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order List Page
                           </Link>
                           <Link
                             to="order-history"
@@ -543,12 +619,12 @@ function OrderPage() {
                       to="/"
                       className="flex items-center gap-[10px] text-base font-medium text-dark dark:text-white"
                     >
-                      Home
+                      Home Page
                     </a>
                   </Link>
                   <li>
                     <Link
-                      to="/order"
+                      to="/order-list"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -556,7 +632,7 @@ function OrderPage() {
                         {" "}
                         /{" "}
                       </span>
-                      Order
+                      Order List Page
                     </Link>
                   </li>
                 </ul>
@@ -586,13 +662,14 @@ function OrderPage() {
               </div>
             </div>
           </div>
-          <div className="-mx-4 flex flex-wrap">
+
+          {/*  */}
+          <div className="-mx-4 flex flex-wrap rounded-xl p-6 shadow-pricing">
             <div className="mx-auto w-full px-4 md:px-5 lg:px-5">
               <div className="inline-flex w-full flex-col items-start justify-start gap-12">
-                {/*  */}
-                <div className="flex w-full flex-col items-center justify-between gap-4 pb-4 md:flex-row">
+                <div className="flex w-full flex-row items-center justify-between gap-4 pb-4">
                   <div className="inline-flex w-full flex-col items-center justify-center gap-1 md:w-1/2 md:items-start md:justify-start">
-                    <h2 className="text-2xl font-semibold leading-9 text-dark dark:text-white">
+                    <h2 className="mb-2 text-2xl font-semibold leading-9 text-dark dark:text-white">
                       Order
                       <span className="text-dark dark:text-white">#125103</span>
                     </h2>
@@ -600,7 +677,16 @@ function OrderPage() {
                       May 21, 2023
                     </span>
                   </div>
-                  <div className="w-full md:w-1/2">
+                  <div className="flex w-full flex-col items-end justify-between md:w-1/2">
+                    <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
+                      Ready for Delivery
+                    </p>
+                    <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
+                      Ready for Delivery
+                    </p>
+                    <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
+                      Ready for Delivery
+                    </p>
                     <button className="primaryButton flex w-full items-center justify-center rounded-lg py-2 transition-all duration-700 ease-in-out sm:w-fit md:w-1/2">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -623,7 +709,6 @@ function OrderPage() {
                     </button>
                   </div>
                 </div>
-                {/*  */}
                 <div className="inline-flex w-full items-start justify-end gap-4">
                   <div className="inline-flex w-full flex-col items-start justify-start gap-4">
                     <div className="flex w-full flex-col items-center justify-center gap-5 rounded-xl bg-white dark:bg-dark md:items-start md:justify-start">
@@ -784,6 +869,7 @@ function OrderPage() {
               </div>
             </div>
           </div>
+          {/*  */}
         </div>
       </section>
       <FooterComponent />

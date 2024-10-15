@@ -5,7 +5,6 @@ import ContentComponent from "../../components/ContentComponent";
 import PricingComponent from "../../components/PricingComponent";
 import FooterComponent from "../../components/FooterComponent";
 import BlogComponent from "../../components/BlogComponent";
-import MapComponent from "../../components/MapComponent";
 
 function HomePage() {
   return (
@@ -13,7 +12,6 @@ function HomePage() {
       <HeaderComponent />
       <BannerComponent />
       <ContentComponent />
-      <MapComponent />
       <PricingComponent />
       <BlogComponent />
       <FooterComponent />
