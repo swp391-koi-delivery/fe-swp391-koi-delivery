@@ -275,12 +275,6 @@ function LayoutTemplate() {
                           Home Page
                         </Link>
                         <Link
-                          to="/order-page"
-                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                        >
-                          Order Page
-                        </Link>
-                        <Link
                           to="/register"
                           className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                         >

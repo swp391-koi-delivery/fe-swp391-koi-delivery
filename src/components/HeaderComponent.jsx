@@ -335,16 +335,22 @@ function HeaderComponent() {
                             Order Page
                           </Link>
                           <Link
-                            to="order-history"
+                            to="/order-list"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
-                            Order History Page
+                            Order List Page
                           </Link>
                           <Link
                             to="/order-tracking"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Order Tracking Page
+                          </Link>
+                          <Link
+                            to="order-history"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order History Page
                           </Link>
                         </div>
                       )}
