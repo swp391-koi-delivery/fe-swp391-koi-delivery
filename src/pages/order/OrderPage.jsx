@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import { Badge, Button, Form, Input, Radio } from "antd";
+import { Button, Form, Input, Select } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
-import { addOrder } from "../../redux/features/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { ShoppingCartOutlined } from "@ant-design/icons";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
 import { toast } from "react-toastify";
 function OrderPage() {
   const navigate = useNavigate();
-  const cart = useSelector((store) => store.cart);
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
-  const [value, setValue] = useState("Individual shipment");
+  const [numberOfFish, setNumberOfFish] = useState(0);
 
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
@@ -184,23 +181,91 @@ function OrderPage() {
     handleDarkMode();
   }, []);
 
-  const onChange = (e) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
-  };
-
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
   };
 
-  const handleAddToCart = () => {
+  const handleNumberOfFishChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    setNumberOfFish(value);
+
+    let singleOrders = 0;
+    let wholesaleOrders = 0;
+    let remainingFish = value;
+
+    // Calculate the number of single and wholesale orders
+    while (remainingFish > 0) {
+      if (remainingFish >= 20) {
+        wholesaleOrders += 1;
+        remainingFish -= 50; // Wholesale order for 20-50 fish
+      } else if (remainingFish > 10) {
+        singleOrders += 2; // If more than 10 but less than 20, split into 2 single orders
+        remainingFish -= 20;
+      } else if (remainingFish >= 1 && remainingFish <= 10) {
+        singleOrders += 1;
+        remainingFish -= 10; // Single order for 1-10 fish
+      }
+    }
+
+    // Display notification to the user
+    toast.info(
+      `You need ${singleOrders} single order(s) and ${wholesaleOrders} wholesale order(s).`,
+    );
+  };
+
+  const handleSubmitOrder = async (values) => {
+    let notes = values.customerNotes || "";
+    let numberOfFish = values.numberOfFish;
+
+    let singleOrders = 0;
+    let wholesaleOrders = 0;
+    let remainingFish = numberOfFish;
+
+    // Calculate the number of single and wholesale orders
+    while (remainingFish > 0) {
+      if (remainingFish >= 20) {
+        wholesaleOrders += 1;
+        remainingFish -= 50; // Wholesale order for 20-50 fish
+      } else if (remainingFish >= 1 && remainingFish <= 10) {
+        singleOrders += 1;
+        remainingFish -= 10; // Single order for 1-10 fish
+      } else if (remainingFish > 10 && remainingFish < 20) {
+        singleOrders += 1;
+        remainingFish -= remainingFish; // Remaining fish will be another single order
+      }
+    }
+
+    // Construct customer notes based on the calculated orders
+    notes += ` ${singleOrders} single order delivery(s) and ${wholesaleOrders} wholesale order delivery(s).`;
+    const orderData = {
+      originLocation: values.originLocation,
+      destinationLocation: values.destinationLocation,
+      customerNotes: notes,
+      paymentMethod: values.paymentMethod,
+      orderDetailRequestList: [
+        {
+          priceOfFish: parseInt(values.priceOfFish),
+          nameFarm: values.nameFarm,
+          farmAddress: values.farmAddress,
+          origin: values.originLocation,
+          destination: values.destinationLocation,
+          recipientInfo: values.recipientInfo,
+          fishSpecies: values.fishSpecies,
+          numberOfFish: parseInt(values.numberOfFish, 10),
+          sizeOfFish: parseFloat(values.sizeOfFish),
+          describeOrder: values.describeOrder,
+        },
+      ],
+    };
     try {
       setLoading(true);
-      const order = form.getFieldsValue(); // Get form values
-      dispatch(addOrder(order)); // Dispatch the action with the form values
+      const response = await api.post("order", orderData);
+      console.log(response);
+      toast.success("Successfully created order");
+      form.resetFields();
     } catch (err) {
-      toast.error("Failed to add order to cart");
+      toast.error(err.response.data);
     } finally {
       setLoading(false);
     }
@@ -388,16 +453,6 @@ function OrderPage() {
                     </svg>
                   </span>
                 </label>
-                {user && (
-                  <Link to="/cart" className="block pt-[2px]">
-                    <Badge count={cart.length}>
-                      <ShoppingCartOutlined
-                        className="cart-page"
-                        style={{ fontSize: 28 }}
-                      />
-                    </Badge>
-                  </Link>
-                )}
                 <div className="hidden sm:flex">
                   <div className="hidden sm:flex">
                     {user == null ? (
@@ -522,143 +577,256 @@ function OrderPage() {
                     />
                   </a>
                 </div>
-                <Radio.Group
-                  onChange={onChange}
-                  value={value}
-                  className="mb-[22px]"
-                >
-                  <Radio
-                    value={"Individual shipment"}
-                    className="dark:text-white"
+                <Form title="Order" form={form} onFinish={handleSubmitOrder}>
+                  <Form.Item
+                    name="originLocation"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input origin location",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
                   >
-                    Individual shipment
-                  </Radio>
-                  <Radio value={"Bulk shipment"} className="dark:text-white">
-                    Bulk shipment
-                  </Radio>
-                </Radio.Group>
-                {value === "Individual shipment" && (
-                  <Form title="Order" form={form} onFinish={handleAddToCart}>
-                    <Form.Item name="originLocation" className="mb-[22px]">
-                      <Input
-                        placeholder="Origin Location"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item name="destinationLocation" className="mb-[22px]">
-                      <Input
-                        placeholder="Destination Location"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item name="fishSize" className="mb-[22px]">
-                      <Input
-                        placeholder="Fish Size"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item name="quantity" className="mb-[22px]">
-                      <Input
-                        placeholder="Quantity"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item className="mb-[22px]">
-                      <Button
-                        type="submit"
-                        onClick={() => form.submit()}
-                        className="primaryButton"
-                        loading={loading}
-                        style={{
-                          margin: "0px",
-                          width: "100%",
-                          color: "#fff",
-                          border: "none",
-                          padding: "1.25rem 1.75rem",
-                          fontSize: "1rem",
-                          lineHeight: "1.5rem",
-                          transitionDuration: "300ms",
-                          fontWeight: "500",
-                          transitionProperty:
-                            "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
-                          transitionTimingFunction:
-                            "cubic-bezier(0.4, 0, 0.2, 1)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            "rgba(234, 88, 12, 1)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            "rgba(249, 115, 22, 1)";
-                        }}
-                      >
-                        Order
-                      </Button>
-                    </Form.Item>
-                  </Form>
-                )}
-                {value === "Bulk shipment" && (
-                  <Form title="Order" form={form} onFinish={handleAddToCart}>
-                    <Form.Item name="originLocation" className="mb-[22px]">
-                      <Input
-                        placeholder="Origin Location"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item name="destinationLocation" className="mb-[22px]">
-                      <Input
-                        placeholder="Destination Location"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item name="fishSize" className="mb-[22px]">
-                      <Input
-                        placeholder="Fish Size"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item name="quantity" className="mb-[22px]">
-                      <Input
-                        placeholder="Quantity"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item className="mb-[22px]">
-                      <Button
-                        type="submit"
-                        onClick={() => form.submit()}
-                        className="primaryButton"
-                        loading={loading}
-                        style={{
-                          margin: "0px",
-                          width: "100%",
-                          color: "#fff",
-                          border: "none",
-                          padding: "1.25rem 1.75rem",
-                          fontSize: "1rem",
-                          lineHeight: "1.5rem",
-                          transitionDuration: "300ms",
-                          fontWeight: "500",
-                          transitionProperty:
-                            "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
-                          transitionTimingFunction:
-                            "cubic-bezier(0.4, 0, 0.2, 1)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            "rgba(234, 88, 12, 1)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            "rgba(249, 115, 22, 1)";
-                        }}
-                      >
-                        Order
-                      </Button>
-                    </Form.Item>
-                  </Form>
-                )}
+                    <Input
+                      placeholder="Origin Location"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="destinationLocation"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input destination location",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Destination Location"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="customerNotes"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input customer notes",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input.TextArea
+                      placeholder="Customer Notes"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    type="number"
+                    name="priceOfFish"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input size of fish",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Price Of Fish"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="nameFarm"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input name farm",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Name Farm"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="farmAddress"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input farm address",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Farm Address"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="recipientInfo"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input recipient info",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input.TextArea
+                      placeholder="Recipient Info"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="fishSpecies"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input fish species",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Fish Species"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    type="number"
+                    name="numberOfFish"
+                    className="mb-[22px]"
+                    onChange={handleNumberOfFishChange}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input number of fish",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Number of Fish"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    type="number"
+                    name="sizeOfFish"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input size of fish",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Size Of Fish"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="paymentMethod"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please choose payment method",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Select
+                      showSearch
+                      style={{
+                        width: "100%",
+                      }}
+                      placeholder="Select payment method"
+                      optionFilterProp="label"
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      options={[
+                        {
+                          value: "Cash",
+                          label: "Cash",
+                        },
+                        {
+                          value: "Bank_transfer",
+                          label: "Bank_transfer",
+                        },
+                      ]}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="describeOrder"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input recipient info",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input.TextArea
+                      placeholder="Describe Order"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item className="mb-[22px]">
+                    <Button
+                      type="submit"
+                      onClick={() => form.submit()}
+                      className="primaryButton"
+                      loading={loading}
+                      style={{
+                        margin: "0px",
+                        width: "100%",
+                        color: "#fff",
+                        border: "none",
+                        padding: "1.25rem 1.75rem",
+                        fontSize: "1rem",
+                        lineHeight: "1.5rem",
+                        transitionDuration: "300ms",
+                        fontWeight: "500",
+                        transitionProperty:
+                          "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                        transitionTimingFunction:
+                          "cubic-bezier(0.4, 0, 0.2, 1)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(234, 88, 12, 1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(249, 115, 22, 1)";
+                      }}
+                    >
+                      Order
+                    </Button>
+                  </Form.Item>
+                </Form>
                 <div>
                   <span className="absolute right-1 top-1">
                     <svg
