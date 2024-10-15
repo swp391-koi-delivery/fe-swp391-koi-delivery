@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import { Badge, Button, Form, Input, Radio, Select } from "antd";
+import { Button, Form, Input, Select } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
 import { useDispatch, useSelector } from "react-redux";
-import { ShoppingCartOutlined } from "@ant-design/icons";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
 import { toast } from "react-toastify";
@@ -14,6 +13,7 @@ function OrderPage() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
+  const [numberOfFish, setNumberOfFish] = useState(0);
 
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
@@ -186,30 +186,84 @@ function OrderPage() {
     navigate("/login");
   };
 
+  const handleNumberOfFishChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    setNumberOfFish(value);
+
+    let singleOrders = 0;
+    let wholesaleOrders = 0;
+    let remainingFish = value;
+
+    // Calculate the number of single and wholesale orders
+    while (remainingFish > 0) {
+      if (remainingFish >= 20) {
+        wholesaleOrders += 1;
+        remainingFish -= 50; // Wholesale order for 20-50 fish
+      } else if (remainingFish > 10) {
+        singleOrders += 2; // If more than 10 but less than 20, split into 2 single orders
+        remainingFish -= 20;
+      } else if (remainingFish >= 1 && remainingFish <= 10) {
+        singleOrders += 1;
+        remainingFish -= 10; // Single order for 1-10 fish
+      }
+    }
+
+    // Display notification to the user
+    toast.info(
+      `You need ${singleOrders} single order(s) and ${wholesaleOrders} wholesale order(s).`,
+    );
+  };
+
   const handleSubmitOrder = async (values) => {
+    let notes = values.customerNotes || "";
+    let numberOfFish = values.numberOfFish;
+
+    let singleOrders = 0;
+    let wholesaleOrders = 0;
+    let remainingFish = numberOfFish;
+
+    // Calculate the number of single and wholesale orders
+    while (remainingFish > 0) {
+      if (remainingFish >= 20) {
+        wholesaleOrders += 1;
+        remainingFish -= 50; // Wholesale order for 20-50 fish
+      } else if (remainingFish >= 1 && remainingFish <= 10) {
+        singleOrders += 1;
+        remainingFish -= 10; // Single order for 1-10 fish
+      } else if (remainingFish > 10 && remainingFish < 20) {
+        singleOrders += 1;
+        remainingFish -= remainingFish; // Remaining fish will be another single order
+      }
+    }
+
+    // Construct customer notes based on the calculated orders
+    notes += ` ${singleOrders} single order delivery(s) and ${wholesaleOrders} wholesale order delivery(s).`;
+    const orderData = {
+      originLocation: values.originLocation,
+      destinationLocation: values.destinationLocation,
+      customerNotes: notes,
+      paymentMethod: values.paymentMethod,
+      orderDetailRequestList: [
+        {
+          priceOfFish: parseInt(values.priceOfFish),
+          nameFarm: values.nameFarm,
+          farmAddress: values.farmAddress,
+          origin: values.originLocation,
+          destination: values.destinationLocation,
+          recipientInfo: values.recipientInfo,
+          fishSpecies: values.fishSpecies,
+          numberOfFish: parseInt(values.numberOfFish, 10),
+          sizeOfFish: parseFloat(values.sizeOfFish),
+          describeOrder: values.describeOrder,
+        },
+      ],
+    };
     try {
       setLoading(true);
-      const orderData = {
-        originLocation: values.orioriginLocation,
-        destinationLocation: values.destinationLocation,
-        customerNotes: values.customerNotes,
-        paymentMethod: values.paymentMethod,
-        orderDetailRequestList: [
-          {
-            priceOfFish: values.priceOfFish,
-            nameFarm: values.nameFarm,
-            farmAddress: values.farmAddress,
-            origin: values.orioriginLocation,
-            destination: values.destinationLocation,
-            recipientInfo: values.recipientInfo,
-            fishSpecies: values.fishSpecies,
-            numberOfFish: values.numberOfFish,
-          },
-        ],
-      };
       const response = await api.post("order", orderData);
       console.log(response);
-      toast.success("Successfully login to account");
+      toast.success("Successfully created order");
+      form.resetFields();
     } catch (err) {
       toast.error(err.response.data);
     } finally {
@@ -573,6 +627,23 @@ function OrderPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    type="number"
+                    name="priceOfFish"
+                    className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input size of fish",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Price Of Fish"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
                     name="nameFarm"
                     className="mb-[22px]"
                     rules={[
@@ -637,6 +708,25 @@ function OrderPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    type="number"
+                    name="numberOfFish"
+                    className="mb-[22px]"
+                    onChange={handleNumberOfFishChange}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input number of fish",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Input
+                      placeholder="Number of Fish"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    type="number"
                     name="sizeOfFish"
                     className="mb-[22px]"
                     rules={[
@@ -649,22 +739,6 @@ function OrderPage() {
                   >
                     <Input
                       placeholder="Size Of Fish"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="numberOfFish"
-                    className="mb-[22px]"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input number of fish",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input
-                      placeholder="Number of Fish"
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
@@ -693,19 +767,33 @@ function OrderPage() {
                       }
                       options={[
                         {
-                          value: "COD",
-                          label: "COD",
+                          value: "Cash",
+                          label: "Cash",
                         },
                         {
-                          value: "VNPAY",
-                          label: "VNPAY",
+                          value: "Bank_transfer",
+                          label: "Bank_transfer",
                         },
                       ]}
                     />
                   </Form.Item>
                   <Form.Item
+                    name="describeOrder"
                     className="mb-[22px]"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input recipient info",
+                      },
+                    ]}
+                    style={{ textAlign: "left" }}
                   >
+                    <Input.TextArea
+                      placeholder="Describe Order"
+                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                    />
+                  </Form.Item>
+                  <Form.Item className="mb-[22px]">
                     <Button
                       type="submit"
                       onClick={() => form.submit()}

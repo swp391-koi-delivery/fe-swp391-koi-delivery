@@ -25,10 +25,10 @@ function RegisterPage() {
     try {
       setLoading(true);
       const response = await api.post("register", values);
-      toast.success("Successfully register a new account");
+      toast.success(response.data || "Successfully register a new account");
       navigate("/login");
     } catch (err) {
-      toast.error(err.response.data);
+      toast.error(err.response.data || "Failed to register a new account");
     } finally {
       setLoading(false);
     }

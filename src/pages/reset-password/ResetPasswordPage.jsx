@@ -4,6 +4,7 @@ import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
@@ -12,12 +13,14 @@ function ResetPasswordPage() {
   const handleResetPassword = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("reset-password", { password: values.password });
+      const response = await axios.post("reset-password", {
+        password: values.password,
+      });
       console.log(response);
-      toast.success("Password reset successfully");
+      toast.success(response.data || "Successfully reset password");
       navigate("/login");
     } catch (err) {
-      toast.error(err.response.data);
+      toast.error(err.response.data || "Failed to reset password");
     } finally {
       setLoading(false);
     }
