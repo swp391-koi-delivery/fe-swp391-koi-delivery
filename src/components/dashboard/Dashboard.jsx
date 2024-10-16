@@ -8,22 +8,30 @@ import {
   DesktopOutlined,
 } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/features/userSlice";
+import { toast } from "react-toastify";
 const { Header, Content, Footer, Sider } = Layout;
 
-function getItem(label, key, icon, children) {
+function getItem(label, key, icon, children, onClick = null) {
   return {
     key,
-    icon:  React.cloneElement(icon, {
-      style: { fontSize: '30px', marginRight: '5px' }, // Tăng kích thước icon và thêm khoảng cách giữa chữ và icon
+    icon: React.cloneElement(icon, {
+      style: { fontSize: "30px", marginRight: "5px" }, // Tăng kích thước icon và thêm khoảng cách giữa chữ và icon
     }),
     children,
-    label: (
+    label: onClick ? (
+      <div
+        onClick={onClick}
+        className="flex items-center text-xl font-semibold text-gray-700 hover:text-blue-500 cursor-pointer"
+      >
+        {label}
+      </div>
+    ) : (
       <Link
         to={`/dashboard/${key}`}
-        className="text-gray-700 hover:text-blue-500 text-xl font-semibold flex items-center"
-        // style={{ gap: '10px', padding: '50px 0', fontSize: '22px', fontWeight: 'bold' }} // Tăng kích thước chữ và thêm khoảng cách giữa các phần tử
+        className="flex items-center text-xl font-semibold text-gray-700 hover:text-blue-500"
       >
         {label}
       </Link>
@@ -40,9 +48,17 @@ const Dashboard = () => {
   const user = useSelector((store) => store.user);
   const role = user.role; // assuming `role` is inside user
 
-
   const location = useLocation(); // Dùng để lấy URL hiện tại
   const pathSnippets = location.pathname.split("/").filter((i) => i); // Tách URL thành từng phần
+
+  const dispathch = useDispatch();
+
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    dispathch(logout());
+    navigate("/");
+    toast.success("Logout successfully");
+  };
 
   // Tạo các breadcrumb items từ path snippets
   const breadcrumbItems = [
@@ -62,16 +78,20 @@ const Dashboard = () => {
     }),
   ];
   let items = [];
+  items.push(getItem("Logout", "logout", <LogoutOutlined />, null, handleLogout));
 
-  if (role === "MANAGER") {
+  if (role === "Manager") {
     items = [
       getItem("Analytics", "statistic", <BarChartOutlined />),
       getItem("Manage User", "user", <UserOutlined />),
-      getItem("Manage Order", "order", <ProductOutlined />),
-      getItem("Log out", "", <LogoutOutlined />),
+      getItem("Manage FeedBack", "order", <ProductOutlined />),
+      getItem("Logout", "logout", <LogoutOutlined />, null, handleLogout),
     ];
-  } else if (role === "SALESSTAFF") {
-    items = [getItem("Manage Order", "orderList", <ProductOutlined />)];
+  } else if (role === "Sale_staff") {
+    items = [
+      getItem("Manage Order", "orderListManagement", <ProductOutlined />),
+      getItem("Logout", "logout", <LogoutOutlined />, null, handleLogout),
+    ];
   }
   return (
     <Layout
@@ -93,10 +113,13 @@ const Dashboard = () => {
           mode="inline"
           items={items}
         />
+        {/* <div onClick={handleLogout} style={{fontSize: "30px", marginRight: "5px" }}>
+          <LogoutOutlined /> <span>Logout</span>
+        </div> */}
       </Sider>
       <Layout className="bg-gray-100">
-      <Header className="bg-white shadow-md">
-          <Breadcrumb separator=">" style={{ padding: '10px 20px' }}>
+        <Header className="bg-white shadow-md">
+          <Breadcrumb separator=">" style={{ padding: "10px 20px" }}>
             {breadcrumbItems}
           </Breadcrumb>
         </Header>
@@ -105,11 +128,11 @@ const Dashboard = () => {
             {/* <Breadcrumb.Item>User</Breadcrumb.Item>
             <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
           </Breadcrumb>
-          <div className="rounded-lg bg-white p-6 shadow-md overflow-auto">
+          <div className="overflow-auto rounded-lg bg-white p-6 shadow-md">
             <Outlet />
           </div>
         </Content>
-        <Footer className=" py-4 text-center">
+        <Footer className="py-4 text-center">
           Ant Design ©{new Date().getFullYear()} Created by Ant UED
         </Footer>
       </Layout>

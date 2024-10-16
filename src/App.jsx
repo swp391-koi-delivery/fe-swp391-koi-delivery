@@ -21,6 +21,7 @@ import LayoutTemplate from "./components/layout/LayoutTemplate";
 import "./index.css";
 import "./App.css";
 import CartPage from "./pages/cart/CartPage";
+import OrderDetailStaff from "./pages/salesstaff/orderDetails-staff";
 function App() {
   const ProtectRouteAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -28,9 +29,9 @@ function App() {
     console.log(user.user);
     if (
       user.user &&
-      (user.user?.role === "MANAGER" ||
-        user.user?.role === "SALESSTAFF" ||
-        user.user?.role === "DELIVERY_STAFF")
+      (user.user?.role === "Manager" ||
+        user.user?.role === "Sale_staff" ||
+        user.user?.role === " Delivering_staff")
     ) {
       return children;
     }
@@ -86,8 +87,12 @@ function App() {
       ),
       children: [
         {
-          path: "orderList",
+          path: "orderListManagement",
           element: <OrderList />,
+        },
+        {
+          path: "orderDetails/:id",
+          element: <OrderDetailStaff />,
         },
       ],
     },
