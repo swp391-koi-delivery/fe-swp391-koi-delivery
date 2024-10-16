@@ -21,8 +21,8 @@ import OrderList from "./pages/sales-staff";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
 import "./index.css";
 import "./App.css";
-import CartPage from "./pages/cart/CartPage";
-import OrderDetailStaff from "./pages/salesstaff/orderDetails-staff";
+//import CartPage from "./pages/cart/CartPage";
+import OrderDetailStaff from "./pages/sales-staff/orderDetails-staff";
 import OrderHistoryPage from "./pages/order-history/OrderHistoryPage";
 import OrderTrackingPage from "./pages/order-tracking/OrderTrackingPage";
 function App() {
@@ -139,9 +139,9 @@ function App() {
     {
       path: "dashboard",
       element: (
-        <ProtectRouteAuth>
+        <ProtectRouteManagerAuth>
           <Dashboard />
-        </ProtectRouteAuth>
+        </ProtectRouteManagerAuth>
       ),
       children: [
         {
