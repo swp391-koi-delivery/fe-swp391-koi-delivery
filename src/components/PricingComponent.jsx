@@ -16,11 +16,11 @@ function PricingComponent() {
     { sizeCm: "40.1 - 44", sizeInch: "15.76 - 17.32" },
     { sizeCm: "44.1 - 50", sizeInch: "17.33 - 19.6" },
     { sizeCm: "50.1 - 55", sizeInch: "19.7 - 21.6" },
-    { sizeCm: "55.1 - 65", sizeInch: "21.7 - 25.5" },
-    { sizeCm: "50 - 60", sizeInch: "19.7 - 23.4" },
-    { sizeCm: "60.1 - 65", sizeInch: "23.5 - 25.5" },
-    { sizeCm: "65.1 - 73", sizeInch: "25.6 - 28.7" },
-    { sizeCm: "73.1 - 83", sizeInch: "28.8 - 32.6" },
+    { sizeCm: "55.1 - 65", sizeInch: "21.7 - 25.6" },
+    { sizeCm: "65.1 -70", sizeInch: "25.6 - 27.6" },
+    { sizeCm: "70.1 - 75", sizeInch: "27.6 -29.5" },
+    { sizeCm: "75.1 - 70", sizeInch: "29.6 - 31.5" },
+    { sizeCm: "80.1 - 83", sizeInch: "31.5 - 37.2" },
   ];
 
   const handleEstimate = async (values) => {

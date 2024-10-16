@@ -5,6 +5,7 @@ import ContentComponent from "../../components/ContentComponent";
 import PricingComponent from "../../components/PricingComponent";
 import FooterComponent from "../../components/FooterComponent";
 import BlogComponent from "../../components/BlogComponent";
+
 function HomePage() {
   return (
     <>

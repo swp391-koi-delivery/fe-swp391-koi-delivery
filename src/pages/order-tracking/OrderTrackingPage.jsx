@@ -1,21 +1,15 @@
-import { Badge, Button, Table } from "antd";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { clearAll } from "../../redux/features/cartSlice";
 import api from "../../config/axios";
-import { toast } from "react-toastify";
+import { Popover, Steps } from "antd";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
-import { ShoppingCartOutlined } from "@ant-design/icons";
-
-function CartPage() {
+function OrderTrackingPage() {
   const navigate = useNavigate();
-  const cart = useSelector((store) => store.cart);
-  const data = useSelector((store) => store.cart);
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
@@ -181,61 +175,127 @@ function CartPage() {
 
   useEffect(() => {
     handleDarkMode();
+    fetchOrder();
   }, []);
 
-  const columns = [
-    {
-      title: "Origin Location",
-      dataIndex: "originLocation",
-    },
-    {
-      title: "Destination Location",
-      dataIndex: "destinationLocation",
-    },
-    {
-      title: "Fish Size",
-      dataIndex: "fishSize",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-    },
-  ];
-  console.log(data);
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
   };
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
+  const customDot = (dot, { status, index }) => (
+    <Popover
+      content={
+        <span>
+          step {index} status: {status}
+        </span>
+      }
+    >
+      {dot}
+    </Popover>
+  );
 
-  const handleBuy = async () => {
+  const fetchOrder = async () => {
     try {
-      console.log(setSelectedRowKeys);
-      const selectedItems = data.filter((koi) =>
-        selectedRowKeys.includes(koi.id),
-      );
-      console.log(selectedItems);
-      const detail = selectedItems.map((koi) => ({
-        koiId: koi.id,
-        quantity: koi.quantity,
-      }));
-      console.log(detail);
-      const response = await api.post("order", { detail });
-      dispatch(clearAll());
-      toast.success("successfully order");
-    } catch (error) {
-      toast.error("failed to order");
+      const response = await api.get("order");
+      setOrders(response.data);
+    } catch (err) {
+      console.log("Failed to fetch order", err);
     }
   };
 
-   const handleLogout = () => {
-     dispatch(logout());
-     navigate("/login");
-   };
+  const steps = [
+    {
+      title: "Finished",
+      description: "hello world",
+      status: "finish", // Mark this as finished
+    },
+    {
+      title: "In Progress",
+      description: "hello world",
+      status: "process", // Currently in progress
+    },
+    {
+      title: "Waiting",
+      description: "hello world",
+      status: "wait", // Waiting status
+    },
+    {
+      title: "Error",
+      description: "hello world",
+      status: "error", // Error occurred
+    },
+    {
+      title: "Pending",
+      description: "hello world",
+      status: "wait", // Pending (waiting for approval)
+    },
+    {
+      title: "Approved",
+      description: "hello world",
+      status: "finish", // Mark as finished (approved)
+    },
+    {
+      title: "Unapproved",
+      description: "hello world",
+      status: "wait", // Still waiting for approval
+    },
+    {
+      title: "Rejected",
+      description: "hello world",
+      status: "error", // Rejected, mark as error
+    },
+  ];
+
+  const transportPrices = [
+    {
+      detail: "Care Costs",
+      vndValue: "100,000 VND/bin",
+      usdValue: "4.02 USD",
+      notes: "-",
+    },
+    {
+      detail: "Product Costs (Large box)",
+      vndValue: "200,000 VND/box",
+      usdValue: "8.05USD",
+      notes: "-",
+    },
+    {
+      detail: "Product Costs (Medium box)",
+      vndValue: "100,000 VND/box",
+      usdValue: "4.02 USD",
+      notes: "-",
+    },
+    {
+      detail: "Product Costs (Small box)",
+      vndValue: "50,000 VND/box",
+      usdValue: "2.01 USD",
+      notes: "-",
+    },
+  ];
+
+  const generateTableRows = (transportPrices) => {
+    return transportPrices.map((transportPrice, index) => (
+      <tr
+        key={index}
+        className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
+      >
+        <td className="whitespace-nowrap px-6 py-3 font-medium">
+          <span className="inline-block">{transportPrice.detail}</span>
+        </td>
+        <td className="px-6 py-3">
+          <span className="inline-block">{transportPrice.vndValue}</span>
+        </td>
+        <td className="px-6 py-3">
+          <span className="inline-block">{transportPrice.usdValue}</span>
+        </td>
+        <td className="px-6 py-3">
+          <span className="inline-block">{transportPrice.notes}</span>
+        </td>
+      </tr>
+    ));
+  };
+
   return (
     <>
       <div className="ud-header absolute left-0 top-0 z-40 flex w-full items-center bg-transparent">
@@ -270,6 +330,58 @@ function CartPage() {
                   className="absolute right-4 top-full hidden w-full max-w-[250px] rounded-lg bg-white py-5 shadow-lg dark:bg-dark-2 lg:static lg:block lg:w-full lg:max-w-full lg:bg-transparent lg:px-4 lg:py-0 lg:shadow-none dark:lg:bg-transparent xl:px-6"
                 >
                   <ul className="blcok lg:flex 2xl:ml-20">
+                    <li className="submenu-item group relative md:hidden">
+                      <a
+                        href="javascript:void(0)"
+                        className="relative mx-8 flex items-center justify-between py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-8 lg:mr-0 lg:inline-flex lg:py-6 lg:pl-0 lg:pr-4 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10"
+                      >
+                        Account
+                        <svg
+                          className="ml-2 fill-current"
+                          width="16"
+                          height="20"
+                          viewBox="0 0 16 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M7.99999 14.9C7.84999 14.9 7.72499 14.85 7.59999 14.75L1.84999 9.10005C1.62499 8.87505 1.62499 8.52505 1.84999 8.30005C2.07499 8.07505 2.42499 8.07505 2.64999 8.30005L7.99999 13.525L13.35 8.25005C13.575 8.02505 13.925 8.02505 14.15 8.25005C14.375 8.47505 14.375 8.82505 14.15 9.05005L8.39999 14.7C8.27499 14.825 8.14999 14.9 7.99999 14.9Z" />
+                        </svg>
+                      </a>
+                      {user == null ? (
+                        <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                          <Link
+                            to="/login"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Login
+                          </Link>
+                          <Link
+                            to="/register"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Register
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                          <span className="block rounded px-4 text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
+                            {user?.username}
+                          </span>
+                          <Link
+                            to=""
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Profile
+                          </Link>
+                          <Link
+                            onClick={handleLogout}
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Logout
+                          </Link>
+                        </div>
+                      )}
+                    </li>
                     <li className="group relative">
                       <Link
                         to="/"
@@ -305,7 +417,7 @@ function CartPage() {
 
                     <li className="group relative">
                       <a
-                        href="/#blog"
+                        href="blog-grids.html"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-body-color dark:lg:text-dark-6 xl:ml-10"
                       >
                         Blog
@@ -339,10 +451,22 @@ function CartPage() {
                       {user && (
                         <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
                           <Link
+                            to="/"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Home Page
+                          </Link>
+                          <Link
                             to="/order"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Order Page
+                          </Link>
+                          <Link
+                            to="/order-list"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order List Page
                           </Link>
                           <Link
                             to="order-history"
@@ -418,16 +542,6 @@ function CartPage() {
                     </svg>
                   </span>
                 </label>
-                {user && (
-                  <Link to="/cart" className="block pt-[2px]">
-                    <Badge count={cart.length}>
-                      <ShoppingCartOutlined
-                        className="cart-page"
-                        style={{ fontSize: 28 }}
-                      />
-                    </Badge>
-                  </Link>
-                )}
                 <div className="hidden sm:flex">
                   <div className="hidden sm:flex">
                     {user == null ? (
@@ -491,7 +605,7 @@ function CartPage() {
             <div className="w-full px-4">
               <div className="text-center">
                 <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Cart Page
+                  Order Tracking Page
                 </h1>
                 <p className="mb-5 text-base text-body-color dark:text-dark-6">
                   There are many variations of passages of Lorem Ipsum
@@ -499,17 +613,17 @@ function CartPage() {
                 </p>
 
                 <ul className="flex items-center justify-center gap-[10px]">
-                  <li>
-                    <Link
+                  <Link>
+                    <a
                       to="/"
                       className="flex items-center gap-[10px] text-base font-medium text-dark dark:text-white"
                     >
-                      Home
-                    </Link>
-                  </li>
+                      Home Page
+                    </a>
+                  </Link>
                   <li>
                     <Link
-                      to="/cart"
+                      to="/order-tracking"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -517,7 +631,7 @@ function CartPage() {
                         {" "}
                         /{" "}
                       </span>
-                      Cart
+                      Order Tracking Page
                     </Link>
                   </li>
                 </ul>
@@ -526,19 +640,240 @@ function CartPage() {
           </div>
         </div>
       </div>
-      <div style={{ padding: "80px", backgroundColor: "#F4F7FF" }}>
-        <Button onClick={() => dispatch(clearAll())}>Clear All</Button>
-        <Table
-          rowKey="id"
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={data}
-        />
-        <Button onClick={handleBuy}>Buy</Button>
-      </div>
+      <section
+        id="order-detail"
+        className="relative bg-white pb-12 pt-20 dark:bg-dark lg:pb-[90px] lg:pt-[120px]"
+      >
+        <div className="container mx-auto">
+          <div className="-mx-4 flex flex-wrap">
+            <div className="w-full px-4">
+              <div className="mx-auto mb-[60px] max-w-[510px] text-center">
+                <span className="mb-2 block text-lg font-semibold text-primary">
+                  Pricing Table
+                </span>
+                <h2 className="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+                  Awesome Pricing Plan
+                </h2>
+                <p className="text-base text-body-color dark:text-dark-6">
+                  There are many variations of passages of Lorem Ipsum available
+                  but the majority have suffered alteration in some form.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/*  */}
+          <div className="-mx-4 flex flex-wrap rounded-xl p-6 shadow-pricing">
+            <div className="mx-auto w-full px-4 md:px-5 lg:px-5">
+              <div className="inline-flex w-full flex-col items-start justify-start gap-12">
+                <div className="flex w-full flex-row items-center justify-between gap-4 pb-4">
+                  <div className="inline-flex w-full flex-col items-center justify-center gap-1 md:w-1/2 md:items-start md:justify-start">
+                    <h2 className="mb-2 text-2xl font-semibold leading-9 text-dark dark:text-white">
+                      Order
+                      <span className="text-dark dark:text-white">#125103</span>
+                    </h2>
+                    <span className="text-base font-medium leading-relaxed text-dark dark:text-white">
+                      May 21, 2023
+                    </span>
+                  </div>
+                  <div className="flex w-full flex-col items-end justify-between md:w-1/2">
+                    <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
+                      Ready for Delivery
+                    </p>
+                    <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
+                      Ready for Delivery
+                    </p>
+                    <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
+                      Ready for Delivery
+                    </p>
+                    <button className="primaryButton flex w-full items-center justify-center rounded-lg py-2 transition-all duration-700 ease-in-out sm:w-fit md:w-1/2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        className="fill-current"
+                      >
+                        <path
+                          d="M14.25 9V5.25C14.25 3.83579 14.25 3.12868 13.8107 2.68934C13.3713 2.25 12.6642 2.25 11.25 2.25H6.75C5.33579 2.25 4.62868 2.25 4.18934 2.68934C3.75 3.12868 3.75 3.83579 3.75 5.25V9M6.75 5.25H11.25M6.75 7.5H11.25M12 12.2143C12 12.0151 12 11.9155 12.0188 11.8331C12.0829 11.5522 12.3022 11.3329 12.5831 11.2688C12.6655 11.25 12.7651 11.25 12.9643 11.25H14.25C14.9571 11.25 15.3107 11.25 15.5303 11.4697C15.75 11.6893 15.75 12.0429 15.75 12.75V14.25C15.75 14.9571 15.75 15.3107 15.5303 15.5303C15.3107 15.75 14.9571 15.75 14.25 15.75H3.75C3.04289 15.75 2.68934 15.75 2.46967 15.5303C2.25 15.3107 2.25 14.9571 2.25 14.25V12.75C2.25 12.0429 2.25 11.6893 2.46967 11.4697C2.68934 11.25 3.04289 11.25 3.75 11.25H5.03571C5.23491 11.25 5.3345 11.25 5.41689 11.2688C5.69776 11.3329 5.91709 11.5522 5.9812 11.8331C6 11.9155 6 12.0151 6 12.2143C6 12.4135 6 12.5131 6.0188 12.5955C6.08291 12.8763 6.30224 13.0957 6.58311 13.1598C6.6655 13.1786 6.76509 13.1786 6.96429 13.1786H11.0357C11.2349 13.1786 11.3345 13.1786 11.4169 13.1598C11.6978 13.0957 11.9171 12.8763 11.9812 12.5955C12 12.5131 12 12.4135 12 12.2143Z"
+                          stroke="white"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <span className="whitespace-nowrap px-1.5 text-sm font-medium leading-6">
+                        Print Invoice
+                      </span>
+                    </button>
+                  </div>
+                </div>
+                <div className="inline-flex w-full items-start justify-end gap-4">
+                  <div className="inline-flex w-full flex-col items-start justify-start gap-4">
+                    <div className="flex w-full flex-col items-center justify-center gap-5 rounded-xl bg-white dark:bg-dark md:items-start md:justify-start">
+                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-center text-2xl font-semibold leading-9 text-dark dark:text-white md:text-start">
+                        Order Tracking
+                      </h2>
+                      <div className="w-full flex-col items-center justify-center md:flex-row">
+                        <div className="pt-10">
+                          <Steps
+                            current={1}
+                            progressDot={customDot}
+                            items={steps}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex w-full flex-col items-start justify-start gap-5 rounded-xl bg-white dark:bg-dark">
+                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
+                        Order Info
+                      </h2>
+                      <table className="table-container w-full overflow-hidden text-center text-sm">
+                        <thead className="">
+                          <tr>
+                            <th className="py-2">
+                              <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                                Detail
+                              </span>
+                            </th>
+                            <th className="py-2">
+                              <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                                Value (VND)
+                              </span>
+                            </th>
+                            <th className="py-2">
+                              <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                                Value (USD)
+                              </span>
+                            </th>
+                            <th className="py-2">
+                              <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                                Notes
+                              </span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-base text-dark dark:text-white">
+                          {generateTableRows(transportPrices)}
+                        </tbody>
+                      </table>
+                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
+                        Order Price
+                      </h2>
+                      <div className="flex w-full flex-col items-start justify-start gap-5 border-b border-gray-200 pb-5">
+                        <div className="flex w-full flex-col items-center justify-start gap-4 md:flex-row lg:gap-8">
+                          <div className="flex items-center justify-start md:w-2/12 md:flex-row lg:gap-5">
+                            <img
+                              className="h-[140px] w-[140px] rounded-md object-cover"
+                              src="./assets/images/order-list/box.jpg"
+                              alt="Boxes"
+                            />
+                          </div>
+                          <div className="flex w-full md:w-10/12">
+                            <div className="flex w-full flex-col items-start justify-center gap-3 sm:w-1/2">
+                              <h4 className="text-center text-xl font-medium leading-8 text-dark dark:text-white">
+                                Number of boxes
+                              </h4>
+                              <div className="flex flex-col items-center justify-start gap-0.5 md:items-start">
+                                <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
+                                  Small box: 3
+                                </h6>
+                                <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
+                                  Small box: 3
+                                </h6>
+                                <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
+                                  Small box: 3
+                                </h6>
+                              </div>
+                            </div>
+                            <div className="flex w-full flex-col items-end justify-center pt-10 sm:w-1/2">
+                              <div className="flex justify-between text-wrap">
+                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white sm:pr-10">
+                                  $40 x 2{" "}
+                                </h4>
+                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
+                                  $80
+                                </h4>
+                              </div>
+                              <div className="flex text-wrap">
+                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white sm:pr-10">
+                                  $40 x 2{" "}
+                                </h4>
+                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
+                                  $80
+                                </h4>
+                              </div>
+                              <div className="flex flex-wrap">
+                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white sm:pr-10">
+                                  $40 x 2{" "}
+                                </h4>
+                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
+                                  $80
+                                </h4>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex w-full flex-col items-start justify-start gap-5">
+                        <div className="flex w-full flex-col items-start justify-start gap-4 pb-1.5">
+                          <div className="inline-flex w-full items-start justify-between gap-6">
+                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
+                              Subtotal
+                            </h6>
+                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              $210.00
+                            </h6>
+                          </div>
+                          <div className="inline-flex w-full items-start justify-between gap-6">
+                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
+                              Shipping Charge
+                            </h6>
+                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              $10.00
+                            </h6>
+                          </div>
+                          <div className="inline-flex w-full items-start justify-between gap-6">
+                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
+                              Tax Fee
+                            </h6>
+                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              $22.00
+                            </h6>
+                          </div>
+                        </div>
+                        <div className="inline-flex w-full items-start justify-between gap-6">
+                          <h5 className="text-lg font-semibold leading-relaxed text-dark dark:text-white">
+                            Total
+                          </h5>
+                          <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
+                            $242.00
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex w-full flex-col items-start justify-start gap-1.5">
+                      <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                        Order Note:
+                      </h6>
+                      <p className="text-sm font-normal leading-normal text-dark dark:text-dark-6">
+                        Make sure to ship all the ordered items together by
+                        Friday. I`ve emailed you the details, so please check it
+                        an review it. Thank You!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/*  */}
+        </div>
+      </section>
       <FooterComponent />
     </>
   );
 }
 
-export default CartPage;
+export default OrderTrackingPage;

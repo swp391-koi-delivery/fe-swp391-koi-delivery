@@ -6,7 +6,6 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { Badge } from "antd";
 function HeaderComponent() {
   const navigate = useNavigate();
-  const cart = useSelector((store) => store.cart);
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
 
@@ -336,16 +335,22 @@ function HeaderComponent() {
                             Order Page
                           </Link>
                           <Link
-                            to="order-history"
+                            to="/order-list"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
-                            Order History Page
+                            Order List Page
                           </Link>
                           <Link
                             to="/order-tracking"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Order Tracking Page
+                          </Link>
+                          <Link
+                            to="order-history"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order History Page
                           </Link>
                         </div>
                       )}
@@ -409,16 +414,6 @@ function HeaderComponent() {
                     </svg>
                   </span>
                 </label>
-                {user && (
-                  <Link to="/cart" className="block pt-[2px]">
-                    <Badge count={cart.length}>
-                      <ShoppingCartOutlined
-                        className="cart"
-                        style={{ fontSize: 28 }}
-                      />
-                    </Badge>
-                  </Link>
-                )}
                 <div className="hidden sm:flex">
                   {user == null ? (
                     <div className="">
