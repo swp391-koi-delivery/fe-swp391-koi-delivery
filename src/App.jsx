@@ -82,9 +82,9 @@ function App() {
     {
       path: "order",
       element: (
-        <ProtectRouteCustomerAuth>
+        // <ProtectRouteCustomerAuth>
           <OrderPage />
-        </ProtectRouteCustomerAuth>
+        // </ProtectRouteCustomerAuth>
       ),
     },
     {

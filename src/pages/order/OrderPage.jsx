@@ -190,28 +190,13 @@ function OrderPage() {
     const value = parseInt(e.target.value, 10);
     setNumberOfFish(value);
 
-    let singleOrders = 0;
-    let wholesaleOrders = 0;
-    let remainingFish = value;
-
-    // Calculate the number of single and wholesale orders
-    while (remainingFish > 0) {
-      if (remainingFish >= 20) {
-        wholesaleOrders += 1;
-        remainingFish -= 50; // Wholesale order for 20-50 fish
-      } else if (remainingFish > 10) {
-        singleOrders += 2; // If more than 10 but less than 20, split into 2 single orders
-        remainingFish -= 20;
-      } else if (remainingFish >= 1 && remainingFish <= 10) {
-        singleOrders += 1;
-        remainingFish -= 10; // Single order for 1-10 fish
-      }
+    if (value <= 10) {
+      toast.info("This is a single order (10 fish or fewer), no discount.");
+    } else {
+      toast.info(
+        "This is a wholesale order (more than 10 fish), discount applies.",
+      );
     }
-
-    // Display notification to the user
-    toast.info(
-      `You need ${singleOrders} single order(s) and ${wholesaleOrders} wholesale order(s).`,
-    );
   };
 
   const handleSubmitOrder = async (values) => {
@@ -220,24 +205,24 @@ function OrderPage() {
 
     let singleOrders = 0;
     let wholesaleOrders = 0;
-    let remainingFish = numberOfFish;
 
-    // Calculate the number of single and wholesale orders
-    while (remainingFish > 0) {
-      if (remainingFish >= 20) {
-        wholesaleOrders += 1;
-        remainingFish -= 50; // Wholesale order for 20-50 fish
-      } else if (remainingFish >= 1 && remainingFish <= 10) {
-        singleOrders += 1;
-        remainingFish -= 10; // Single order for 1-10 fish
-      } else if (remainingFish > 10 && remainingFish < 20) {
-        singleOrders += 1;
-        remainingFish -= remainingFish; // Remaining fish will be another single order
-      }
+    if (numberOfFish <= 10) {
+      singleOrders = 1;
+    } else {
+      wholesaleOrders = 1;
+    }
+
+    // Check if the user provided multiple fish sizes or quantities
+    const describeOrder = values.describeOrder;
+    if (describeOrder && describeOrder.includes(",")) {
+      toast.warning(
+        "Please specify the size and quantity for each type of fish.",
+      );
     }
 
     // Construct customer notes based on the calculated orders
     notes += ` ${singleOrders} single order delivery(s) and ${wholesaleOrders} wholesale order delivery(s).`;
+
     const orderData = {
       originLocation: values.originLocation,
       destinationLocation: values.destinationLocation,
@@ -258,6 +243,7 @@ function OrderPage() {
         },
       ],
     };
+
     try {
       setLoading(true);
       const response = await api.post("order", orderData);
@@ -675,6 +661,22 @@ function OrderPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    name="describeOrder"
+                    className="mb-[22px]"
+                    rules={[
+                      { required: true, message: "Please select order type" },
+                    ]}
+                    style={{ textAlign: "left" }}
+                  >
+                    <Select
+                      placeholder="Select order type"
+                      options={[
+                        { value: "Retail_Order", label: "Retail_Order" },
+                        { value: "Wholesale_Order", label: "Wholesale_Order" },
+                      ]}
+                    />
+                  </Form.Item>
+                  <Form.Item
                     name="customerNotes"
                     className="mb-[22px]"
                     rules={[
@@ -690,122 +692,128 @@ function OrderPage() {
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
-                  <Form.Item
-                    type="number"
-                    name="priceOfFish"
-                    className="mb-[22px]"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input size of fish",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input
-                      placeholder="Price Of Fish"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="nameFarm"
-                    className="mb-[22px]"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input name farm",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input
-                      placeholder="Name Farm"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="farmAddress"
-                    className="mb-[22px]"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input farm address",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input
-                      placeholder="Farm Address"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="recipientInfo"
-                    className="mb-[22px]"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input recipient info",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input.TextArea
-                      placeholder="Recipient Info"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="fishSpecies"
-                    className="mb-[22px]"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input fish species",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input
-                      placeholder="Fish Species"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    type="number"
-                    name="numberOfFish"
-                    className="mb-[22px]"
-                    onChange={handleNumberOfFishChange}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input number of fish",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input
-                      placeholder="Number of Fish"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    type="number"
-                    name="sizeOfFish"
-                    className="mb-[22px]"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input size of fish",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input
-                      placeholder="Size Of Fish"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                    />
-                  </Form.Item>
+                  {orderDetails.map((detail, index) => (
+                    <div className="" key={index}>
+                      <Form.Item
+                        type="number"
+                        name="priceOfFish"
+                        className="mb-[22px]"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input size of fish",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Price Of Fish"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="nameFarm"
+                        className="mb-[22px]"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input name farm",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Name Farm"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="farmAddress"
+                        className="mb-[22px]"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input farm address",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Farm Address"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="recipientInfo"
+                        className="mb-[22px]"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input recipient info",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input.TextArea
+                          placeholder="Recipient Info"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="fishSpecies"
+                        className="mb-[22px]"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input fish species",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Fish Species"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        type="number"
+                        name="numberOfFish"
+                        className="mb-[22px]"
+                        onChange={handleNumberOfFishChange}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input number of fish",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Number of Fish"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        type="number"
+                        name="sizeOfFish"
+                        className="mb-[22px]"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input size of fish",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Size Of Fish"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                    </div>
+                  ))}
+
+                  <Button>Add Another Fish</Button>
                   <Form.Item
                     name="paymentMethod"
                     className="mb-[22px]"
@@ -839,22 +847,6 @@ function OrderPage() {
                           label: "Bank_transfer",
                         },
                       ]}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="describeOrder"
-                    className="mb-[22px]"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input recipient info",
-                      },
-                    ]}
-                    style={{ textAlign: "left" }}
-                  >
-                    <Input.TextArea
-                      placeholder="Describe Order"
-                      className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
                   <Form.Item className="mb-[22px]">

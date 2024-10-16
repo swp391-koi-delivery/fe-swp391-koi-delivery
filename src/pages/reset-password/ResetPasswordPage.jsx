@@ -3,17 +3,23 @@ import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const getParams = (param) => {
+    const data = new URLSearchParams(location.search);
+    return data.get(param);
+  };
+  const token = getParams("token");
+  console.log(token);
   const handleResetPassword = async (values) => {
     try {
       setLoading(true);
-      const response = await axios.post("reset-password", {
+      localStorage.setItem("token", token);
+      const response = await api.post("reset-password", {
         password: values.password,
       });
       console.log(response);
