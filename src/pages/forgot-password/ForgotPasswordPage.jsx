@@ -113,7 +113,7 @@ function ForgotPasswordPage() {
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
                     <Button
-                      type="submit"
+                      htmlType="submit"
                       onClick={() => form.submit()}
                       className="primaryButton"
                       loading={loading}
