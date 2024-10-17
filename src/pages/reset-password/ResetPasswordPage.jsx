@@ -11,6 +11,7 @@ function ResetPasswordPage() {
   const [form] = useForm();
   const navigate = useNavigate();
   const params = useGetParams();
+
   const token = params("token");
   console.log(token);
   const handleResetPassword = async (values) => {
