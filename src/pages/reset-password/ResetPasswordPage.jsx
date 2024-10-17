@@ -3,17 +3,15 @@ import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useGetParams from "../../hooks/useGetParam";
+
 function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const navigate = useNavigate();
-  const location = useLocation();
-  const getParams = (param) => {
-    const data = new URLSearchParams(location.search);
-    return data.get(param);
-  };
-  const token = getParams("token");
+  const params = useGetParams();
+  const token = params("token");
   console.log(token);
   const handleResetPassword = async (values) => {
     try {
