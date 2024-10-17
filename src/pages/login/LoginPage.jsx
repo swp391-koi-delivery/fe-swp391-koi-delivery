@@ -42,15 +42,24 @@ function LoginPage() {
   const handleLoginGoogle = () => {
     const auth = getAuth();
     signInWithPopup(auth, googleProvider)
-      .then((result) => {
+      .then(async (result) => {
+        try {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          const user = result.user;
+          const { accessToken } = user;
+          const response = await api.post("login-google", accessToken);
+          console.log(response.data);
+          navigate("/");
+        } catch (err) {
+          toast.error(err.response.data || "Failed to login account");
+        }
         // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
+
         // The signed-in user info.
-        const user = result.user;
+
         // IdP data available using getAdditionalUserInfo(result)
         // ...
-        console.log(user);
       })
       .catch((error) => {
         // Handle Errors here.
@@ -190,7 +199,7 @@ function LoginPage() {
                   </div>
                   <Form.Item className="mb-[22px]">
                     <Button
-                      type="submit"
+                      htmlType="submit"
                       onClick={() => form.submit()}
                       className="primaryButton"
                       loading={loading}
