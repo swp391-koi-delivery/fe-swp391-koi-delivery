@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import FooterComponent from "../FooterComponent";
 import { Link, Outlet } from "react-router-dom";
 
@@ -164,9 +164,7 @@ function LayoutTemplate() {
       );
     };
   };
-  useEffect(() => {
-    handleDarkMode();
-  }, []);
+
   return (
     <>
       <div className="ud-header absolute left-0 top-0 z-40 flex w-full items-center bg-transparent">

@@ -171,10 +171,6 @@ function HeaderComponent() {
     };
   };
 
-  useEffect(() => {
-    handleDarkMode();
-  }, []);
-
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");

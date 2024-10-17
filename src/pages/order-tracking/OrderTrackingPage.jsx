@@ -173,11 +173,6 @@ function OrderTrackingPage() {
     };
   };
 
-  useEffect(() => {
-    handleDarkMode();
-    fetchOrder();
-  }, []);
-
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
