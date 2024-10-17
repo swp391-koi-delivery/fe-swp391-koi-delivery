@@ -84,9 +84,9 @@ function App() {
     {
       path: "order",
       element: (
-        // <ProtectRouteCustomerAuth>
+        <ProtectRouteCustomerAuth>
           <OrderPage />
-        // </ProtectRouteCustomerAuth>
+        </ProtectRouteCustomerAuth>
       ),
     },
     {
@@ -114,10 +114,6 @@ function App() {
       ),
     },
 
-    {
-      path: "orderList",
-      element: <OrderList />,
-    },
     {
       path: "dashboard",
       element: (
