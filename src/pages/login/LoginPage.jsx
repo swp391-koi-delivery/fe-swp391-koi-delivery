@@ -23,15 +23,13 @@ function LoginPage() {
       dispatch(login(response.data));
       const { role, token } = response.data;
       localStorage.setItem("token", token);
-      if (role === "CUSTOMER") {
+      if (role === "Customer") {
         navigate("/");
       } else if (
-        role === "MANAGER" ||
-        role === "SALES_STAFF" ||
-        role === "DELIVERY_STAFF"
+        role === "Manager"
       ) {
         navigate("/dashboard");
-      }else if (role === "SALESSTAFF") {
+      }else if (role === "Sale_staff") {
         navigate("/dashboard");
       }
     } catch (err) {

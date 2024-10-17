@@ -27,7 +27,7 @@
     width: 100%;
   }
   .custom-table-header {
-    font-size: 22px; /* Kích thước chữ lớn hơn */
+    font-size: 18px; /* Kích thước chữ lớn hơn */
     font-family: 'Arial', monospace; /* Thay đổi font family */
     font-weight: bold; /* In đậm */
   }

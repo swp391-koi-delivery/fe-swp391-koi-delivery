@@ -129,7 +129,12 @@ function ManageUser() {
 
       //await axios.put(`${api}/${editingUser.userId}`, updatedUser);
       //console.log(editingUser.userId);
-      await api.put(`manager/${editingUser.id}`, updatedUser);
+      await api.put(`manager/${editingUser.id}`, {
+        "image": updatedUser.image,
+        "role": updatedUser.role,
+        "loyaltyPoint": updatedUser.loyaltyPoint,
+        "deleted": updatedUser.deleted
+      });
       toast.success("Updated successfully");
       fetchUser(); // Cập nhật lại danh sách sau khi sửa
       handleCloseModal();
@@ -188,7 +193,7 @@ function ManageUser() {
   const columns = [
     {
       
-      title: <span className="custom-table-header">UserId</span>,
+      title: <span className="custom-table-header">ID</span>,
       dataIndex: "id",
       key: "id",
       align: "left",
@@ -241,8 +246,8 @@ function ManageUser() {
     },
     {
       title:  <span className="custom-table-header">User Status</span>,
-      dataIndex: "userstatus",
-      key: "userstatus",
+      dataIndex: "deleted",
+      key: "deleted",
       align: "left",
       
       render: (userstatus) => (<Tag style={{fontSize:"22px"}}
@@ -263,10 +268,10 @@ function ManageUser() {
       key: "role",
       align: "left",
       filters: [
-        { text: "MANAGER", value: "MANAGER" },
-        { text: "SALESSTAFF", value: "SALESSTAFF" },
-        { text: "DELIVERINGSTAFF", value: "DELIVERINGSTAFF" },
-        { text: "CUSTOMER", value: "CUSTOMER" },
+        { text: "Manager", value: "Manager" },
+        { text: "Sale_staff", value: "Sale_staff" },
+        { text: "Delivering_staff", value: "Delivering_staff" },
+        { text: "Customer", value: "Customer" },
       ],
       onFilter: (value, record) => record.role === value, // Lọc theo role
     },
@@ -420,7 +425,7 @@ function ManageUser() {
           >
             <InputNumber />
           </Form.Item>
-          <Form.Item name="userstatus" label="Userstatus">
+          <Form.Item name="deleted" label="Status">
             <Select>
               <Select.Option value={true}>Inactive</Select.Option>
               <Select.Option value={false}>Active</Select.Option>
@@ -428,9 +433,9 @@ function ManageUser() {
           </Form.Item>
           <Form.Item name="role" label="Role">
             <Select>
-              <Select.Option value="SALESSTAFF">SALESSTAFF</Select.Option>
-              <Select.Option value="DELIVERINGSTAFF">
-                DELIVERINGSTAFF
+              <Select.Option value="Sale_staff">Sale_staff</Select.Option>
+              <Select.Option value=" Delivering_staff">
+              Delivering_staff
               </Select.Option>
             </Select>
           </Form.Item>
@@ -557,7 +562,7 @@ function ManageUser() {
           >
             <InputNumber />
           </Form.Item>
-          <Form.Item name="userstatus" label="Userstatus">
+          <Form.Item name="deleted" label="Status">
             <Select>
               <Select.Option value={true}>Inactive</Select.Option>
               <Select.Option value={false}>Active</Select.Option>
@@ -574,9 +579,9 @@ function ManageUser() {
             ]}
           >
             <Select>
-              <Select.Option value="SALESSTAFF">SALESSTAFF</Select.Option>
-              <Select.Option value="DELIVERINGSTAFF">
-                DELIVERINGSTAFF
+              <Select.Option value="Sale_staff">Sale_staff</Select.Option>
+              <Select.Option value=" Delivering_staff">
+              Delivering_staff
               </Select.Option>
             </Select>
           </Form.Item>
