@@ -31,6 +31,8 @@ function LoginPage() {
         navigate("/dashboard");
       }else if (role === "Sale_staff") {
         navigate("/dashboard");
+      }else if(role === "DELIVERING_STAFF"){
+        navigate("/deliveryStaff");
       }
     } catch (err) {
       toast.error(err.response.data || "Failed to login account");

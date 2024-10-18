@@ -19,6 +19,18 @@ import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
 import OrderList from "./pages/sales-staff";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
+
+import ProfileUser from "./pages/ProfileUser/ProfileUser";
+// Delivery Staff
+import DeliveryStaff from "./pages/DeliveryStaff/Dashboard_DS/DeliveryStaff";
+import ListOrders from "./pages/DeliveryStaff/ListOrders/ListOrders";
+import OrderDetails from "./pages/DeliveryStaff/OrderDetails/OrderDetails";
+import OrderRequest from "./pages/DeliveryStaff/OrderRequest/OrderRequest";
+import Chat from "./pages/DeliveryStaff/Chat/Chat";
+import OrderRouting from "./pages/DeliveryStaff/OrderRouting/OrderRouting";
+import OrderTracking from "./pages/OrderTracking/OrderTracking";
+import OrderDetailsInfo from "./pages/DeliveryStaff/OrderDetailsInfo/OrderDetailsInfo";
+
 import "./index.css";
 import "./App.css";
 //import CartPage from "./pages/cart/CartPage";
@@ -32,9 +44,7 @@ function App() {
     console.log(user.user);
     if (
       user.user &&
-      (user.user?.role === "Manager" ||
-        user.user?.role === "Sale_staff" ||
-        user.user?.role === " Delivering_staff")
+      (user.user?.role === "Manager" || user.user?.role === "Sale_staff")
     ) {
       return children;
     }
@@ -47,6 +57,17 @@ function App() {
     console.log(user);
     console.log(user.user);
     if (user.user && user.user?.role === "CUSTOMER") {
+      return children;
+    }
+    toast.error("You are not allow to access this");
+    return <Navigate to={"/login"} />;
+  };
+
+  const ProtectRouteDeliveryAuth = ({ children }) => {
+    const user = useSelector((store) => store);
+    console.log(user);
+    console.log(user.user);
+    if (user.user && user.user?.role === "DELIVERING_STAFF") {
       return children;
     }
     toast.error("You are not allow to access this");
@@ -152,6 +173,49 @@ function App() {
         {
           path: "statistic",
           element: <ManageStatistic />,
+        },
+      ],
+    },
+    {
+      path: "OrderTracking",
+      element: <OrderTracking />,
+    },
+    {
+      path: "profileUser/:id",
+      element: <ProfileUser />,
+    },
+    {
+      path: "deliveryStaff",
+
+      element: (
+        <ProtectRouteDeliveryAuth>
+          <DeliveryStaff />
+        </ProtectRouteDeliveryAuth>
+      ),
+      children: [
+        {
+          path: "listOrders_Deli",
+          element: <ListOrders />,
+        },
+        {
+          path: "orderRequest_Deli",
+          element: <OrderRequest />,
+        },
+        {
+          path: "chat_Deli",
+          element: <Chat />,
+        },
+        {
+          path: "orderRouting_Deli",
+          element: <OrderRouting />,
+        },
+        {
+          path: "orderDetails_Deli/:id",
+          element: <OrderDetails />,
+        },
+        {
+          path: "orderDetailsInfo_Deli/:id",
+          element: <OrderDetailsInfo />,
         },
       ],
     },
