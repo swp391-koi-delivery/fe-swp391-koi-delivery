@@ -6,6 +6,7 @@ import {
   LogoutOutlined,
   ProductOutlined,
   DesktopOutlined,
+  InboxOutlined,
 } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -13,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import { toast } from "react-toastify";
 const { Header, Content, Footer, Sider } = Layout;
-
+import { FaWarehouse } from "react-icons/fa";
 function getItem(label, key, icon, children, onClick = null) {
   return {
     key,
@@ -24,14 +25,14 @@ function getItem(label, key, icon, children, onClick = null) {
     label: onClick ? (
       <div
         onClick={onClick}
-        className="flex items-center text-xl font-semibold text-gray-700 hover:text-blue-500 cursor-pointer"
+        className="flex items-center text-xl font-semibold text-gray-700  cursor-pointer"
       >
         {label}
       </div>
     ) : (
       <Link
         to={`/dashboard/${key}`}
-        className="flex items-center text-xl font-semibold text-gray-700 hover:text-blue-500"
+        className="flex items-center text-xl font-semibold text-gray-700 "
       >
         {label}
       </Link>
@@ -80,14 +81,16 @@ const Dashboard = () => {
   let items = [];
   items.push(getItem("Logout", "logout", <LogoutOutlined />, null, handleLogout));
 
-  if (role === "Manager") {
+  if (role === "MANAGER") {
     items = [
       getItem("Analytics", "statistic", <BarChartOutlined />),
       getItem("Manage User", "user", <UserOutlined />),
-      getItem("Manage FeedBack", "order", <ProductOutlined />),
+      getItem("Manage Order", "order", <ProductOutlined />),
+      getItem("Manage Box", "box", <InboxOutlined />),
+      getItem("Manage Warehouse", "warehouse", <FaWarehouse />),
       getItem("Logout", "logout", <LogoutOutlined />, null, handleLogout),
     ];
-  } else if (role === "Sale_staff") {
+  } else if (role === "SALE_STAFF") {
     items = [
       getItem("Manage Order", "orderListManagement", <ProductOutlined />),
       getItem("Logout", "logout", <LogoutOutlined />, null, handleLogout),
