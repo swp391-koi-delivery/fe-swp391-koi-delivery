@@ -17,8 +17,8 @@ function LoginPage() {
   const handleLogin = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("login", values);
-      toast.success(response.data || "Successfully login account");
+      const response = await api.post("/authentication/login", values);
+      toast.success("Successfully login account");
       console.log(response.data);
       dispatch(login(response.data));
       const { role, token } = response.data;
@@ -48,7 +48,10 @@ function LoginPage() {
           const token = credential.accessToken;
           const user = result.user;
           const { accessToken } = user;
-          const response = await api.post("login-google", accessToken);
+          const response = await api.post(
+            "/authentication/login-google",
+            accessToken,
+          );
           console.log(response.data);
           navigate("/");
         } catch (err) {
@@ -199,7 +202,6 @@ function LoginPage() {
                   </div>
                   <Form.Item className="mb-[22px]">
                     <Button
-                      htmlType="submit"
                       onClick={() => form.submit()}
                       className="primaryButton"
                       loading={loading}

@@ -17,12 +17,9 @@ import OrderListPage from "./pages/order-list/OrderListPage";
 import ManageUser from "./pages/manager/manage-user";
 import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
-import OrderList from "./pages/sales-staff";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
 import "./index.css";
 import "./App.css";
-import OrderHistoryPage from "./pages/order-history/OrderHistoryPage";
-import OrderTrackingPage from "./pages/order-tracking/OrderTrackingPage";
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -78,13 +75,12 @@ function App() {
         },
       ],
     },
-
     {
       path: "order",
       element: (
         <ProtectRouteCustomerAuth>
-          <OrderPage />
-        </ProtectRouteCustomerAuth>
+        <OrderPage />
+       </ProtectRouteCustomerAuth>
       ),
     },
     {
@@ -95,23 +91,6 @@ function App() {
         </ProtectRouteCustomerAuth>
       ),
     },
-    {
-      path: "order-history",
-      element: (
-        <ProtectRouteCustomerAuth>
-          <OrderHistoryPage />
-        </ProtectRouteCustomerAuth>
-      ),
-    },
-    {
-      path: "order-tracking",
-      element: (
-        <ProtectRouteCustomerAuth>
-          <OrderTrackingPage />
-        </ProtectRouteCustomerAuth>
-      ),
-    },
-
     {
       path: "dashboard",
       element: (

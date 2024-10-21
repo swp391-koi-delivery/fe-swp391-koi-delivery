@@ -18,6 +18,7 @@ function OrderPage() {
       priceOfFish: "",
       nameFarm: "",
       farmAddress: "",
+      origin: "",
       fishSpecies: "",
       numberOfFish: "",
       sizeOfFish: "",
@@ -186,9 +187,25 @@ function OrderPage() {
     };
   };
 
+  useEffect(() => {
+    handleDarkMode();
+  }, []);
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
+  };
+
+  const handleOrderDescribeChange = (value) => {
+    if (value === "RETAIL_ORDER") {
+      toast.info(
+        "If total number of fish less than 10, retail order price will be suitable",
+      );
+    } else if (value === "WHOLESALE_ORDER") {
+      toast.info(
+        "If total number of fish more than 10, wholesale order price will be cheaper with 10% disconut",
+      );
+    }
   };
 
   const handleOrderDetailChange = (index, field, value) => {
@@ -203,12 +220,14 @@ function OrderPage() {
       destinationLocation: values.destinationLocation,
       describeOrder: values.describeOrder,
       recipientInfo: values.recipientInfo,
+      methodTransport: values.methodTransport,
       customerNotes: values.customerNotes,
       paymentMethod: values.paymentMethod,
       orderDetailRequestList: orderDetails.map((detail) => ({
         priceOfFish: parseInt(detail.priceOfFish),
         nameFarm: detail.nameFarm,
         farmAddress: detail.farmAddress,
+        origin: detail.origin,
         fishSpecies: detail.fishSpecies,
         numberOfFish: parseInt(detail.numberOfFish),
         sizeOfFish: parseFloat(detail.sizeOfFish),
@@ -219,7 +238,7 @@ function OrderPage() {
 
     try {
       setLoading(true);
-      const response = await api.post("order", orderData);
+      const response = await api.post("/customer/order", orderData);
       console.log(response);
       toast.success("Successfully created order");
       form.resetFields();
@@ -228,11 +247,12 @@ function OrderPage() {
           priceOfFish: "",
           nameFarm: "",
           farmAddress: "",
+          origin: "",
           fishSpecies: "",
           numberOfFish: "",
           sizeOfFish: "",
         },
-      ]); // Reset after successful submission
+      ]);
     } catch (err) {
       toast.error(err.response.data);
     } finally {
@@ -247,6 +267,7 @@ function OrderPage() {
         priceOfFish: "",
         nameFarm: "",
         farmAddress: "",
+        origin: "",
         fishSpecies: "",
         numberOfFish: "",
         sizeOfFish: "",
@@ -628,7 +649,7 @@ function OrderPage() {
                   <div className="flex w-full flex-wrap">
                     <Form.Item
                       name="originLocation"
-                      className="mb-[22px] w-1/2 px-2"
+                      className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
                         {
                           required: true,
@@ -644,7 +665,7 @@ function OrderPage() {
                     </Form.Item>
                     <Form.Item
                       name="destinationLocation"
-                      className="mb-[22px] w-1/2 px-2"
+                      className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
                         {
                           required: true,
@@ -661,7 +682,7 @@ function OrderPage() {
 
                     <Form.Item
                       name="customerNotes"
-                      className="mb-[22px] w-1/2 px-2"
+                      className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
                         {
                           required: true,
@@ -677,7 +698,7 @@ function OrderPage() {
                     </Form.Item>
                     <Form.Item
                       name="recipientInfo"
-                      className="mb-[22px] w-1/2 px-2"
+                      className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
                         {
                           required: true,
@@ -693,7 +714,7 @@ function OrderPage() {
                     </Form.Item>
                     <Form.Item
                       name="describeOrder"
-                      className="mb-[22px] w-1/2 px-2"
+                      className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
                         { required: true, message: "Please select order type" },
                       ]}
@@ -701,18 +722,45 @@ function OrderPage() {
                     >
                       <Select
                         placeholder="Select order type"
+                        onChange={handleOrderDescribeChange}
                         options={[
-                          { value: "Retail_Order", label: "Retail_Order" },
+                          { value: "RETAIL_ORDER", label: "Retail Order" },
                           {
-                            value: "Wholesale_Order",
-                            label: "Wholesale_Order",
+                            value: "WHOLESALE_ORDER",
+                            label: "Wholesale Order",
+                          },
+                        ]}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="methodTransport"
+                      className="mb-[22px] w-full px-2 md:w-1/2"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please select transport method",
+                        },
+                      ]}
+                      style={{ textAlign: "left" }}
+                    >
+                      <Select
+                        placeholder="Select transport method"
+                        onChange={handleOrderDescribeChange}
+                        options={[
+                          {
+                            value: "FAST_DELIVERY",
+                            label: "Fast Delivery",
+                          },
+                          {
+                            value: "NORMAL_DELIVERY",
+                            label: "Normal Delivery",
                           },
                         ]}
                       />
                     </Form.Item>
                     <Form.Item
                       name="paymentMethod"
-                      className="mb-[22px] w-1/2 px-2"
+                      className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
                         {
                           required: true,
@@ -735,12 +783,12 @@ function OrderPage() {
                         }
                         options={[
                           {
-                            value: "Cash",
+                            value: "CASH",
                             label: "Cash",
                           },
                           {
-                            value: "Bank_transfer",
-                            label: "Bank_transfer",
+                            value: "BANK_TRANSFER",
+                            label: "Bank Transfer",
                           },
                         ]}
                       />
@@ -751,8 +799,8 @@ function OrderPage() {
                       <div
                         key={index}
                         className={`${
-                          orderDetails.length === 1 ? "w-full" : "w-1/2"
-                        }`}
+                          orderDetails.length === 1 ? "md:w-full" : "md:w-1/2"
+                        } w-full`}
                       >
                         <Form.Item
                           name={`orderDetails[${index}].priceOfFish`}
@@ -763,7 +811,7 @@ function OrderPage() {
                               e.target.value.replace(",", "."),
                             )
                           }
-                          className="mb-[22px] px-2"
+                          className="mb-[22px] w-full px-2 md:w-1/2"
                           rules={[
                             {
                               required: true,
@@ -789,7 +837,7 @@ function OrderPage() {
                               e.target.value,
                             )
                           }
-                          className="mb-[22px] px-2"
+                          className="mb-[22px] w-full px-2 md:w-1/2"
                           rules={[
                             {
                               required: true,
@@ -812,7 +860,7 @@ function OrderPage() {
                               e.target.value,
                             )
                           }
-                          className="mb-[22px] px-2"
+                          className="mb-[22px] w-full px-2 md:w-1/2"
                           rules={[
                             {
                               required: true,
@@ -827,6 +875,29 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
+                          name={`orderDetails[${index}].origin`}
+                          onChange={(e) =>
+                            handleOrderDetailChange(
+                              index,
+                              "origin",
+                              e.target.value,
+                            )
+                          }
+                          className="mb-[22px] w-full px-2 md:w-1/2"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please input origin",
+                            },
+                          ]}
+                          style={{ textAlign: "left" }}
+                        >
+                          <Input
+                            placeholder="Origin"
+                            className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          />
+                        </Form.Item>
+                        <Form.Item
                           name={`orderDetails[${index}].fishSpecies`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -835,7 +906,7 @@ function OrderPage() {
                               e.target.value,
                             )
                           }
-                          className="mb-[22px] px-2"
+                          className="mb-[22px] w-full px-2 md:w-1/2"
                           rules={[
                             {
                               required: true,
@@ -851,7 +922,7 @@ function OrderPage() {
                         </Form.Item>
                         <Form.Item
                           name={`orderDetails[${index}].numberOfFish`}
-                          className="mb-[22px] px-2"
+                          className="mb-[22px] w-full px-2 md:w-1/2"
                           onChange={(e) =>
                             handleOrderDetailChange(
                               index,
@@ -877,7 +948,7 @@ function OrderPage() {
                         </Form.Item>
                         <Form.Item
                           name={`orderDetails[${index}].sizeOfFish`}
-                          className="mb-[22px] px-2"
+                          className="mb-[22px] w-full px-2 md:w-1/2"
                           onChange={(e) =>
                             handleOrderDetailChange(
                               index,
@@ -914,7 +985,6 @@ function OrderPage() {
                   </Form.Item>
                   <Form.Item className="mb-[22px] px-2">
                     <Button
-                      htmlType="submit"
                       onClick={() => form.submit()}
                       className="primaryButton"
                       loading={loading}

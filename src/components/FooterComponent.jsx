@@ -229,7 +229,7 @@ function Footer() {
                       />
                     </div>
                     <span className="max-w-[180px] text-base text-gray-7 group-hover:text-white">
-                     Koi fish shipping progcess...
+                     Koi fish shipping process...
                     </span>
                   </a>
                   <a className="group flex items-center gap-[22px]">

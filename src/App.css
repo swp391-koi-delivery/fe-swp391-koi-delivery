@@ -3286,45 +3286,4 @@ a.back-to-top:hover span {
   color: rgb(156 163 175 / var(--tw-text-opacity)) /* #9ca3af */;
 }
 
-.cart {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-:is(.sticky .cart ) {
-  --tw-text-opacity: 1;
-  color: rgb(17 25 40 / var(--tw-text-opacity));
-}
-
-:is(.dark .sticky .cart ) {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-:is(.dark .sticky:hover .cart) {
-  --tw-text-opacity: 1;
-  color: rgb(234 88 12 / var(--tw-text-opacity));
-}
-
-.cart-page {
-  --tw-text-opacity: 1;
-  color: rgb(17 25 40  / var(--tw-text-opacity));
-}
-
-:is(.sticky .cart-page ) {
-  --tw-text-opacity: 1;
-  color: rgb(17 25 40 / var(--tw-text-opacity));
-}
-
-:is(.dark .sticky .cart-page ) {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-:is(.dark .sticky:hover .cart-page) {
-  --tw-text-opacity: 1;
-  color: rgb(234 88 12 / var(--tw-text-opacity));
-}
-
 /* Custom End */
-

@@ -24,8 +24,8 @@ function RegisterPage() {
     }
     try {
       setLoading(true);
-      const response = await api.post("register", values);
-      toast.success(response.data || "Successfully register a new account");
+      const response = await api.post("/authentication/register", values);
+      toast.success("Successfully register a new account");
       navigate("/login");
     } catch (err) {
       toast.error(err.response.data || "Failed to register a new account");
@@ -278,7 +278,6 @@ function RegisterPage() {
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
                     <Button
-                      htmlType="submit"
                       onClick={() => form.submit()}
                       className="primaryButton"
                       loading={loading}

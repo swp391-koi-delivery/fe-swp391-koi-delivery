@@ -43,7 +43,7 @@ function CRUDTemplate({ columns, formItems, path }) {
       render: (id, record) => (
         <>
           <Button
-            icon={<EditTwoTone/>}
+            icon={<EditTwoTone />}
             onClick={() => {
               setOpenModal(true);
               form.setFieldsValue(record);
@@ -54,7 +54,7 @@ function CRUDTemplate({ columns, formItems, path }) {
             description="Are you sure want to delete?"
             onConfirm={() => handleDelete(id)}
           >
-            <Button icon={<DeleteOutlined/>} danger/>
+            <Button icon={<DeleteOutlined />} danger />
           </Popconfirm>
         </>
       ),
@@ -80,7 +80,7 @@ function CRUDTemplate({ columns, formItems, path }) {
   const handleSearch = (value) => {
     setSearchText(value); // Cập nhật giá trị search text
     const filteredData = users.filter(
-      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()) // Lọc theo tên người dùng
+      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()), // Lọc theo tên người dùng
     );
     setFilteredUsers(filteredData); // Cập nhật danh sách đã lọc
   };
@@ -273,16 +273,22 @@ function CRUDTemplate({ columns, formItems, path }) {
   //   ];
   return (
     <div>
-      <div style={{width:"500px"}}>    
-      <Search
-        placeholder="Search..."
-        onSearch={handleSearch}
-        onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
-        value={searchText}
-        style={{ marginBottom: 20, width: 300 }} // Thêm style cho input search
+      <div style={{ width: "500px" }}>
+        <Search
+          placeholder="Search..."
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
+          value={searchText}
+          style={{ marginBottom: 20, width: 300 }} // Thêm style cho input search
         />
-        </div>
-      <Button icon={<PlusOutlined/>} onClick={() => setOpenModal(true)} style={{marginLeft:"20px"}}>Add</Button>
+      </div>
+      <Button
+        icon={<PlusOutlined />}
+        onClick={() => setOpenModal(true)}
+        style={{ marginLeft: "20px" }}
+      >
+        Add
+      </Button>
       <Table columns={tableColumn} dataSource={filteredUsers} rowKey="userId" />
       <Modal
         confirmLoading={submitting}
