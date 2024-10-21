@@ -17,8 +17,10 @@ function LoginPage() {
   const handleLogin = async (values) => {
     try {
       setLoading(true);
+
       const response = await api.post("/authentication/login", values);
       toast.success("Successfully login account");
+
       console.log(response.data);
       dispatch(login(response.data));
       const { role, token } = response.data;
@@ -26,11 +28,13 @@ function LoginPage() {
       if (role === "CUSTOMER") {
         navigate("/");
       } else if (
-        role === "MANAGER" ||
-        role === "SALES_STAFF" ||
-        role === "DELIVERY_STAFF"
+        role === "MANAGER"
       ) {
         navigate("/dashboard");
+      }else if (role === "SALE_STAFF") {
+        navigate("/dashboard");
+      }else if(role === "DELIVERING_STAFF"){
+        navigate("/deliveryStaff");
       }
     } catch (err) {
       toast.error(err.response.data || "Failed to login account");

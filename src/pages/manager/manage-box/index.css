@@ -26,7 +26,11 @@
   .w-full {
     width: 100%;
   }
-  
+  .custom-table-header {
+    font-size: 18px; /* Kích thước chữ lớn hơn */
+    font-family: 'Arial', monospace; /* Thay đổi font family */
+    font-weight: bold; /* In đậm */
+  }
   /* Phong cách cho bảng */
   .ant-table {
     border-radius: 8px;
@@ -40,9 +44,10 @@
     text-align: center;
     color: #333;
   }
-  
   .ant-table-tbody > tr > td {
     text-align: center;
+    font-size: 18px;
+    font-family: 'Arial', monospace;
   }
   
   .ant-table-tbody > tr:hover > td {

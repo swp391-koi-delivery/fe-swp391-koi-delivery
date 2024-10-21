@@ -18,8 +18,10 @@ import ManageUser from "./pages/manager/manage-user";
 import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
+
 import "./index.css";
 import "./App.css";
+
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -27,9 +29,7 @@ function App() {
     console.log(user.user);
     if (
       user.user &&
-      (user.user?.role === "MANAGER" ||
-        user.user?.role === "SALES_STAFF" ||
-        user.user?.role === "DELIVERY_STAFF")
+      (user.user?.role === "MANAGER" || user.user?.role === "SALE_STAFF")
     ) {
       return children;
     }
@@ -42,6 +42,17 @@ function App() {
     console.log(user);
     console.log(user.user);
     if (user.user && user.user?.role === "CUSTOMER") {
+      return children;
+    }
+    toast.error("You are not allow to access this");
+    return <Navigate to={"/login"} />;
+  };
+
+  const ProtectRouteDeliveryAuth = ({ children }) => {
+    const user = useSelector((store) => store);
+    console.log(user);
+    console.log(user.user);
+    if (user.user && user.user?.role === "DELIVERING_STAFF") {
       return children;
     }
     toast.error("You are not allow to access this");
@@ -100,6 +111,28 @@ function App() {
       ),
       children: [
         {
+          path: "orderListManagement",
+          element: <OrderList />,
+        },
+        {
+          path: "orderDetails/:id",
+          element: <OrderDetailStaff />,
+        },
+        {
+          path: "orderDetailsInfo/:id",
+          element: <OrderDetailsInfoStaff />,
+        },
+      ],
+    },
+    {
+      path: "dashboard",
+      element: (
+        <ProtectRouteManagerAuth>
+          <Dashboard />
+        </ProtectRouteManagerAuth>
+      ),
+      children: [
+        {
           path: "user",
           element: <ManageUser />,
         },
@@ -108,11 +141,36 @@ function App() {
           element: <ManageOrder />,
         },
         {
+          path: "orderDetails/:id",
+          element: <OrderDetailStaff />,
+        },
+        {
+          path: "orderDetailsInfo/:id",
+          element: <OrderDetailsInfoStaff />,
+        },
+        {
+          path:"box",
+          element:<ManageBox/>
+        },
+        {
+          path:"warehouse",
+          element:<ManageWarehouse/>
+        },
+        {
           path: "statistic",
           element: <ManageStatistic />,
         },
       ],
     },
+    {
+      path: "OrderTracking",
+      element: <OrderTracking />,
+    },
+    {
+      path: "profileUser/:id",
+      element: <ProfileUser />,
+    },
+   
   ]);
   return <RouterProvider router={router} />;
 }
