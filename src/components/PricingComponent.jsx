@@ -46,13 +46,13 @@ function PricingComponent() {
     try {
       setLoading(true);
       const response = await api.get(
-        `calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
+        `/free-access/calculateBoxAndSuggestFishSizes?quantities=${submissionData.map((item) => item.quantities)}&fishSizes=${submissionData.map((item) => item.fishSizes)}`,
       );
       toast.success("Successfully estimate prices and boxes!");
       console.log(response.data);
       setData(response.data);
     } catch (err) {
-      toast.error(err.response.data);
+      toast.error(err.response.data || "Failed to estimate prices and boxes!");
       console.error(err);
       setData(null);
     } finally {
@@ -60,113 +60,8 @@ function PricingComponent() {
     }
   };
 
-  const transportPrices = [
-    {
-      detail: "Care Costs",
-      vndValue: "100,000 VND/bin",
-      usdValue: "4.02 USD",
-      notes: "-",
-    },
-    {
-      detail: "Product Costs (Large box)",
-      vndValue: "200,000 VND/box",
-      usdValue: "8.05USD",
-      notes: "-",
-    },
-    {
-      detail: "Product Costs (Medium box)",
-      vndValue: "100,000 VND/box",
-      usdValue: "4.02 USD",
-      notes: "-",
-    },
-    {
-      detail: "Product Costs (Small box)",
-      vndValue: "50,000 VND/box",
-      usdValue: "2.01 USD",
-      notes: "-",
-    },
-  ];
-
-  const generateTableRows = (transportPrices) => {
-    return transportPrices.map((transportPrice, index) => (
-      <tr
-        key={index}
-        className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
-      >
-        <td className="whitespace-nowrap px-6 py-3 font-medium">
-          <span className="inline-block">{transportPrice.detail}</span>
-        </td>
-        <td className="px-6 py-3">
-          <span className="inline-block">{transportPrice.vndValue}</span>
-        </td>
-        <td className="px-6 py-3">
-          <span className="inline-block">{transportPrice.usdValue}</span>
-        </td>
-        <td className="px-6 py-3">
-          <span className="inline-block">{transportPrice.notes}</span>
-        </td>
-      </tr>
-    ));
-  };
-
   return (
     <>
-      <section
-        id="pricing"
-        className="relative z-20 overflow-hidden bg-white pb-12 pt-20 dark:bg-dark lg:pb-[90px] lg:pt-[120px]"
-      >
-        <div className="container mx-auto">
-          <div className="-mx-4 flex flex-wrap">
-            <div className="w-full px-4">
-              <div className="mx-auto mb-[60px] max-w-[510px] text-center">
-                <span className="mb-2 block text-lg font-semibold text-primary">
-                  Pricing Table
-                </span>
-                <h2 className="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Detail Price Table
-                </h2>
-                <p className="text-base text-body-color dark:text-dark-6">
-                  There are many types of costs incurred when transporting koi
-                  fish from Japan to Vietnam
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="-mx-4 flex flex-wrap justify-center">
-            <div className="relative flex w-full items-center justify-center rounded-md shadow-pricing">
-              <table className="table-container w-full overflow-hidden text-center text-sm">
-                <thead className="">
-                  <tr>
-                    <th className="py-2">
-                      <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                        Detail
-                      </span>
-                    </th>
-                    <th className="py-2">
-                      <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                        Value (VND)
-                      </span>
-                    </th>
-                    <th className="py-2">
-                      <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                        Value (USD)
-                      </span>
-                    </th>
-                    <th className="py-2">
-                      <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                        Notes
-                      </span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="text-base text-dark dark:text-white">
-                  {generateTableRows(transportPrices)}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
       <section
         id="estimate"
         className="relative z-20 overflow-hidden bg-white pb-12 pt-20 dark:bg-dark lg:pb-[90px] lg:pt-[120px]"
@@ -274,7 +169,6 @@ function PricingComponent() {
 
                 <div className="flex justify-end">
                   <Button
-                    type="submit"
                     onClick={() => form.submit()}
                     className="primaryButton"
                     loading={loading}
@@ -318,8 +212,8 @@ function PricingComponent() {
                   </span>
                   <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
                     <span className="-ml-1 -tracking-[2px]">
-                      {data?.smallBoxCount} small boxes, {data?.mediumBoxCount}{" "}
-                      medium boxes, {data?.largeBoxCount} large boxes
+                      {data?.Small} small boxes, {data?.Medium} medium boxes,{" "}
+                      {data?.Large} large boxes
                     </span>
                   </h2>
                 </div>
@@ -330,11 +224,11 @@ function PricingComponent() {
                     alt=""
                   />
                   <span className="mb-5 block text-xl font-medium text-dark dark:text-white">
-                    Total shipping cost
+                    Total price
                   </span>
                   <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
                     <span className="-ml-1 -tracking-[2px]">
-                      {data?.remainingVolume}
+                      {data?.totalPrice}$
                     </span>
                   </h2>
                 </div>

@@ -2,14 +2,12 @@ import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../src/redux/features/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { ShoppingCartOutlined } from "@ant-design/icons";
-import { Badge } from "antd";
 function HeaderComponent() {
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
 
-  const handleDarkMode = async (values) => {
+  const handleDarkMode = async () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
     const handleScroll = () => {
       const ud_header = document.querySelector(".ud-header");
@@ -170,6 +168,10 @@ function HeaderComponent() {
       );
     };
   };
+
+    useEffect(() => {
+      handleDarkMode();
+    }, []);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -335,18 +337,6 @@ function HeaderComponent() {
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Order List Page
-                          </Link>
-                          <Link
-                            to="/order-tracking"
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Order Tracking Page
-                          </Link>
-                          <Link
-                            to="order-history"
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Order History Page
                           </Link>
                         </div>
                       )}

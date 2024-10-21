@@ -18,11 +18,11 @@ function ResetPasswordPage() {
     try {
       setLoading(true);
       localStorage.setItem("token", token);
-      const response = await api.post("reset-password", {
+      const response = await api.post("/authentication/reset-password", {
         password: values.password,
       });
       console.log(response);
-      toast.success(response.data || "Successfully reset password");
+      toast.success("Successfully reset password");
       navigate("/login");
     } catch (err) {
       toast.error(err.response.data || "Failed to reset password");
@@ -171,7 +171,6 @@ function ResetPasswordPage() {
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
                     <Button
-                      htmlType="submit"
                       onClick={() => form.submit()}
                       className="primaryButton"
                       loading={loading}

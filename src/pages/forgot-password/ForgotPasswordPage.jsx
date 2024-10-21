@@ -10,9 +10,12 @@ function ForgotPasswordPage() {
   const handleForgotPassword = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("forgot-password", values);
+      const response = await api.post(
+        "/authentication/forgot-password",
+        values,
+      );
       console.log(response);
-      toast.success(response.data || "Successfully forgot password");
+      toast.success("Successfully forgot password");
     } catch (err) {
       toast.error(err.response.data || "Failed to forgot password");
     } finally {
@@ -113,7 +116,6 @@ function ForgotPasswordPage() {
                   </Form.Item>
                   <Form.Item className="mb-[22px]">
                     <Button
-                      htmlType="submit"
                       onClick={() => form.submit()}
                       className="primaryButton"
                       loading={loading}

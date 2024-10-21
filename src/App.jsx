@@ -17,7 +17,6 @@ import OrderListPage from "./pages/order-list/OrderListPage";
 import ManageUser from "./pages/manager/manage-user";
 import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
-import OrderList from "./pages/sales-staff";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
 
 import "./index.css";
@@ -87,13 +86,12 @@ function App() {
         },
       ],
     },
-
     {
       path: "order",
       element: (
         <ProtectRouteCustomerAuth>
-          <OrderPage />
-        </ProtectRouteCustomerAuth>
+        <OrderPage />
+       </ProtectRouteCustomerAuth>
       ),
     },
     {
@@ -104,23 +102,6 @@ function App() {
         </ProtectRouteCustomerAuth>
       ),
     },
-    {
-      path: "order-history",
-      element: (
-        <ProtectRouteCustomerAuth>
-          <OrderHistoryPage />
-        </ProtectRouteCustomerAuth>
-      ),
-    },
-    {
-      path: "order-tracking",
-      element: (
-        <ProtectRouteCustomerAuth>
-          <OrderTrackingPage />
-        </ProtectRouteCustomerAuth>
-      ),
-    },
-
     {
       path: "dashboard",
       element: (
@@ -189,41 +170,7 @@ function App() {
       path: "profileUser/:id",
       element: <ProfileUser />,
     },
-    {
-      path: "deliveryStaff",
-
-      element: (
-        <ProtectRouteDeliveryAuth>
-          <DeliveryStaff />
-        </ProtectRouteDeliveryAuth>
-      ),
-      children: [
-        {
-          path: "listOrders_Deli",
-          element: <ListOrders />,
-        },
-        {
-          path: "orderRequest_Deli",
-          element: <OrderRequest />,
-        },
-        {
-          path: "chat_Deli",
-          element: <Chat />,
-        },
-        {
-          path: "orderRouting_Deli",
-          element: <OrderRouting />,
-        },
-        {
-          path: "orderDetails_Deli/:id",
-          element: <OrderDetails />,
-        },
-        {
-          path: "orderDetailsInfo_Deli/:id",
-          element: <OrderDetailsInfo />,
-        },
-      ],
-    },
+   
   ]);
   return <RouterProvider router={router} />;
 }

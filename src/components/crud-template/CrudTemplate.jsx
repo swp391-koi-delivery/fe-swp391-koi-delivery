@@ -156,4 +156,3 @@ function CrudTemplate({ column, formItems, path }) {
 }
 
 export default CrudTemplate;
-

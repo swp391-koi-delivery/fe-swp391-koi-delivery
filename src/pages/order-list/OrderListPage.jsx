@@ -1,182 +1,208 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import { Popover, Steps } from "antd";
+import { Alert, Button, Form, Input, Modal, Popover, Rate, Steps } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
+import { useForm } from "antd/es/form/Form";
 import { toast } from "react-toastify";
-function OrderPage() {
+function OrderHistoryPage() {
+  const [openModal, setOpenModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form] = useForm();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const handleDarkMode = () => {
-    // ======= Sticky Header and Back-to-Top Button Scroll Behavior
-    const handleScroll = () => {
-      const ud_header = document.querySelector(".ud-header");
-      const logo = document.querySelectorAll(".header-logo");
-      const sticky = ud_header ? ud_header.offsetTop : 0;
+  useEffect(() => {
+    handleDarkMode();
+    fetchOrder();
+  }, []);
 
-      if (window.pageYOffset > sticky) {
-        ud_header.classList.add("sticky");
+const handleDarkMode = () => {
+  // ======= Sticky Header and Back-to-Top Button Scroll Behavior
+  const handleScroll = () => {
+    const ud_header = document.querySelector(".ud-header");
+    const logo = document.querySelectorAll(".header-logo");
+    const sticky = ud_header ? ud_header.offsetTop : 0;
+
+    if (window.pageYOffset > sticky) {
+      ud_header.classList.add("sticky");
+    } else {
+      ud_header.classList.remove("sticky");
+    }
+
+    // Logo Change on Sticky Header
+    if (logo.length) {
+      const logoSrc = ud_header.classList.contains("sticky")
+        ? "assets/images/logo/logo.svg"
+        : "assets/images/logo/logo-white.svg";
+
+      document.querySelector(".header-logo").src = logoSrc;
+    }
+
+    // Handle logo change for dark mode
+    if (document.documentElement.classList.contains("dark")) {
+      if (logo.length && ud_header.classList.contains("sticky")) {
+        document.querySelector(".header-logo").src =
+          "assets/images/logo/logo-white.svg";
+      }
+    }
+
+    // Show or hide the back-to-top button
+    const backToTop = document.querySelector(".back-to-top");
+    if (backToTop) {
+      if (window.scrollY > 50) {
+        backToTop.style.display = "flex";
       } else {
-        ud_header.classList.remove("sticky");
+        backToTop.style.display = "none";
       }
-
-      // Logo Change on Sticky Header
-      if (logo.length) {
-        const logoSrc = ud_header.classList.contains("sticky")
-          ? "assets/images/logo/logo.svg"
-          : "assets/images/logo/logo-white.svg";
-
-        document.querySelector(".header-logo").src = logoSrc;
-      }
-
-      // Handle logo change for dark mode
-      if (document.documentElement.classList.contains("dark")) {
-        if (logo.length && ud_header.classList.contains("sticky")) {
-          document.querySelector(".header-logo").src =
-            "assets/images/logo/logo-white.svg";
-        }
-      }
-
-      // Show or hide the back-to-top button
-      const backToTop = document.querySelector(".back-to-top");
-      if (backToTop) {
-        if (window.scrollY > 50) {
-          backToTop.style.display = "flex";
-        } else {
-          backToTop.style.display = "none";
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    // ===== Navbar Toggle Behavior
-    const navbarToggler = document.querySelector("#navbarToggler");
-    const navbarCollapse = document.querySelector("#navbarCollapse");
-
-    const handleNavbarToggle = () => {
-      navbarToggler.classList.toggle("navbarTogglerActive");
-      navbarCollapse.classList.toggle("hidden");
-    };
-
-    if (navbarToggler) {
-      navbarToggler.addEventListener("click", handleNavbarToggle);
     }
-
-    // Close Navbar on Link Click
-    const closeNavbarOnClick = () => {
-      navbarToggler.classList.remove("navbarTogglerActive");
-      navbarCollapse.classList.add("hidden");
-    };
-
-    const navbarLinks = document.querySelectorAll(
-      "#navbarCollapse ul li:not(.submenu-item) a",
-    );
-    navbarLinks.forEach((link) =>
-      link.addEventListener("click", closeNavbarOnClick),
-    );
-
-    // ===== Sub-menu Toggle
-    const submenuItems = document.querySelectorAll(".submenu-item");
-    submenuItems.forEach((el) => {
-      el.querySelector("a").addEventListener("click", () => {
-        el.querySelector(".submenu").classList.toggle("hidden");
-      });
-    });
-
-    // ===== FAQ Accordion
-    const faqs = document.querySelectorAll(".single-faq");
-    faqs.forEach((el) => {
-      el.querySelector(".faq-btn").addEventListener("click", () => {
-        el.querySelector(".icon").classList.toggle("rotate-180");
-        el.querySelector(".faq-content").classList.toggle("hidden");
-      });
-    });
-
-    // ===== wow.js for animations
-    // new WOW.WOW().init();
-
-    // ===== Scroll-to-Top Functionality
-    const scrollTo = (element, to = 0, duration = 500) => {
-      const start = element.scrollTop;
-      const change = to - start;
-      const increment = 20;
-      let currentTime = 0;
-
-      const animateScroll = () => {
-        currentTime += increment;
-        const val = Math.easeInOutQuad(currentTime, start, change, duration);
-        element.scrollTop = val;
-
-        if (currentTime < duration) {
-          setTimeout(animateScroll, increment);
-        }
-      };
-
-      animateScroll();
-    };
-
-    Math.easeInOutQuad = function (t, b, c, d) {
-      t /= d / 2;
-      if (t < 1) return (c / 2) * t * t + b;
-      t--;
-      return (-c / 2) * (t * (t - 2) - 1) + b;
-    };
-
-    const backToTopButton = document.querySelector(".back-to-top");
-    if (backToTopButton) {
-      backToTopButton.onclick = () => scrollTo(document.documentElement);
-    }
-
-    // ===== Theme Switcher
-    const themeSwitcher = document.getElementById("themeSwitcher");
-    const userTheme = localStorage.getItem("theme");
-    const systemTheme = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-
-    const themeCheck = () => {
-      if (userTheme === "dark" || (!userTheme && systemTheme)) {
-        document.documentElement.classList.add("dark");
-      }
-    };
-
-    const themeSwitch = () => {
-      if (document.documentElement.classList.contains("dark")) {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      } else {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      }
-    };
-
-    if (themeSwitcher) {
-      themeSwitcher.addEventListener("click", themeSwitch);
-    }
-
-    themeCheck();
-
-    // Cleanup on unmount
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (navbarToggler) {
-        navbarToggler.removeEventListener("click", handleNavbarToggle);
-      }
-      navbarLinks.forEach((link) =>
-        link.removeEventListener("click", closeNavbarOnClick),
-      );
-    };
   };
+
+  window.addEventListener("scroll", handleScroll);
+
+  // ===== Navbar Toggle Behavior
+  const navbarToggler = document.querySelector("#navbarToggler");
+  const navbarCollapse = document.querySelector("#navbarCollapse");
+
+  const handleNavbarToggle = () => {
+    navbarToggler.classList.toggle("navbarTogglerActive");
+    navbarCollapse.classList.toggle("hidden");
+  };
+
+  if (navbarToggler) {
+    navbarToggler.addEventListener("click", handleNavbarToggle);
+  }
+
+  // Close Navbar on Link Click
+  const closeNavbarOnClick = () => {
+    navbarToggler.classList.remove("navbarTogglerActive");
+    navbarCollapse.classList.add("hidden");
+  };
+
+  const navbarLinks = document.querySelectorAll(
+    "#navbarCollapse ul li:not(.submenu-item) a",
+  );
+  navbarLinks.forEach((link) =>
+    link.addEventListener("click", closeNavbarOnClick),
+  );
+
+  // ===== Sub-menu Toggle
+  const submenuItems = document.querySelectorAll(".submenu-item");
+  submenuItems.forEach((el) => {
+    el.querySelector("a").addEventListener("click", () => {
+      el.querySelector(".submenu").classList.toggle("hidden");
+    });
+  });
+
+  // ===== FAQ Accordion
+  const faqs = document.querySelectorAll(".single-faq");
+  faqs.forEach((el) => {
+    el.querySelector(".faq-btn").addEventListener("click", () => {
+      el.querySelector(".icon").classList.toggle("rotate-180");
+      el.querySelector(".faq-content").classList.toggle("hidden");
+    });
+  });
+
+  // ===== wow.js for animations
+  // new WOW.WOW().init();
+
+  // ===== Scroll-to-Top Functionality
+  const scrollTo = (element, to = 0, duration = 500) => {
+    const start = element.scrollTop;
+    const change = to - start;
+    const increment = 20;
+    let currentTime = 0;
+
+    const animateScroll = () => {
+      currentTime += increment;
+      const val = Math.easeInOutQuad(currentTime, start, change, duration);
+      element.scrollTop = val;
+
+      if (currentTime < duration) {
+        setTimeout(animateScroll, increment);
+      }
+    };
+
+    animateScroll();
+  };
+
+  Math.easeInOutQuad = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return (c / 2) * t * t + b;
+    t--;
+    return (-c / 2) * (t * (t - 2) - 1) + b;
+  };
+
+  const backToTopButton = document.querySelector(".back-to-top");
+  if (backToTopButton) {
+    backToTopButton.onclick = () => scrollTo(document.documentElement);
+  }
+
+  // ===== Theme Switcher
+  const themeSwitcher = document.getElementById("themeSwitcher");
+  const userTheme = localStorage.getItem("theme");
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  const themeCheck = () => {
+    if (userTheme === "dark" || (!userTheme && systemTheme)) {
+      document.documentElement.classList.add("dark");
+    }
+  };
+
+  const themeSwitch = () => {
+    if (document.documentElement.classList.contains("dark")) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
+  };
+
+  if (themeSwitcher) {
+    themeSwitcher.addEventListener("click", themeSwitch);
+  }
+
+  themeCheck();
+
+  // Cleanup on unmount
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+    if (navbarToggler) {
+      navbarToggler.removeEventListener("click", handleNavbarToggle);
+    }
+    navbarLinks.forEach((link) =>
+      link.removeEventListener("click", closeNavbarOnClick),
+    );
+  };
+};
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
+  };
+
+  const handleOpenModal = (values) => {
+    setSelectedOrder(values);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const fetchOrder = async () => {
+    try {
+      const response = await api.get("/customer/order/each-user");
+      setOrders(response.data);
+    } catch (err) {
+      console.log("Failed to fetch order", err);
+    }
   };
 
   const customDot = (dot, { status, index }) => (
@@ -190,15 +216,6 @@ function OrderPage() {
       {dot}
     </Popover>
   );
-
-  const fetchOrder = async () => {
-    try {
-      const response = await api.get("order");
-      setOrders(response.data);
-    } catch (err) {
-      console.log("Failed to fetch order", err);
-    }
-  };
 
   const steps = [
     {
@@ -226,70 +243,441 @@ function OrderPage() {
       description: "hello world",
       status: "wait", // Pending (waiting for approval)
     },
-    {
-      title: "Approved",
-      description: "hello world",
-      status: "finish", // Mark as finished (approved)
-    },
-    {
-      title: "Unapproved",
-      description: "hello world",
-      status: "wait", // Still waiting for approval
-    },
-    {
-      title: "Rejected",
-      description: "hello world",
-      status: "error", // Rejected, mark as error
-    },
+
   ];
 
-  const transportPrices = [
-    {
-      detail: "Care Costs",
-      vndValue: "100,000 VND/bin",
-      usdValue: "4.02 USD",
-      notes: "-",
-    },
-    {
-      detail: "Product Costs (Large box)",
-      vndValue: "200,000 VND/box",
-      usdValue: "8.05USD",
-      notes: "-",
-    },
-    {
-      detail: "Product Costs (Medium box)",
-      vndValue: "100,000 VND/box",
-      usdValue: "4.02 USD",
-      notes: "-",
-    },
-    {
-      detail: "Product Costs (Small box)",
-      vndValue: "50,000 VND/box",
-      usdValue: "2.01 USD",
-      notes: "-",
-    },
-  ];
-
-  const generateTableRows = (transportPrices) => {
-    return transportPrices.map((transportPrice, index) => (
-      <tr
-        key={index}
-        className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
-      >
-        <td className="whitespace-nowrap px-6 py-3 font-medium">
-          <span className="inline-block">{transportPrice.detail}</span>
-        </td>
-        <td className="px-6 py-3">
-          <span className="inline-block">{transportPrice.vndValue}</span>
-        </td>
-        <td className="px-6 py-3">
-          <span className="inline-block">{transportPrice.usdValue}</span>
-        </td>
-        <td className="px-6 py-3">
-          <span className="inline-block">{transportPrice.notes}</span>
-        </td>
-      </tr>
+  const generateTables = (orderDetails) => {
+    return orderDetails.map((detail, index) => (
+      <div key={index}>
+        <table
+          className={`${
+            orderDetails.length === 1 ? "md:w-full" : "md:w-1/2"
+          } table-container w-full overflow-hidden text-nowrap text-center text-sm`}
+        >
+          <thead className="">
+            <tr>
+              <th className="py-2">
+                <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                  Info
+                </span>
+              </th>
+              <th className="py-2">
+                <span className="block py-4 text-xl font-medium text-dark dark:text-white">
+                  Notes
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="text-base text-dark dark:text-white">
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-2 font-medium">
+                Farm Name
+              </td>
+              <td className="px-6 py-2">{detail.nameFarm}</td>
+            </tr>
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-3 font-medium">
+                Farm Address
+              </td>
+              <td className="px-6 py-3">{detail.farmAddress}</td>
+            </tr>
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-2 font-medium">
+                Fish Species
+              </td>
+              <td className="px-6 py-2">{detail.fishSpecies}</td>
+            </tr>
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-2 font-medium">
+                Number of Fish
+              </td>
+              <td className="px-6 py-2">{detail.numberOfFish}</td>
+            </tr>
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-2 font-medium">
+                Size of Fish (cm)
+              </td>
+              <td className="px-6 py-2">{detail.sizeOfFish}cm</td>
+            </tr>
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-2 font-medium">
+                Total Box
+              </td>
+              <td className="px-6 py-2">{detail.totalBox}</td>
+            </tr>
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-2 font-medium">
+                Total Volume (L)
+              </td>
+              <td className="px-6 py-2">{detail.totalVolume}L</td>
+            </tr>
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-2 font-medium">
+                Price ($)
+              </td>
+              <td className="px-6 py-2">${detail.priceOfFish}</td>
+            </tr>
+            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
+              <td className="whitespace-nowrap px-6 py-2 font-medium">
+                Health Status
+              </td>
+              <td className="px-6 py-2">{detail.healthFishStatus}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     ));
+  };
+
+  const handleFeedback = async (values) => {
+    try {
+      setLoading(true);
+      const response = await api.post("feedback", values);
+      toast.success("Successfully send feedback");
+    } catch (err) {
+      toast.error(err.response.data || "Failed to lsend feedback");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const Order = ({ order }) => {
+    return (
+      <>
+        <div className="order my-8">
+          <div className="-mx-4 flex flex-wrap rounded-xl p-6 shadow-pricing">
+            <div className="mx-auto w-full px-4 md:px-5 lg:px-5">
+              <div className="inline-flex w-full flex-col items-start justify-start gap-12">
+                <div className="flex w-full flex-row items-center justify-between gap-4">
+                  <div className="inline-flex w-full flex-col justify-center gap-1 md:w-1/2 md:items-start md:justify-start">
+                    <h2 className="mb-2 text-2xl font-semibold leading-9 text-dark dark:text-white">
+                      Order ID:{" "}
+                      <span className="text-dark dark:text-white">
+                        {order.id}
+                      </span>
+                    </h2>
+                    <span className="text-base font-medium leading-relaxed text-dark dark:text-white">
+                      {order.orderDate}
+                    </span>
+                  </div>
+                  <div className="flex w-full flex-col items-end justify-between md:w-1/2">
+                    {order.orderStatus === "ACCEPTED" && (
+                      <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
+                        {order.orderStatus}
+                      </p>
+                    )}
+                    {order.orderStatus === "PENDING" && (
+                      <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
+                        {order.orderStatus}
+                      </p>
+                    )}
+                    {order.orderStatus === "REJECTED" && (
+                      <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
+                        {order.orderStatus}
+                      </p>
+                    )}
+                    {order.orderStatus === "AWAITING_PAYMENT" && (
+                      <p className="mb-3 whitespace-nowrap rounded-full bg-yellow-50 px-3 py-0.5 text-sm font-medium leading-6 text-yellow-600 lg:mt-3">
+                        {order.orderStatus}
+                      </p>
+                    )}
+                    <button className="primaryButton flex w-full items-center justify-center rounded-lg py-2 transition-all duration-700 ease-in-out sm:w-fit md:w-1/2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        className="fill-current"
+                      >
+                        <path
+                          d="M14.25 9V5.25C14.25 3.83579 14.25 3.12868 13.8107 2.68934C13.3713 2.25 12.6642 2.25 11.25 2.25H6.75C5.33579 2.25 4.62868 2.25 4.18934 2.68934C3.75 3.12868 3.75 3.83579 3.75 5.25V9M6.75 5.25H11.25M6.75 7.5H11.25M12 12.2143C12 12.0151 12 11.9155 12.0188 11.8331C12.0829 11.5522 12.3022 11.3329 12.5831 11.2688C12.6655 11.25 12.7651 11.25 12.9643 11.25H14.25C14.9571 11.25 15.3107 11.25 15.5303 11.4697C15.75 11.6893 15.75 12.0429 15.75 12.75V14.25C15.75 14.9571 15.75 15.3107 15.5303 15.5303C15.3107 15.75 14.9571 15.75 14.25 15.75H3.75C3.04289 15.75 2.68934 15.75 2.46967 15.5303C2.25 15.3107 2.25 14.9571 2.25 14.25V12.75C2.25 12.0429 2.25 11.6893 2.46967 11.4697C2.68934 11.25 3.04289 11.25 3.75 11.25H5.03571C5.23491 11.25 5.3345 11.25 5.41689 11.2688C5.69776 11.3329 5.91709 11.5522 5.9812 11.8331C6 11.9155 6 12.0151 6 12.2143C6 12.4135 6 12.5131 6.0188 12.5955C6.08291 12.8763 6.30224 13.0957 6.58311 13.1598C6.6655 13.1786 6.76509 13.1786 6.96429 13.1786H11.0357C11.2349 13.1786 11.3345 13.1786 11.4169 13.1598C11.6978 13.0957 11.9171 12.8763 11.9812 12.5955C12 12.5131 12 12.4135 12 12.2143Z"
+                          stroke="white"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <span className="whitespace-nowrap px-1.5 text-sm font-medium leading-6">
+                        Print Invoice
+                      </span>
+                    </button>
+                  </div>
+                </div>
+                <div className="flex w-full flex-row items-center justify-between gap-4">
+                  <Form>
+                    <div className="flex w-full flex-wrap justify-between">
+                      <Form.Item
+                        initialValue={order.originLocation}
+                        name="originLocation"
+                        className="mb-[22px] w-full md:w-1/2 md:pr-4"
+                      >
+                        <Input
+                          readOnly
+                          placeholder="Origin Location"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        initialValue={order.destinationLocation}
+                        name="destinationLocation"
+                        className="mb-[22px] w-full md:w-1/2 md:pl-4"
+                      >
+                        <Input
+                          readOnly
+                          placeholder="Destination Location"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        initialValue={order.customerNotes}
+                        name="customerNotes"
+                        className="mb-[22px] w-full md:w-1/2 md:pr-4"
+                      >
+                        <Input.TextArea
+                          readOnly
+                          placeholder="Customer Notes"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        initialValue={order.recipientInfo}
+                        name="recipientInfo"
+                        className="mb-[22px] w-full md:w-1/2 md:pl-4"
+                      >
+                        <Input.TextArea
+                          readOnly
+                          placeholder="Recipient Info"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        initialValue={order.methodTransPort}
+                        name="methodTransport"
+                        className="mb-[22px] w-full md:w-1/2 md:pr-4"
+                      >
+                        <Input
+                          readOnly
+                          placeholder="Method Transport"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        initialValue={order.paymentMethod}
+                        name="paymentMethod"
+                        className="mb-[22px] w-full md:w-1/2 md:pl-4"
+                      >
+                        <Input
+                          readOnly
+                          placeholder="Payment Method"
+                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                    </div>
+                  </Form>
+                </div>
+                <div className="inline-flex w-full items-start justify-end gap-4">
+                  <div className="inline-flex w-full flex-col items-start justify-start gap-4">
+                    <div className="flex w-full flex-col items-center justify-center gap-5 rounded-xl bg-white dark:bg-dark md:items-start md:justify-start">
+                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-center text-2xl font-semibold leading-9 text-dark dark:text-white md:text-start">
+                        Order Tracking
+                      </h2>
+                      <div className="w-full flex-col items-center justify-center md:flex-row">
+                        <div className="pt-10">
+                          <Steps
+                            current={1}
+                            progressDot={customDot}
+                            items={steps}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex w-full flex-col items-start justify-start gap-5 rounded-xl bg-white dark:bg-dark">
+                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
+                        Order Info
+                      </h2>
+                      <div className="table-list flex w-full flex-col flex-wrap items-center justify-center md:flex-row">
+                        {generateTables(order.orderDetails)}
+                      </div>
+                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
+                        Order Price
+                      </h2>
+                      <div className="flex w-full flex-col items-start justify-start gap-5 border-b border-gray-200 pb-5">
+                        <div className="flex w-full flex-col items-center justify-start gap-4 md:flex-row lg:gap-8">
+                          <div className="flex items-center justify-start md:w-2/12 md:flex-row lg:gap-5">
+                            <img
+                              className="h-[140px] w-[140px] rounded-md object-cover"
+                              src="./assets/images/order-list/box.jpg"
+                              alt="Boxes"
+                            />
+                          </div>
+                          <div className="flex w-full md:w-10/12">
+                            <div className="flex w-full flex-col items-start justify-center gap-3 sm:w-1/2">
+                              <h4 className="text-center text-xl font-medium leading-8 text-dark dark:text-white">
+                                Number of boxes
+                              </h4>
+                              <div className="flex flex-col items-center justify-start gap-0.5 md:items-start">
+                                {/* Accumulate box quantities */}
+                                {(() => {
+                                  const boxSummary = order.orderDetails.reduce(
+                                    (acc, detail) => {
+                                      detail.boxDetails.forEach((boxDetail) => {
+                                        const boxType = boxDetail.box?.type;
+                                        if (!acc[boxType]) {
+                                          acc[boxType] = {
+                                            type: boxType,
+                                            quantity: 0,
+                                            price: boxDetail.box?.price || 0,
+                                          };
+                                        }
+                                        acc[boxType].quantity +=
+                                          boxDetail.quantity;
+                                      });
+                                      return acc;
+                                    },
+                                    {},
+                                  );
+
+                                  return Object.values(boxSummary).map(
+                                    (box, idx) => (
+                                      <div key={idx}>
+                                        <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
+                                          {box.type + " box"}: {box.quantity}
+                                        </h6>
+                                      </div>
+                                    ),
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                            <div className="flex w-full flex-col items-end justify-center pt-10 sm:w-1/2">
+                              {(() => {
+                                const boxSummary = order.orderDetails.reduce(
+                                  (acc, detail) => {
+                                    detail.boxDetails.forEach((boxDetail) => {
+                                      const boxType = boxDetail.box?.type;
+                                      if (!acc[boxType]) {
+                                        acc[boxType] = {
+                                          type: boxType,
+                                          quantity: 0,
+                                          price: boxDetail.box?.price || 0,
+                                        };
+                                      }
+                                      acc[boxType].quantity +=
+                                        boxDetail.quantity;
+                                    });
+                                    return acc;
+                                  },
+                                  {},
+                                );
+
+                                return Object.values(boxSummary).map(
+                                  (box, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="flex w-full max-w-[200px] justify-between text-wrap"
+                                    >
+                                      <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
+                                        $ {box.price} x {box.quantity}
+                                      </h4>
+                                      <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
+                                        $ {box.price * box.quantity}
+                                      </h4>
+                                    </div>
+                                  ),
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex w-full flex-col items-start justify-start gap-5">
+                        {/* <div className="flex w-full flex-col items-start justify-start gap-4 pb-1.5">
+                          <div className="inline-flex w-full items-start justify-between gap-6">
+                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
+                              Subtotal
+                            </h6>
+                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              $210.00
+                            </h6>
+                          </div>
+                          <div className="inline-flex w-full items-start justify-between gap-6">
+                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
+                              Shipping Charge
+                            </h6>
+                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              $10.00
+                            </h6>
+                          </div>
+                          <div className="inline-flex w-full items-start justify-between gap-6">
+                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
+                              Tax Fee
+                            </h6>
+                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              $22.00
+                            </h6>
+                          </div>
+                        </div> */}
+                        <div className="inline-flex w-full items-start justify-between gap-6">
+                          <h5 className="text-lg font-semibold leading-relaxed text-dark dark:text-white">
+                            Total
+                          </h5>
+                          <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
+                            ${order.totalPrice}
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex w-full flex-col items-end justify-end gap-1.5">
+                      <Modal
+                        title="Feedback"
+                        loading={loading}
+                        onOk={() => form.submit()}
+                        open={openModal}
+                        onCancel={handleCloseModal}
+                      >
+                        <Form labelCol={{ span: 24 }} onFinish={handleFeedback}>
+                          <Alert
+                            message={`Feedback for ${selectedOrder?.id}`}
+                            type="info"
+                          />
+                          <Form.Item
+                            label="Order Id"
+                            name="orderId"
+                            initialValue={selectedOrder?.id}
+                          >
+                            <Input hidden />
+                          </Form.Item>
+                          <Form.Item label="Rating Score" name="ratingScore">
+                            <Rate></Rate>
+                          </Form.Item>
+                          <Form.Item label="Comment" name="comment">
+                            <Input.TextArea />
+                          </Form.Item>
+                        </Form>
+                      </Modal>
+                      <Button onClick={() => handleOpenModal(order)}>
+                        Feedback
+                      </Button>
+                    </div>
+                    <div className="flex w-full flex-col items-start justify-start gap-1.5">
+                      <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                        Order Note:
+                      </h6>
+                      <p className="text-sm font-normal leading-normal text-dark dark:text-dark-6">
+                        Make sure to ship all the ordered items together by
+                        Friday. I`ve emailed you the details, so please check it
+                        an review it. Thank You!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
   };
 
   return (
@@ -464,18 +852,6 @@ function OrderPage() {
                           >
                             Order List Page
                           </Link>
-                          <Link
-                            to="order-history"
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Order History Page
-                          </Link>
-                          <Link
-                            to="/order-tracking"
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Order Tracking Page
-                          </Link>
                         </div>
                       )}
                     </li>
@@ -601,7 +977,7 @@ function OrderPage() {
             <div className="w-full px-4">
               <div className="text-center">
                 <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Order Page
+                  Order History Page
                 </h1>
                 <p className="mb-5 text-base text-body-color dark:text-dark-6">
                   There are many variations of passages of Lorem Ipsum
@@ -619,7 +995,7 @@ function OrderPage() {
                   </Link>
                   <li>
                     <Link
-                      to="/order-list"
+                      to="/order-history"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -627,7 +1003,7 @@ function OrderPage() {
                         {" "}
                         /{" "}
                       </span>
-                      Order List Page
+                      Order History Page
                     </Link>
                   </li>
                 </ul>
@@ -643,228 +1019,15 @@ function OrderPage() {
         <div className="container mx-auto">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4">
-              <div className="mx-auto mb-[60px] max-w-[510px] text-center">
-                <span className="mb-2 block text-lg font-semibold text-primary">
-                  Pricing Table
-                </span>
-                <h2 className="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Awesome Pricing Plan
-                </h2>
-                <p className="text-base text-body-color dark:text-dark-6">
-                  There are many variations of passages of Lorem Ipsum available
-                  but the majority have suffered alteration in some form.
-                </p>
+              {/*  */}
+              <div className="order-list">
+                {orders.map((order) => (
+                  <Order key={order.id} order={order} />
+                ))}
               </div>
+              {/*  */}
             </div>
           </div>
-
-          {/*  */}
-          <div className="-mx-4 flex flex-wrap rounded-xl p-6 shadow-pricing">
-            <div className="mx-auto w-full px-4 md:px-5 lg:px-5">
-              <div className="inline-flex w-full flex-col items-start justify-start gap-12">
-                <div className="flex w-full flex-row items-center justify-between gap-4 pb-4">
-                  <div className="inline-flex w-full flex-col items-center justify-center gap-1 md:w-1/2 md:items-start md:justify-start">
-                    <h2 className="mb-2 text-2xl font-semibold leading-9 text-dark dark:text-white">
-                      Order
-                      <span className="text-dark dark:text-white">#125103</span>
-                    </h2>
-                    <span className="text-base font-medium leading-relaxed text-dark dark:text-white">
-                      May 21, 2023
-                    </span>
-                  </div>
-                  <div className="flex w-full flex-col items-end justify-between md:w-1/2">
-                    <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
-                      Ready for Delivery
-                    </p>
-                    <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
-                      Ready for Delivery
-                    </p>
-                    <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
-                      Ready for Delivery
-                    </p>
-                    <button className="primaryButton flex w-full items-center justify-center rounded-lg py-2 transition-all duration-700 ease-in-out sm:w-fit md:w-1/2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        className="fill-current"
-                      >
-                        <path
-                          d="M14.25 9V5.25C14.25 3.83579 14.25 3.12868 13.8107 2.68934C13.3713 2.25 12.6642 2.25 11.25 2.25H6.75C5.33579 2.25 4.62868 2.25 4.18934 2.68934C3.75 3.12868 3.75 3.83579 3.75 5.25V9M6.75 5.25H11.25M6.75 7.5H11.25M12 12.2143C12 12.0151 12 11.9155 12.0188 11.8331C12.0829 11.5522 12.3022 11.3329 12.5831 11.2688C12.6655 11.25 12.7651 11.25 12.9643 11.25H14.25C14.9571 11.25 15.3107 11.25 15.5303 11.4697C15.75 11.6893 15.75 12.0429 15.75 12.75V14.25C15.75 14.9571 15.75 15.3107 15.5303 15.5303C15.3107 15.75 14.9571 15.75 14.25 15.75H3.75C3.04289 15.75 2.68934 15.75 2.46967 15.5303C2.25 15.3107 2.25 14.9571 2.25 14.25V12.75C2.25 12.0429 2.25 11.6893 2.46967 11.4697C2.68934 11.25 3.04289 11.25 3.75 11.25H5.03571C5.23491 11.25 5.3345 11.25 5.41689 11.2688C5.69776 11.3329 5.91709 11.5522 5.9812 11.8331C6 11.9155 6 12.0151 6 12.2143C6 12.4135 6 12.5131 6.0188 12.5955C6.08291 12.8763 6.30224 13.0957 6.58311 13.1598C6.6655 13.1786 6.76509 13.1786 6.96429 13.1786H11.0357C11.2349 13.1786 11.3345 13.1786 11.4169 13.1598C11.6978 13.0957 11.9171 12.8763 11.9812 12.5955C12 12.5131 12 12.4135 12 12.2143Z"
-                          stroke="white"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      <span className="whitespace-nowrap px-1.5 text-sm font-medium leading-6">
-                        Print Invoice
-                      </span>
-                    </button>
-                  </div>
-                </div>
-                <div className="inline-flex w-full items-start justify-end gap-4">
-                  <div className="inline-flex w-full flex-col items-start justify-start gap-4">
-                    <div className="flex w-full flex-col items-center justify-center gap-5 rounded-xl bg-white dark:bg-dark md:items-start md:justify-start">
-                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-center text-2xl font-semibold leading-9 text-dark dark:text-white md:text-start">
-                        Order Tracking
-                      </h2>
-                      <div className="w-full flex-col items-center justify-center md:flex-row">
-                        <div className="pt-10">
-                          <Steps
-                            current={1}
-                            progressDot={customDot}
-                            items={steps}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex w-full flex-col items-start justify-start gap-5 rounded-xl bg-white dark:bg-dark">
-                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
-                        Order Info
-                      </h2>
-                      <table className="table-container w-full overflow-hidden text-center text-sm">
-                        <thead className="">
-                          <tr>
-                            <th className="py-2">
-                              <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                                Detail
-                              </span>
-                            </th>
-                            <th className="py-2">
-                              <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                                Value (VND)
-                              </span>
-                            </th>
-                            <th className="py-2">
-                              <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                                Value (USD)
-                              </span>
-                            </th>
-                            <th className="py-2">
-                              <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                                Notes
-                              </span>
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="text-base text-dark dark:text-white">
-                          {generateTableRows(transportPrices)}
-                        </tbody>
-                      </table>
-                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
-                        Order Price
-                      </h2>
-                      <div className="flex w-full flex-col items-start justify-start gap-5 border-b border-gray-200 pb-5">
-                        <div className="flex w-full flex-col items-center justify-start gap-4 md:flex-row lg:gap-8">
-                          <div className="flex items-center justify-start md:w-2/12 md:flex-row lg:gap-5">
-                            <img
-                              className="h-[140px] w-[140px] rounded-md object-cover"
-                              src="./assets/images/order-list/box.jpg"
-                              alt="Boxes"
-                            />
-                          </div>
-                          <div className="flex w-full md:w-10/12">
-                            <div className="flex w-full flex-col items-start justify-center gap-3 sm:w-1/2">
-                              <h4 className="text-center text-xl font-medium leading-8 text-dark dark:text-white">
-                                Number of boxes
-                              </h4>
-                              <div className="flex flex-col items-center justify-start gap-0.5 md:items-start">
-                                <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
-                                  Small box: 3
-                                </h6>
-                                <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
-                                  Small box: 3
-                                </h6>
-                                <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
-                                  Small box: 3
-                                </h6>
-                              </div>
-                            </div>
-                            <div className="flex w-full flex-col items-end justify-center pt-10 sm:w-1/2">
-                              <div className="flex justify-between text-wrap">
-                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white sm:pr-10">
-                                  $40 x 2{" "}
-                                </h4>
-                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                  $80
-                                </h4>
-                              </div>
-                              <div className="flex text-wrap">
-                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white sm:pr-10">
-                                  $40 x 2{" "}
-                                </h4>
-                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                  $80
-                                </h4>
-                              </div>
-                              <div className="flex flex-wrap">
-                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white sm:pr-10">
-                                  $40 x 2{" "}
-                                </h4>
-                                <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                  $80
-                                </h4>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex w-full flex-col items-start justify-start gap-5">
-                        <div className="flex w-full flex-col items-start justify-start gap-4 pb-1.5">
-                          <div className="inline-flex w-full items-start justify-between gap-6">
-                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Subtotal
-                            </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              $210.00
-                            </h6>
-                          </div>
-                          <div className="inline-flex w-full items-start justify-between gap-6">
-                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Shipping Charge
-                            </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              $10.00
-                            </h6>
-                          </div>
-                          <div className="inline-flex w-full items-start justify-between gap-6">
-                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Tax Fee
-                            </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              $22.00
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="inline-flex w-full items-start justify-between gap-6">
-                          <h5 className="text-lg font-semibold leading-relaxed text-dark dark:text-white">
-                            Total
-                          </h5>
-                          <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
-                            $242.00
-                          </h5>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex w-full flex-col items-start justify-start gap-1.5">
-                      <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                        Order Note:
-                      </h6>
-                      <p className="text-sm font-normal leading-normal text-dark dark:text-dark-6">
-                        Make sure to ship all the ordered items together by
-                        Friday. I`ve emailed you the details, so please check it
-                        an review it. Thank You!
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/*  */}
         </div>
       </section>
       <FooterComponent />
@@ -872,4 +1035,4 @@ function OrderPage() {
   );
 }
 
-export default OrderPage;
+export default OrderHistoryPage;
