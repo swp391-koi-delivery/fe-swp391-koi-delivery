@@ -18,10 +18,13 @@ import ManageUser from "./pages/manager/manage-user";
 import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
-
+import OrderList from "./pages/sales-staff";
+import OrderDetailStaff from "./pages/sales-staff/orderDetails-staff";
+import OrderDetailsInfoStaff from "./pages/sales-staff/orderDetailInfo";
+import ManageBox from "./pages/manager/manage-box";
+import ManageWarehouse from "./pages/manager/manage-warehouse";
 import "./index.css";
 import "./App.css";
-
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -162,14 +165,14 @@ function App() {
         },
       ],
     },
-    {
-      path: "OrderTracking",
-      element: <OrderTracking />,
-    },
-    {
-      path: "profileUser/:id",
-      element: <ProfileUser />,
-    },
+    // {
+    //   path: "OrderTracking",
+    //   element: <OrderTracking />,
+    // },
+    // {
+    //   path: "profileUser/:id",
+    //   element: <ProfileUser />,
+    // },
    
   ]);
   return <RouterProvider router={router} />;
