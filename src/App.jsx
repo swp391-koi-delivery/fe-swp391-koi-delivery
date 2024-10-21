@@ -20,26 +20,9 @@ import ManageStatistic from "./pages/manager/manage-statistic";
 import OrderList from "./pages/sales-staff";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
 
-import ProfileUser from "./pages/ProfileUser/ProfileUser";
-// Delivery Staff
-import DeliveryStaff from "./pages/DeliveryStaff/Dashboard_DS/DeliveryStaff";
-import ListOrders from "./pages/DeliveryStaff/ListOrders/ListOrders";
-import OrderDetails from "./pages/DeliveryStaff/OrderDetails/OrderDetails";
-import OrderRequest from "./pages/DeliveryStaff/OrderRequest/OrderRequest";
-import Chat from "./pages/DeliveryStaff/Chat/Chat";
-import OrderRouting from "./pages/DeliveryStaff/OrderRouting/OrderRouting";
-import OrderTracking from "./pages/OrderTracking/OrderTracking";
-import OrderDetailsInfo from "./pages/DeliveryStaff/OrderDetailsInfo/OrderDetailsInfo";
-
 import "./index.css";
 import "./App.css";
-//import CartPage from "./pages/cart/CartPage";
-import OrderDetailStaff from "./pages/sales-staff/orderDetails-staff";
-import OrderHistoryPage from "./pages/order-history/OrderHistoryPage";
-import OrderTrackingPage from "./pages/order-tracking/OrderTrackingPage";
-import ManageBox from "./pages/manager/manage-box";
-import OrderDetailsInfoStaff from "./pages/sales-staff/orderDetailInfo";
-import ManageWarehouse from "./pages/manager/manage-warehouse";
+
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
