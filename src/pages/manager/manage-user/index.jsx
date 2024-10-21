@@ -24,7 +24,7 @@ import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, EditTwoTone, 
 import api from "../../../config/axios";
 import uploadFile from "../../../utils/file";
 import "boxicons";
-import "../index.css";
+import "./index.css";
 function ManageUser() {
   //const api = "https://66ebf57e2b6cf2b89c5c9df5.mockapi.io/User";
   const [users, setUsers] = useState([]);
@@ -59,7 +59,7 @@ function ManageUser() {
   const fetchUser = async () => {
     // const response = await axios.get(api);
     try {
-      const response = await api.get("manager");
+      const response = await api.get("manager/allUser?page=1&size=1000000000");
       //lấy dữ liệu từ BE và set nó
       setUsers(response.data);
       setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
@@ -90,7 +90,7 @@ function ManageUser() {
     }
     try {
       setSubmitting(true);
-      const response = await api.post("manager",user);
+      const response = await api.post("manager/user",user);
       toast.success("Submit successfully");
       setFileList([])
       formAdd.resetFields();
@@ -268,10 +268,10 @@ function ManageUser() {
       key: "role",
       align: "left",
       filters: [
-        { text: "Manager", value: "Manager" },
-        { text: "Sale_staff", value: "Sale_staff" },
-        { text: "Delivering_staff", value: "Delivering_staff" },
-        { text: "Customer", value: "Customer" },
+        { text: "MANAGER", value: "MANAGER" },
+        { text: "SALE_STAFF", value: "SALE_STAFF" },
+        { text: "DELIVERING_STAFF", value: "DELIVERING_STAFF" },
+        { text: "CUSTOMER", value: "CUSTOMER" },
       ],
       onFilter: (value, record) => record.role === value, // Lọc theo role
     },
@@ -298,7 +298,7 @@ function ManageUser() {
   ];
 
   return (
-    <div className="p-8">
+    <div className="p-8 min-h-screen bg-gradient-to-br from-blue-100 to-purple-200">
       <h1 className="text-2xl font-bold mb-6">User Management</h1>
       <div  className="mb-4" style={{width:"350px"}}>
 
@@ -433,9 +433,9 @@ function ManageUser() {
           </Form.Item>
           <Form.Item name="role" label="Role">
             <Select>
-              <Select.Option value="Sale_staff">Sale_staff</Select.Option>
-              <Select.Option value=" Delivering_staff">
-              Delivering_staff
+              <Select.Option value="SALE_STAFF">SALE_STAFF</Select.Option>
+              <Select.Option value=" DELIVERING_STAFF">
+              DELIVERING_STAFF
               </Select.Option>
             </Select>
           </Form.Item>
@@ -579,9 +579,9 @@ function ManageUser() {
             ]}
           >
             <Select>
-              <Select.Option value="Sale_staff">Sale_staff</Select.Option>
-              <Select.Option value=" Delivering_staff">
-              Delivering_staff
+              <Select.Option value="SALE_STAFF">SALE_STAFF</Select.Option>
+              <Select.Option value="DELIVERING_STAFF">
+              DELIVERING_STAFF
               </Select.Option>
             </Select>
           </Form.Item>

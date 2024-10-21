@@ -17,19 +17,19 @@ function LoginPage() {
   const handleLogin = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("login", values);
+      const response = await api.post("authentication/login", values);
       toast.success(response.data || "Successfully login account");
       console.log(response.data);
       dispatch(login(response.data));
       const { role, token } = response.data;
       localStorage.setItem("token", token);
-      if (role === "Customer") {
+      if (role === "CUSTOMER") {
         navigate("/");
       } else if (
-        role === "Manager"
+        role === "MANAGER"
       ) {
         navigate("/dashboard");
-      }else if (role === "Sale_staff") {
+      }else if (role === "SALE_STAFF") {
         navigate("/dashboard");
       }else if(role === "DELIVERING_STAFF"){
         navigate("/deliveryStaff");

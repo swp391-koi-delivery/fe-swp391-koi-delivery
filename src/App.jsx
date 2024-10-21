@@ -37,6 +37,9 @@ import "./App.css";
 import OrderDetailStaff from "./pages/sales-staff/orderDetails-staff";
 import OrderHistoryPage from "./pages/order-history/OrderHistoryPage";
 import OrderTrackingPage from "./pages/order-tracking/OrderTrackingPage";
+import ManageBox from "./pages/manager/manage-box";
+import OrderDetailsInfoStaff from "./pages/sales-staff/orderDetailInfo";
+import ManageWarehouse from "./pages/manager/manage-warehouse";
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -44,7 +47,7 @@ function App() {
     console.log(user.user);
     if (
       user.user &&
-      (user.user?.role === "Manager" || user.user?.role === "Sale_staff")
+      (user.user?.role === "MANAGER" || user.user?.role === "SALE_STAFF")
     ) {
       return children;
     }
@@ -151,6 +154,10 @@ function App() {
           path: "orderDetails/:id",
           element: <OrderDetailStaff />,
         },
+        {
+          path: "orderDetailsInfo/:id",
+          element: <OrderDetailsInfoStaff />,
+        },
       ],
     },
     {
@@ -167,8 +174,23 @@ function App() {
         },
         {
           path: "order",
-
           element: <ManageOrder />,
+        },
+        {
+          path: "orderDetails/:id",
+          element: <OrderDetailStaff />,
+        },
+        {
+          path: "orderDetailsInfo/:id",
+          element: <OrderDetailsInfoStaff />,
+        },
+        {
+          path:"box",
+          element:<ManageBox/>
+        },
+        {
+          path:"warehouse",
+          element:<ManageWarehouse/>
         },
         {
           path: "statistic",
