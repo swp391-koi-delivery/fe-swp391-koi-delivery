@@ -1,3 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.breadcrumb-link {
+  font-size: 22px;
+  font-weight: 500;
+  color: #333;
+  text-decoration: none;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.breadcrumb-link:hover {
+  color: #1890ff; /* Màu khi hover */
+  background-color: rgba(24, 144, 255, 0.1); /* Hiệu ứng nền khi hover */
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.ant-breadcrumb-separator {
+  font-size: 20px;
+  color: #666;
+}
+
 .ant-layout-sider-children{
     background-color: white;
 }
@@ -8,7 +34,7 @@
     overflow: hidden; /* Ẩn phần bị tràn */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho bảng */
   }
-  
+  .ant-layout-sider-children{}
   /* Nội dung bảng */
   .ant-table-content {
     background-color: #fff; /* Màu nền trắng */
@@ -85,3 +111,11 @@ button.ant-btn {
     background-color: #e6f7ff;
     border-color: #40a9ff;
   }
+
+  /* .ant-menu-item.ant-menu-item-selected{
+    color: #fff !important;
+  }
+
+  .ant-menu-item-icon svg{
+    color: rgb(55 65 81 / var(--tw-text-opacity)) !important
+  } */

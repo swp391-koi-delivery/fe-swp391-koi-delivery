@@ -11,18 +11,20 @@ import {
   InputNumber,
   Upload,
   Image,
+  Tag,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import Search from "antd/es/transfer/search";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { render } from "react-dom";
+import { createStyles } from 'antd-style';
 import { toast } from "react-toastify";
-import { DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
 import api from "../../../config/axios";
 import uploadFile from "../../../utils/file";
 import "boxicons";
-import "../index.css";
+import "./index.css";
 function ManageUser() {
   //const api = "https://66ebf57e2b6cf2b89c5c9df5.mockapi.io/User";
   const [users, setUsers] = useState([]);
@@ -37,10 +39,27 @@ function ManageUser() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
+  
+  const useStyle = createStyles(({ css, token }) => {
+    const { antCls } = token;
+    return {
+      customTable: css`
+        ${antCls}-table {
+          ${antCls}-table-container {
+            ${antCls}-table-body,
+            ${antCls}-table-content {
+              scrollbar-width: thin;
+              scrollbar-color: unset;
+            }
+          }
+        }
+      `,
+    };
+  });
   const fetchUser = async () => {
     // const response = await axios.get(api);
     try {
-      const response = await api.get("manager");
+      const response = await api.get("manager/allUser?page=1&size=1000000000");
       //lấy dữ liệu từ BE và set nó
       setUsers(response.data);
       setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
@@ -71,7 +90,7 @@ function ManageUser() {
     }
     try {
       setSubmitting(true);
-      const response = await api.post("manager",user);
+      const response = await api.post("manager/user",user);
       toast.success("Submit successfully");
       setFileList([])
       formAdd.resetFields();
@@ -84,10 +103,10 @@ function ManageUser() {
     }
   };
   //xóa user
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = async (id) => {
     try {
       //await axios.delete(`${api}/${userId}`);
-      await api.delete(`manager/${userId}`);
+      await api.delete(`manager/${id}`);
       toast.success("Deleted successfully");
       fetchUser();
     } catch (error) {
@@ -110,7 +129,12 @@ function ManageUser() {
 
       //await axios.put(`${api}/${editingUser.userId}`, updatedUser);
       //console.log(editingUser.userId);
-      await api.put(`manager/${editingUser.userId}`, updatedUser);
+      await api.put(`manager/${editingUser.id}`, {
+        "image": updatedUser.image,
+        "role": updatedUser.role,
+        "loyaltyPoint": updatedUser.loyaltyPoint,
+        "deleted": updatedUser.deleted
+      });
       toast.success("Updated successfully");
       fetchUser(); // Cập nhật lại danh sách sau khi sửa
       handleCloseModal();
@@ -121,6 +145,7 @@ function ManageUser() {
       setSubmitting(false);
     }
   };
+  const { styles } = useStyle();
   //mở modal
   const handleOpenModal = (user) => {
     setEditingUser(user); // Lưu người dùng đang được chỉnh sửa
@@ -168,13 +193,14 @@ function ManageUser() {
   const columns = [
     {
       
-      title: "UserId",
-      dataIndex: "userId",
-      key: "userId",
+      title: <span className="custom-table-header">ID</span>,
+      dataIndex: "id",
+      key: "id",
+      align: "left",
     },
     {
       
-      title: "Image",
+      title: <span className="custom-table-header">Image</span>,
       dataIndex: "image",
       key: "image",
       render: (image) => {
@@ -182,41 +208,54 @@ function ManageUser() {
       },
     },
     {
-      title: "FullName",
+      title: <span className="custom-table-header">FullName</span>,
       dataIndex: "fullname",
       key: "fullname",
+      align: "left",
     },
     {
-      title: "UserName",
+      title: <span className="custom-table-header">UserName</span>,
       dataIndex: "username",
       key: "username",
+      align: "left",
     },
     {
-      title: "Address",
+      title: <span className="custom-table-header">Address</span>,
       dataIndex: "address",
       key: "address",
+      align: "left",
     },
     {
-      title: "Phone",
+      title: <span className="custom-table-header">Phone</span>,
       dataIndex: "phone",
       key: "phone",
+      align: "left",
     },
     {
-      title: "Email",
+      title: <span className="custom-table-header">Email</span>,
       dataIndex: "email",
       key: "email",
+      align: "left",
     },
     {
-      title: "Loyalty Point",
+      title: <span className="custom-table-header">Loyalty Point</span>,
       dataIndex: "loyaltyPoint",
       key: "loyaltyPoint",
+      align: "left",
       sorter: (a, b) => a.loyaltyPoint - b.loyaltyPoint, // Sắp xếp theo loyaltyPoint
     },
     {
-      title: "Userstatus",
-      dataIndex: "userstatus",
-      key: "userstatus",
-      render: (userstatus) => (userstatus ? "Inactive" : "Active"),
+      title:  <span className="custom-table-header">User Status</span>,
+      dataIndex: "deleted",
+      key: "deleted",
+      align: "left",
+      
+      render: (userstatus) => (<Tag style={{fontSize:"22px"}}
+        icon={userstatus ? <CloseCircleOutlined /> : <CheckCircleOutlined />} 
+        color={userstatus ? 'error' : 'success'} // Màu đỏ cho Inactive, xanh cho Active
+      >
+        {userstatus ? 'Inactive' : 'Active'}
+      </Tag>),
       filters: [
         { text: "Inactive", value: true },
         { text: "Active", value: false },
@@ -224,29 +263,31 @@ function ManageUser() {
       onFilter: (value, record) => record.status === value, // Lọc theo status
     },
     {
-      title: "Role",
+      title: <span className="custom-table-header">Role</span>,
       dataIndex: "role",
       key: "role",
+      align: "left",
       filters: [
         { text: "MANAGER", value: "MANAGER" },
-        { text: "SALESSTAFF", value: "SALESSTAFF" },
-        { text: "DELIVERINGSTAFF", value: "DELIVERINGSTAFF" },
+        { text: "SALE_STAFF", value: "SALE_STAFF" },
+        { text: "DELIVERING_STAFF", value: "DELIVERING_STAFF" },
         { text: "CUSTOMER", value: "CUSTOMER" },
       ],
       onFilter: (value, record) => record.role === value, // Lọc theo role
     },
     {
-      title: "Action",
-      dataIndex: "userId",
-      key: "userId",
-      render: (userId, record) => {
+      title: <span className="custom-table-header">Action</span>,
+      dataIndex: "id",
+      fixed: 'right',
+      key: "id",
+      render: (id, record) => {
         return (
           <>
-            <Button icon={<EditTwoTone/>} onClick={() => handleOpenModal(record)}/>{" "}
+            <Button icon={<EditTwoTone/>} onClick={() => handleOpenModal(record)}/>
             <Popconfirm
               title="Delete"
               description="Are you sure want to delete?"
-              onConfirm={() => handleDeleteUser(userId)}
+              onConfirm={() => handleDeleteUser(id)}
             >
               <Button icon={<DeleteOutlined />}danger />
             </Popconfirm>
@@ -255,8 +296,9 @@ function ManageUser() {
       },
     },
   ];
+
   return (
-    <div className="p-8">
+    <div className="p-8 min-h-screen bg-gradient-to-br from-blue-100 to-purple-200">
       <h1 className="text-2xl font-bold mb-6">User Management</h1>
       <div  className="mb-4" style={{width:"350px"}}>
 
@@ -270,7 +312,9 @@ function ManageUser() {
         />
         </div>
       <Button icon={<PlusOutlined/>} onClick={() => setShowModal(true)} className="mb-4" style={{marginLeft:"20px"}}>Add</Button>
-      <Table columns={columns} dataSource={filteredUsers} rowKey="userId" size="middle" />
+      <Table className={styles.customTable} columns={columns} dataSource={filteredUsers} rowKey="id" size="middle" scroll={{
+        x: 'max-content',
+      }} />
       <Modal
         confirmLoading={submitting}
         open={openModal}
@@ -381,7 +425,7 @@ function ManageUser() {
           >
             <InputNumber />
           </Form.Item>
-          <Form.Item name="userstatus" label="Userstatus">
+          <Form.Item name="deleted" label="Status">
             <Select>
               <Select.Option value={true}>Inactive</Select.Option>
               <Select.Option value={false}>Active</Select.Option>
@@ -389,9 +433,9 @@ function ManageUser() {
           </Form.Item>
           <Form.Item name="role" label="Role">
             <Select>
-              <Select.Option value="SALESSTAFF">SALESSTAFF</Select.Option>
-              <Select.Option value="DELIVERINGSTAFF">
-                DELIVERINGSTAFF
+              <Select.Option value="SALE_STAFF">SALE_STAFF</Select.Option>
+              <Select.Option value=" DELIVERING_STAFF">
+              DELIVERING_STAFF
               </Select.Option>
             </Select>
           </Form.Item>
@@ -518,7 +562,7 @@ function ManageUser() {
           >
             <InputNumber />
           </Form.Item>
-          <Form.Item name="userstatus" label="Userstatus">
+          <Form.Item name="deleted" label="Status">
             <Select>
               <Select.Option value={true}>Inactive</Select.Option>
               <Select.Option value={false}>Active</Select.Option>
@@ -535,9 +579,9 @@ function ManageUser() {
             ]}
           >
             <Select>
-              <Select.Option value="SALESSTAFF">SALESSTAFF</Select.Option>
-              <Select.Option value="DELIVERINGSTAFF">
-                DELIVERINGSTAFF
+              <Select.Option value="SALE_STAFF">SALE_STAFF</Select.Option>
+              <Select.Option value="DELIVERING_STAFF">
+              DELIVERING_STAFF
               </Select.Option>
             </Select>
           </Form.Item>

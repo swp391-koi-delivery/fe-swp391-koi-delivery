@@ -22,7 +22,7 @@ import { DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
 import Password from "antd/es/input/Password";
 import api from "../../config/axios";
 import uploadFile from "../../utils/file";
-function CRUDTemplate({ columns, formItems, path }) {
+function CRUDTemplate({ columns, formItems, path , path2}) {
   //const api = "https://66ebf57e2b6cf2b89c5c9df5.mockapi.io/User";
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -40,21 +40,22 @@ function CRUDTemplate({ columns, formItems, path }) {
       title: "Action",
       dataIndex: "id",
       key: "id",
+      align: "left",
       render: (id, record) => (
         <>
-          <Button
-            icon={<EditTwoTone />}
+          {/* <Button
+            icon={<EditTwoTone/>}
             onClick={() => {
               setOpenModal(true);
               form.setFieldsValue(record);
             }}
-          />{" "}
+          />{" "} */}
           <Popconfirm
             title="Delete"
             description="Are you sure want to delete?"
             onConfirm={() => handleDelete(id)}
           >
-            <Button icon={<DeleteOutlined />} danger />
+            <Button icon={<DeleteOutlined/>} danger/>
           </Popconfirm>
         </>
       ),
@@ -63,7 +64,7 @@ function CRUDTemplate({ columns, formItems, path }) {
   const fetchData = async () => {
     // const response = await axios.get(api);
     try {
-      const response = await api.get(path);
+      const response = await api.get(`manager/${path2}`);
       //lấy dữ liệu từ BE và set nó
       setUsers(response.data);
       setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
@@ -80,7 +81,7 @@ function CRUDTemplate({ columns, formItems, path }) {
   const handleSearch = (value) => {
     setSearchText(value); // Cập nhật giá trị search text
     const filteredData = users.filter(
-      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()), // Lọc theo tên người dùng
+      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()) // Lọc theo tên người dùng
     );
     setFilteredUsers(filteredData); // Cập nhật danh sách đã lọc
   };
@@ -89,13 +90,13 @@ function CRUDTemplate({ columns, formItems, path }) {
     try {
       setSubmitting(true);
       if (values.id) {
-        const response = await api.put(`${path}/${values.id}`, values);
+        const response = await api.put(`manager/${path}/${values.id}`, values);
       } else {
-        const response = await api.post(path, values);
+        const response = await api.post(`manager/${path}`, values);
       }
       toast.success("Submit successfully");
       form.resetFields();
-      setShowModal(false);
+      setOpenModal(false);
       fetchData();
     } catch (error) {
       toast.error(error.response.data);
@@ -107,7 +108,7 @@ function CRUDTemplate({ columns, formItems, path }) {
   const handleDelete = async (id) => {
     try {
       //await axios.delete(`${api}/${userId}`);
-      await api.delete(`${path}/${id}`);
+      await api.delete(`manager/${path}/${id}`);
       toast.success("Deleted successfully");
       fetchData();
     } catch (error) {
@@ -273,23 +274,17 @@ function CRUDTemplate({ columns, formItems, path }) {
   //   ];
   return (
     <div>
-      <div style={{ width: "500px" }}>
-        <Search
-          placeholder="Search..."
-          onSearch={handleSearch}
-          onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
-          value={searchText}
-          style={{ marginBottom: 20, width: 300 }} // Thêm style cho input search
+      {/* <div style={{width:"500px"}}>    
+      <Search
+        placeholder="Search..."
+        onSearch={handleSearch}
+        onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
+        value={searchText}
+        style={{ marginBottom: 20, width: 300 }} // Thêm style cho input search
         />
-      </div>
-      <Button
-        icon={<PlusOutlined />}
-        onClick={() => setOpenModal(true)}
-        style={{ marginLeft: "20px" }}
-      >
-        Add
-      </Button>
-      <Table columns={tableColumn} dataSource={filteredUsers} rowKey="userId" />
+        </div> */}
+      <Button icon={<PlusOutlined/>} onClick={() => setOpenModal(true)} className="mb-4" style={{marginLeft:"20px"}}>Add</Button>
+      <Table columns={tableColumn} dataSource={users} rowKey="userId" />
       <Modal
         confirmLoading={submitting}
         open={openModal}
