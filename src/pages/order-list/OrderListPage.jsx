@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import { Alert, Button, Form, Input, Modal, Popover, Rate, Steps } from "antd";
+import { Alert, Button, Form, Input, Modal, Pagination, Popover, Rate, Steps } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
@@ -337,7 +337,19 @@ function OrderListPage() {
       const response = await api.post("feedback", values);
       toast.success("Successfully send feedback");
     } catch (err) {
-      toast.error(err.response.data || "Failed to lsend feedback");
+      toast.error(err.response.data || "Failed to send feedback");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePayment = async (values) => {
+    try {
+      setLoading(true);
+      const response = await api.post("/customer/payment", values);
+      toast.success("Successfully pay for order");
+    } catch (err) {
+      toast.error(err.response.data || "Failed to pay for order");
     } finally {
       setLoading(false);
     }
@@ -481,8 +493,8 @@ function OrderListPage() {
                         />
                       </Form.Item>
                       <Form.Item
-                        label="Total Distance"
-                        initialValue={order.totalDistance + ` km`}
+                        label="Total Distance (Km)"
+                        initialValue={order.totalDistance}
                         name="totalDistance"
                         className="mb-[22px] w-full md:w-1/2 md:pr-4"
                       >
@@ -633,7 +645,7 @@ function OrderListPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex w-full flex-col items-end justify-end gap-1.5">
+                    <div className="flex w-full flex-row items-end justify-end gap-1.5">
                       <Modal
                         title="Feedback"
                         loading={loading}
@@ -662,6 +674,9 @@ function OrderListPage() {
                         </Form>
                       </Modal>
                       <Button onClick={() => handleOpenModal(order)}>
+                        Feedback
+                      </Button>
+                      <Button onClick={handlePayment(order)}>
                         Feedback
                       </Button>
                     </div>
@@ -936,38 +951,41 @@ function OrderListPage() {
                           Register
                         </Link>
                       </div>
-                    ) : (user != null && user?.role === "CUSTOMER" && (
-                      <a className="submenu-item group relative">
-                        <div className="pl-6">
-                          <img
-                            className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
-                            src={
-                              user?.image ||
-                              "assets/images/navbar/default-avatar.jpg"
-                            }
-                            alt="default-avatar"
-                          />
-                        </div>
+                    ) : (
+                      user != null &&
+                      user?.role === "CUSTOMER" && (
+                        <a className="submenu-item group relative">
+                          <div className="pl-6">
+                            <img
+                              className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
+                              src={
+                                user?.image ||
+                                "assets/images/navbar/default-avatar.jpg"
+                              }
+                              alt="default-avatar"
+                            />
+                          </div>
 
-                        <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
-                          <span className="block rounded px-4 py-[10px] text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
-                            {user?.username}
-                          </span>
-                          <Link
-                            to=""
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Profile
-                          </Link>
-                          <Link
-                            onClick={handleLogout}
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Logout
-                          </Link>
-                        </div>
-                      </a>
-                    ))}
+                          <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                            <span className="block rounded px-4 py-[10px] text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
+                              {user?.username}
+                            </span>
+                            <Link
+                              to=""
+                              className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                            >
+                              Profile
+                            </Link>
+                            <Link
+                              onClick={handleLogout}
+                              className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                            >
+                              Logout
+                            </Link>
+                          </div>
+                        </a>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -1031,6 +1049,9 @@ function OrderListPage() {
                 ))}
               </div>
               {/*  */}
+              <div className="flex justify-end">
+                <Pagination defaultCurrent={1} total={50} />
+              </div>
             </div>
           </div>
         </div>
