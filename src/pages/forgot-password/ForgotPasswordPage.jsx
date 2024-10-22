@@ -96,8 +96,10 @@ function ForgotPasswordPage() {
                   onFinish={handleForgotPassword}
                   title="Forgot Password"
                   form={form}
+                  layout="vertical"
                 >
                   <Form.Item
+                    label="Email"
                     name="email"
                     className="mb-[22px]"
                     rules={[

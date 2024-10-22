@@ -25,15 +25,13 @@ function LoginPage() {
       dispatch(login(response.data));
       const { role, token } = response.data;
       localStorage.setItem("token", token);
-      if (role === "CUSTOMER") {
+     if (role === "CUSTOMER") {
         navigate("/");
-      } else if (
-        role === "MANAGER"
-      ) {
+      } else if (role === "MANAGER") {
         navigate("/dashboard");
-      }else if (role === "SALE_STAFF") {
+      } else if (role === "SALE_STAFF") {
         navigate("/dashboard");
-      }else if(role === "DELIVERING_STAFF"){
+      } else if (role === "DELIVERING_STAFF") {
         navigate("/deliveryStaff");
       }
     } catch (err) {
@@ -150,8 +148,14 @@ function LoginPage() {
                     />
                   </a>
                 </div>
-                <Form onFinish={handleLogin} title="Login" form={form}>
+                <Form
+                  onFinish={handleLogin}
+                  title="Login"
+                  form={form}
+                  layout="vertical"
+                >
                   <Form.Item
+                    label="Username"
                     name="username"
                     className="mb-[22px]"
                     rules={[
@@ -172,6 +176,7 @@ function LoginPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    label="Password"
                     name="password"
                     className="mb-[14px]"
                     rules={[
