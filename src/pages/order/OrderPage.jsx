@@ -538,38 +538,41 @@ function OrderPage() {
                           Register
                         </Link>
                       </div>
-                    ) : (user != null && user?.role === "CUSTOMER" && (
-                      <a className="submenu-item group relative">
-                        <div className="pl-6">
-                          <img
-                            className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
-                            src={
-                              user?.image ||
-                              "assets/images/navbar/default-avatar.jpg"
-                            }
-                            alt="default-avatar"
-                          />
-                        </div>
+                    ) : (
+                      user != null &&
+                      user?.role === "CUSTOMER" && (
+                        <a className="submenu-item group relative">
+                          <div className="pl-6">
+                            <img
+                              className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
+                              src={
+                                user?.image ||
+                                "assets/images/navbar/default-avatar.jpg"
+                              }
+                              alt="default-avatar"
+                            />
+                          </div>
 
-                        <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
-                          <span className="block rounded px-4 py-[10px] text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
-                            {user?.username}
-                          </span>
-                          <Link
-                            to=""
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Profile
-                          </Link>
-                          <Link
-                            onClick={handleLogout}
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Logout
-                          </Link>
-                        </div>
-                      </a>
-                    ))}
+                          <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                            <span className="block rounded px-4 py-[10px] text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
+                              {user?.username}
+                            </span>
+                            <Link
+                              to=""
+                              className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                            >
+                              Profile
+                            </Link>
+                            <Link
+                              onClick={handleLogout}
+                              className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                            >
+                              Logout
+                            </Link>
+                          </div>
+                        </a>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -726,7 +729,9 @@ function OrderPage() {
                       name="describeOrder"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
-                        { required: true, message: "Please select order type" },
+                        { required: true, 
+                          message: "Please select order type",
+                         },
                       ]}
                       style={{ textAlign: "left" }}
                     >
@@ -807,7 +812,7 @@ function OrderPage() {
                         } w-full`}
                       >
                         <Form.Item
-                          label="Price of Fish (USD)"
+                          label="Price Of Fish (USD)"
                           name={`orderDetails[${index}].priceOfFish`}
                           onChange={(e) =>
                             handleOrderDetailChange(

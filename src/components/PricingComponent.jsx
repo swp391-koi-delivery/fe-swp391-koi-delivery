@@ -224,7 +224,7 @@ function PricingComponent() {
                     alt=""
                   />
                   <span className="mb-5 block text-xl font-medium text-dark dark:text-white">
-                    Total price
+                    Total price of boxes
                   </span>
                   <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
                     <span className="-ml-1 -tracking-[2px]">
