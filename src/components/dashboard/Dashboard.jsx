@@ -45,7 +45,7 @@ const Dashboard = () => {
       getItem("Manage Order", "order", <ProductOutlined />),
       getItem("Log out", "", <LogoutOutlined />),
     ];
-  } else if (role === "SALES_TAFF") {
+  } else if (role === "SALE_TAFF") {
     items = [getItem("Feedback", "feedback", <BarChartOutlined />)];
   }
 

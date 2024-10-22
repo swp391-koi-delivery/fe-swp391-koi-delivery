@@ -104,8 +104,10 @@ function ResetPasswordPage() {
                   onFinish={handleResetPassword}
                   title="Reset Password"
                   form={form}
+                  layout="vertical"
                 >
                   <Form.Item
+                    label="Password"
                     name="password"
                     className="mb-[22px]"
                     rules={[
@@ -133,6 +135,7 @@ function ResetPasswordPage() {
                   </Form.Item>
 
                   <Form.Item
+                    label="Password Confirm"
                     name="passwordConfirm"
                     className="mb-[22px]"
                     dependencies={["password"]}

@@ -140,8 +140,14 @@ function RegisterPage() {
                     />
                   </a>
                 </div>
-                <Form onFinish={handleRegister} title="Register" form={form}>
+                <Form
+                  onFinish={handleRegister}
+                  title="Register"
+                  form={form}
+                  layout="vertical"
+                >
                   <Form.Item
+                    label="Username"
                     name="username"
                     className="mb-[22px]"
                     rules={[
@@ -163,6 +169,7 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    label="Password"
                     name="password"
                     className="mb-[22px]"
                     rules={[
@@ -189,6 +196,7 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    label="Fullname"
                     name="fullname"
                     className="mb-[22px]"
                     rules={[
@@ -210,6 +218,7 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    label="Address"
                     name="address"
                     className="mb-[22px]"
                     rules={[
@@ -227,6 +236,7 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    label="Phone"
                     name="phone"
                     className="mb-[22px]"
                     rules={[
@@ -249,6 +259,7 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    label="Email"
                     name="email"
                     className="mb-[22px]"
                     rules={[

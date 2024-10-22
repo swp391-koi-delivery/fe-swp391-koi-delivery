@@ -7,7 +7,7 @@ import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
 import { useForm } from "antd/es/form/Form";
 import { toast } from "react-toastify";
-function OrderHistoryPage() {
+function OrderListPage() {
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
@@ -22,165 +22,167 @@ function OrderHistoryPage() {
     fetchOrder();
   }, []);
 
-const handleDarkMode = () => {
-  // ======= Sticky Header and Back-to-Top Button Scroll Behavior
-  const handleScroll = () => {
-    const ud_header = document.querySelector(".ud-header");
-    const logo = document.querySelectorAll(".header-logo");
-    const sticky = ud_header ? ud_header.offsetTop : 0;
+  const handleDarkMode = () => {
+    // ======= Sticky Header and Back-to-Top Button Scroll Behavior
+    const handleScroll = () => {
+      const ud_header = document.querySelector(".ud-header");
+      const logo = document.querySelectorAll(".header-logo");
+      const sticky = ud_header ? ud_header.offsetTop : 0;
 
-    if (window.pageYOffset > sticky) {
-      ud_header.classList.add("sticky");
-    } else {
-      ud_header.classList.remove("sticky");
-    }
-
-    // Logo Change on Sticky Header
-    if (logo.length) {
-      const logoSrc = ud_header.classList.contains("sticky")
-        ? "assets/images/logo/logo.svg"
-        : "assets/images/logo/logo-white.svg";
-
-      document.querySelector(".header-logo").src = logoSrc;
-    }
-
-    // Handle logo change for dark mode
-    if (document.documentElement.classList.contains("dark")) {
-      if (logo.length && ud_header.classList.contains("sticky")) {
-        document.querySelector(".header-logo").src =
-          "assets/images/logo/logo-white.svg";
-      }
-    }
-
-    // Show or hide the back-to-top button
-    const backToTop = document.querySelector(".back-to-top");
-    if (backToTop) {
-      if (window.scrollY > 50) {
-        backToTop.style.display = "flex";
+      if (window.pageYOffset > sticky) {
+        ud_header.classList.add("sticky");
       } else {
-        backToTop.style.display = "none";
+        ud_header.classList.remove("sticky");
       }
-    }
-  };
 
-  window.addEventListener("scroll", handleScroll);
+      // Logo Change on Sticky Header
+      if (logo.length) {
+        const logoSrc = ud_header.classList.contains("sticky")
+          ? "assets/images/logo/logo.svg"
+          : "assets/images/logo/logo-white.svg";
 
-  // ===== Navbar Toggle Behavior
-  const navbarToggler = document.querySelector("#navbarToggler");
-  const navbarCollapse = document.querySelector("#navbarCollapse");
+        document.querySelector(".header-logo").src = logoSrc;
+      }
 
-  const handleNavbarToggle = () => {
-    navbarToggler.classList.toggle("navbarTogglerActive");
-    navbarCollapse.classList.toggle("hidden");
-  };
+      // Handle logo change for dark mode
+      if (document.documentElement.classList.contains("dark")) {
+        if (logo.length && ud_header.classList.contains("sticky")) {
+          document.querySelector(".header-logo").src =
+            "assets/images/logo/logo-white.svg";
+        }
+      }
 
-  if (navbarToggler) {
-    navbarToggler.addEventListener("click", handleNavbarToggle);
-  }
-
-  // Close Navbar on Link Click
-  const closeNavbarOnClick = () => {
-    navbarToggler.classList.remove("navbarTogglerActive");
-    navbarCollapse.classList.add("hidden");
-  };
-
-  const navbarLinks = document.querySelectorAll(
-    "#navbarCollapse ul li:not(.submenu-item) a",
-  );
-  navbarLinks.forEach((link) =>
-    link.addEventListener("click", closeNavbarOnClick),
-  );
-
-  // ===== Sub-menu Toggle
-  const submenuItems = document.querySelectorAll(".submenu-item");
-  submenuItems.forEach((el) => {
-    el.querySelector("a").addEventListener("click", () => {
-      el.querySelector(".submenu").classList.toggle("hidden");
-    });
-  });
-
-  // ===== FAQ Accordion
-  const faqs = document.querySelectorAll(".single-faq");
-  faqs.forEach((el) => {
-    el.querySelector(".faq-btn").addEventListener("click", () => {
-      el.querySelector(".icon").classList.toggle("rotate-180");
-      el.querySelector(".faq-content").classList.toggle("hidden");
-    });
-  });
-
-  // ===== wow.js for animations
-  // new WOW.WOW().init();
-
-  // ===== Scroll-to-Top Functionality
-  const scrollTo = (element, to = 0, duration = 500) => {
-    const start = element.scrollTop;
-    const change = to - start;
-    const increment = 20;
-    let currentTime = 0;
-
-    const animateScroll = () => {
-      currentTime += increment;
-      const val = Math.easeInOutQuad(currentTime, start, change, duration);
-      element.scrollTop = val;
-
-      if (currentTime < duration) {
-        setTimeout(animateScroll, increment);
+      // Show or hide the back-to-top button
+      const backToTop = document.querySelector(".back-to-top");
+      if (backToTop) {
+        if (window.scrollY > 50) {
+          backToTop.style.display = "flex";
+        } else {
+          backToTop.style.display = "none";
+        }
       }
     };
 
-    animateScroll();
-  };
+    window.addEventListener("scroll", handleScroll);
 
-  Math.easeInOutQuad = function (t, b, c, d) {
-    t /= d / 2;
-    if (t < 1) return (c / 2) * t * t + b;
-    t--;
-    return (-c / 2) * (t * (t - 2) - 1) + b;
-  };
+    // ===== Navbar Toggle Behavior
+    const navbarToggler = document.querySelector("#navbarToggler");
+    const navbarCollapse = document.querySelector("#navbarCollapse");
 
-  const backToTopButton = document.querySelector(".back-to-top");
-  if (backToTopButton) {
-    backToTopButton.onclick = () => scrollTo(document.documentElement);
-  }
+    const handleNavbarToggle = () => {
+      navbarToggler.classList.toggle("navbarTogglerActive");
+      navbarCollapse.classList.toggle("hidden");
+    };
 
-  // ===== Theme Switcher
-  const themeSwitcher = document.getElementById("themeSwitcher");
-  const userTheme = localStorage.getItem("theme");
-  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-  const themeCheck = () => {
-    if (userTheme === "dark" || (!userTheme && systemTheme)) {
-      document.documentElement.classList.add("dark");
-    }
-  };
-
-  const themeSwitch = () => {
-    if (document.documentElement.classList.contains("dark")) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-  };
-
-  if (themeSwitcher) {
-    themeSwitcher.addEventListener("click", themeSwitch);
-  }
-
-  themeCheck();
-
-  // Cleanup on unmount
-  return () => {
-    window.removeEventListener("scroll", handleScroll);
     if (navbarToggler) {
-      navbarToggler.removeEventListener("click", handleNavbarToggle);
+      navbarToggler.addEventListener("click", handleNavbarToggle);
     }
-    navbarLinks.forEach((link) =>
-      link.removeEventListener("click", closeNavbarOnClick),
+
+    // Close Navbar on Link Click
+    const closeNavbarOnClick = () => {
+      navbarToggler.classList.remove("navbarTogglerActive");
+      navbarCollapse.classList.add("hidden");
+    };
+
+    const navbarLinks = document.querySelectorAll(
+      "#navbarCollapse ul li:not(.submenu-item) a",
     );
+    navbarLinks.forEach((link) =>
+      link.addEventListener("click", closeNavbarOnClick),
+    );
+
+    // ===== Sub-menu Toggle
+    const submenuItems = document.querySelectorAll(".submenu-item");
+    submenuItems.forEach((el) => {
+      el.querySelector("a").addEventListener("click", () => {
+        el.querySelector(".submenu").classList.toggle("hidden");
+      });
+    });
+
+    // ===== FAQ Accordion
+    const faqs = document.querySelectorAll(".single-faq");
+    faqs.forEach((el) => {
+      el.querySelector(".faq-btn").addEventListener("click", () => {
+        el.querySelector(".icon").classList.toggle("rotate-180");
+        el.querySelector(".faq-content").classList.toggle("hidden");
+      });
+    });
+
+    // ===== wow.js for animations
+    // new WOW.WOW().init();
+
+    // ===== Scroll-to-Top Functionality
+    const scrollTo = (element, to = 0, duration = 500) => {
+      const start = element.scrollTop;
+      const change = to - start;
+      const increment = 20;
+      let currentTime = 0;
+
+      const animateScroll = () => {
+        currentTime += increment;
+        const val = Math.easeInOutQuad(currentTime, start, change, duration);
+        element.scrollTop = val;
+
+        if (currentTime < duration) {
+          setTimeout(animateScroll, increment);
+        }
+      };
+
+      animateScroll();
+    };
+
+    Math.easeInOutQuad = function (t, b, c, d) {
+      t /= d / 2;
+      if (t < 1) return (c / 2) * t * t + b;
+      t--;
+      return (-c / 2) * (t * (t - 2) - 1) + b;
+    };
+
+    const backToTopButton = document.querySelector(".back-to-top");
+    if (backToTopButton) {
+      backToTopButton.onclick = () => scrollTo(document.documentElement);
+    }
+
+    // ===== Theme Switcher
+    const themeSwitcher = document.getElementById("themeSwitcher");
+    const userTheme = localStorage.getItem("theme");
+    const systemTheme = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+
+    const themeCheck = () => {
+      if (userTheme === "dark" || (!userTheme && systemTheme)) {
+        document.documentElement.classList.add("dark");
+      }
+    };
+
+    const themeSwitch = () => {
+      if (document.documentElement.classList.contains("dark")) {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      } else {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      }
+    };
+
+    if (themeSwitcher) {
+      themeSwitcher.addEventListener("click", themeSwitch);
+    }
+
+    themeCheck();
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (navbarToggler) {
+        navbarToggler.removeEventListener("click", handleNavbarToggle);
+      }
+      navbarLinks.forEach((link) =>
+        link.removeEventListener("click", closeNavbarOnClick),
+      );
+    };
   };
-};
 
   const handleLogout = () => {
     dispatch(logout());
@@ -243,90 +245,90 @@ const handleDarkMode = () => {
       description: "hello world",
       status: "wait", // Pending (waiting for approval)
     },
-
   ];
 
   const generateTables = (orderDetails) => {
-    return orderDetails.map((detail, index) => (
-      <div key={index}>
-        <table
-          className={`${
-            orderDetails.length === 1 ? "md:w-full" : "md:w-1/2"
-          } table-container w-full overflow-hidden text-nowrap text-center text-sm`}
-        >
-          <thead className="">
+    return (
+      <div>
+        <table className="table-container w-full overflow-hidden text-nowrap text-center text-sm">
+          <thead>
             <tr>
-              <th className="py-2">
-                <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                  Info
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Fish ID
                 </span>
               </th>
-              <th className="py-2">
-                <span className="block py-4 text-xl font-medium text-dark dark:text-white">
-                  Notes
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Farm Name
+                </span>
+              </th>
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Farm Address
+                </span>
+              </th>
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Fish Species
+                </span>
+              </th>
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Number of Fish
+                </span>
+              </th>
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Size of Fish (cm)
+                </span>
+              </th>
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Total Box
+                </span>
+              </th>
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Total Volume (L)
+                </span>
+              </th>
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Price ($)
+                </span>
+              </th>
+              <th className="px-3 py-2">
+                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                  Health Status
                 </span>
               </th>
             </tr>
           </thead>
           <tbody className="text-base text-dark dark:text-white">
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-2 font-medium">
-                Farm Name
-              </td>
-              <td className="px-6 py-2">{detail.nameFarm}</td>
-            </tr>
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-3 font-medium">
-                Farm Address
-              </td>
-              <td className="px-6 py-3">{detail.farmAddress}</td>
-            </tr>
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-2 font-medium">
-                Fish Species
-              </td>
-              <td className="px-6 py-2">{detail.fishSpecies}</td>
-            </tr>
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-2 font-medium">
-                Number of Fish
-              </td>
-              <td className="px-6 py-2">{detail.numberOfFish}</td>
-            </tr>
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-2 font-medium">
-                Size of Fish (cm)
-              </td>
-              <td className="px-6 py-2">{detail.sizeOfFish}cm</td>
-            </tr>
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-2 font-medium">
-                Total Box
-              </td>
-              <td className="px-6 py-2">{detail.totalBox}</td>
-            </tr>
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-2 font-medium">
-                Total Volume (L)
-              </td>
-              <td className="px-6 py-2">{detail.totalVolume}L</td>
-            </tr>
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-2 font-medium">
-                Price ($)
-              </td>
-              <td className="px-6 py-2">${detail.priceOfFish}</td>
-            </tr>
-            <tr className="text-center hover:table-row hover:scale-105 dark:hover:table-row">
-              <td className="whitespace-nowrap px-6 py-2 font-medium">
-                Health Status
-              </td>
-              <td className="px-6 py-2">{detail.healthFishStatus}</td>
-            </tr>
+            {orderDetails.map((detail, index) => (
+              <tr
+                key={index}
+                className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
+              >
+                <td className="whitespace-nowrap px-6 py-2 font-medium">
+                  {detail.id}
+                </td>
+                <td className="text-wrap px-6 py-2">{detail.nameFarm}</td>
+                <td className="text-wrap px-6 py-2">{detail.farmAddress}</td>
+                <td className="px-6 py-2">{detail.fishSpecies}</td>
+                <td className="px-6 py-2">{detail.numberOfFish}</td>
+                <td className="px-6 py-2">{detail.sizeOfFish}</td>
+                <td className="px-6 py-2">{detail.totalBox}</td>
+                <td className="px-6 py-2">{detail.totalVolume}</td>
+                <td className="px-6 py-2">{detail.priceOfFish}</td>
+                <td className="px-6 py-2">{detail.healthFishStatus}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
-    ));
+    );
   };
 
   const handleFeedback = async (values) => {
@@ -404,9 +406,10 @@ const handleDarkMode = () => {
                   </div>
                 </div>
                 <div className="flex w-full flex-row items-center justify-between gap-4">
-                  <Form>
+                  <Form layout="vertical">
                     <div className="flex w-full flex-wrap justify-between">
                       <Form.Item
+                        label="Origin Location"
                         initialValue={order.originLocation}
                         name="originLocation"
                         className="mb-[22px] w-full md:w-1/2 md:pr-4"
@@ -414,10 +417,11 @@ const handleDarkMode = () => {
                         <Input
                           readOnly
                           placeholder="Origin Location"
-                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
                       <Form.Item
+                        label="Destination Location"
                         initialValue={order.destinationLocation}
                         name="destinationLocation"
                         className="mb-[22px] w-full md:w-1/2 md:pl-4"
@@ -425,10 +429,11 @@ const handleDarkMode = () => {
                         <Input
                           readOnly
                           placeholder="Destination Location"
-                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
                       <Form.Item
+                        label="Customer Notes"
                         initialValue={order.customerNotes}
                         name="customerNotes"
                         className="mb-[22px] w-full md:w-1/2 md:pr-4"
@@ -436,10 +441,11 @@ const handleDarkMode = () => {
                         <Input.TextArea
                           readOnly
                           placeholder="Customer Notes"
-                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
                       <Form.Item
+                        label="Recipient Info"
                         initialValue={order.recipientInfo}
                         name="recipientInfo"
                         className="mb-[22px] w-full md:w-1/2 md:pl-4"
@@ -447,10 +453,11 @@ const handleDarkMode = () => {
                         <Input.TextArea
                           readOnly
                           placeholder="Recipient Info"
-                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
                       <Form.Item
+                        label="Transport Method"
                         initialValue={order.methodTransPort}
                         name="methodTransport"
                         className="mb-[22px] w-full md:w-1/2 md:pr-4"
@@ -458,10 +465,11 @@ const handleDarkMode = () => {
                         <Input
                           readOnly
                           placeholder="Method Transport"
-                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
                       <Form.Item
+                        label="Payment Method"
                         initialValue={order.paymentMethod}
                         name="paymentMethod"
                         className="mb-[22px] w-full md:w-1/2 md:pl-4"
@@ -469,7 +477,19 @@ const handleDarkMode = () => {
                         <Input
                           readOnly
                           placeholder="Payment Method"
-                          className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label="Total Distance"
+                        initialValue={order.totalDistance + ` km`}
+                        name="totalDistance"
+                        className="mb-[22px] w-full md:w-1/2 md:pr-4"
+                      >
+                        <Input
+                          readOnly
+                          placeholder="Total Distance"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
                     </div>
@@ -495,7 +515,7 @@ const handleDarkMode = () => {
                       <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
                         Order Info
                       </h2>
-                      <div className="table-list flex w-full flex-col flex-wrap items-center justify-center md:flex-row">
+                      <div className="table-list flex w-full flex-wrap items-center justify-center">
                         {generateTables(order.orderDetails)}
                       </div>
                       <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
@@ -592,32 +612,17 @@ const handleDarkMode = () => {
                       </div>
 
                       <div className="flex w-full flex-col items-start justify-start gap-5">
-                        {/* <div className="flex w-full flex-col items-start justify-start gap-4 pb-1.5">
+                        <div className="flex w-full flex-col items-start justify-start gap-4 pb-1.5">
                           <div className="inline-flex w-full items-start justify-between gap-6">
                             <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Subtotal
+                              Delivery fee (0.42 USD per km for Fast Delivery /
+                              0.22 USD per km for Normal Delivery)
                             </h6>
                             <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              $210.00
+                              ???
                             </h6>
                           </div>
-                          <div className="inline-flex w-full items-start justify-between gap-6">
-                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Shipping Charge
-                            </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              $10.00
-                            </h6>
-                          </div>
-                          <div className="inline-flex w-full items-start justify-between gap-6">
-                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Tax Fee
-                            </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              $22.00
-                            </h6>
-                          </div>
-                        </div> */}
+                        </div>
                         <div className="inline-flex w-full items-start justify-between gap-6">
                           <h5 className="text-lg font-semibold leading-relaxed text-dark dark:text-white">
                             Total
@@ -931,7 +936,7 @@ const handleDarkMode = () => {
                           Register
                         </Link>
                       </div>
-                    ) : (
+                    ) : (user != null && user?.role === "CUSTOMER" && (
                       <a className="submenu-item group relative">
                         <div className="pl-6">
                           <img
@@ -962,7 +967,7 @@ const handleDarkMode = () => {
                           </Link>
                         </div>
                       </a>
-                    )}
+                    ))}
                   </div>
                 </div>
               </div>
@@ -977,7 +982,7 @@ const handleDarkMode = () => {
             <div className="w-full px-4">
               <div className="text-center">
                 <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Order History Page
+                  Order List Page
                 </h1>
                 <p className="mb-5 text-base text-body-color dark:text-dark-6">
                   There are many variations of passages of Lorem Ipsum
@@ -995,7 +1000,7 @@ const handleDarkMode = () => {
                   </Link>
                   <li>
                     <Link
-                      to="/order-history"
+                      to="/order-list"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -1003,7 +1008,7 @@ const handleDarkMode = () => {
                         {" "}
                         /{" "}
                       </span>
-                      Order History Page
+                      Order List Page
                     </Link>
                   </li>
                 </ul>
@@ -1035,4 +1040,4 @@ const handleDarkMode = () => {
   );
 }
 
-export default OrderHistoryPage;
+export default OrderListPage;

@@ -196,6 +196,18 @@ function OrderPage() {
     navigate("/login");
   };
 
+  const validateRecipientInfo = (e) => {
+    const value = e.target.value;
+    const emailRegex = /\S+@\S+\.\S+/;
+    const phoneRegex = /^\+?[0-9]{7,15}$/;
+
+    if (!emailRegex.test(value) && !phoneRegex.test(value)) {
+      toast.info(
+        "Recipient Info must contain contact information of receiver such as email or phone number",
+      );
+    }
+  };
+
   const handleOrderDescribeChange = (value) => {
     if (value === "RETAIL_ORDER") {
       toast.info(
@@ -220,7 +232,7 @@ function OrderPage() {
       destinationLocation: values.destinationLocation,
       describeOrder: values.describeOrder,
       recipientInfo: values.recipientInfo,
-      methodTransport: values.methodTransport,
+      methodTransPort: values.methodTransPort,
       customerNotes: values.customerNotes,
       paymentMethod: values.paymentMethod,
       orderDetailRequestList: orderDetails.map((detail) => ({
@@ -447,18 +459,6 @@ function OrderPage() {
                           >
                             Order List Page
                           </Link>
-                          <Link
-                            to="/order-tracking"
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Order Tracking Page
-                          </Link>
-                          <Link
-                            to="order-history"
-                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
-                          >
-                            Order History Page
-                          </Link>
                         </div>
                       )}
                     </li>
@@ -538,7 +538,7 @@ function OrderPage() {
                           Register
                         </Link>
                       </div>
-                    ) : (
+                    ) : (user != null && user?.role === "CUSTOMER" && (
                       <a className="submenu-item group relative">
                         <div className="pl-6">
                           <img
@@ -569,7 +569,7 @@ function OrderPage() {
                           </Link>
                         </div>
                       </a>
-                    )}
+                    ))}
                   </div>
                 </div>
               </div>
@@ -645,9 +645,15 @@ function OrderPage() {
                     />
                   </a>
                 </div>
-                <Form title="Order" form={form} onFinish={handleSubmitOrder}>
+                <Form
+                  title="Order"
+                  form={form}
+                  onFinish={handleSubmitOrder}
+                  layout="vertical"
+                >
                   <div className="flex w-full flex-wrap">
                     <Form.Item
+                      label="Origin Location"
                       name="originLocation"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
@@ -664,6 +670,7 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
+                      label="Destination Location"
                       name="destinationLocation"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
@@ -679,8 +686,8 @@ function OrderPage() {
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
-
                     <Form.Item
+                      label="Customer Notes"
                       name="customerNotes"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
@@ -697,6 +704,7 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
+                      label="Recipient Info"
                       name="recipientInfo"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
@@ -708,11 +716,13 @@ function OrderPage() {
                       style={{ textAlign: "left" }}
                     >
                       <Input.TextArea
+                        onBlur={validateRecipientInfo}
                         placeholder="Recipient Info"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
                     </Form.Item>
                     <Form.Item
+                      label="Order Type"
                       name="describeOrder"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
@@ -733,7 +743,8 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
-                      name="methodTransport"
+                      label="Transport Method"
+                      name="methodTransPort"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
                         {
@@ -747,10 +758,7 @@ function OrderPage() {
                         placeholder="Select transport method"
                         onChange={handleOrderDescribeChange}
                         options={[
-                          {
-                            value: "FAST_DELIVERY",
-                            label: "Fast Delivery",
-                          },
+                          { value: "FAST_DELIVERY", label: "Fast Delivery" },
                           {
                             value: "NORMAL_DELIVERY",
                             label: "Normal Delivery",
@@ -759,6 +767,7 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
+                      label="Payment Method"
                       name="paymentMethod"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
@@ -782,18 +791,13 @@ function OrderPage() {
                             .localeCompare((optionB?.label ?? "").toLowerCase())
                         }
                         options={[
-                          {
-                            value: "CASH",
-                            label: "Cash",
-                          },
-                          {
-                            value: "BANK_TRANSFER",
-                            label: "Bank Transfer",
-                          },
+                          { value: "VISA", label: "Visa" },
+                          { value: "BANK_TRANSFER", label: "Bank Transfer" },
                         ]}
                       />
                     </Form.Item>
                   </div>
+
                   <div className="flex w-full flex-wrap">
                     {orderDetails.map((detail, index) => (
                       <div
@@ -803,6 +807,7 @@ function OrderPage() {
                         } w-full`}
                       >
                         <Form.Item
+                          label="Price of Fish (USD)"
                           name={`orderDetails[${index}].priceOfFish`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -811,7 +816,7 @@ function OrderPage() {
                               e.target.value.replace(",", "."),
                             )
                           }
-                          className="mb-[22px] w-full px-2 md:w-1/2"
+                          className="mb-[22px] w-full px-2"
                           rules={[
                             {
                               required: true,
@@ -829,6 +834,7 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
+                          label="Farm Name"
                           name={`orderDetails[${index}].nameFarm`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -837,7 +843,7 @@ function OrderPage() {
                               e.target.value,
                             )
                           }
-                          className="mb-[22px] w-full px-2 md:w-1/2"
+                          className="mb-[22px] w-full px-2"
                           rules={[
                             {
                               required: true,
@@ -852,6 +858,7 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
+                          label="Farm Address"
                           name={`orderDetails[${index}].farmAddress`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -860,7 +867,7 @@ function OrderPage() {
                               e.target.value,
                             )
                           }
-                          className="mb-[22px] w-full px-2 md:w-1/2"
+                          className="mb-[22px] w-full px-2"
                           rules={[
                             {
                               required: true,
@@ -875,6 +882,7 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
+                          label="Origin"
                           name={`orderDetails[${index}].origin`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -883,7 +891,7 @@ function OrderPage() {
                               e.target.value,
                             )
                           }
-                          className="mb-[22px] w-full px-2 md:w-1/2"
+                          className="mb-[22px] w-full px-2"
                           rules={[
                             {
                               required: true,
@@ -898,6 +906,7 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
+                          label="Fish Species"
                           name={`orderDetails[${index}].fishSpecies`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -906,7 +915,7 @@ function OrderPage() {
                               e.target.value,
                             )
                           }
-                          className="mb-[22px] w-full px-2 md:w-1/2"
+                          className="mb-[22px] w-full px-2"
                           rules={[
                             {
                               required: true,
@@ -921,8 +930,8 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
+                          label="Number Of Fish"
                           name={`orderDetails[${index}].numberOfFish`}
-                          className="mb-[22px] w-full px-2 md:w-1/2"
                           onChange={(e) =>
                             handleOrderDetailChange(
                               index,
@@ -930,10 +939,23 @@ function OrderPage() {
                               e.target.value,
                             )
                           }
+                          className="mb-[22px] w-full px-2"
                           rules={[
                             {
                               required: true,
                               message: "Please input number of fish",
+                            },
+                            {
+                              validator: (_, value) => {
+                                if (value > 100) {
+                                  return Promise.reject(
+                                    new Error(
+                                      "Number of fish must be less than or eqaul to 100!",
+                                    ),
+                                  );
+                                }
+                                return Promise.resolve(); // No error if value is valid
+                              },
                             },
                           ]}
                           style={{ textAlign: "left" }}
@@ -947,8 +969,8 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
+                          label="Size Of Fish (Cm)"
                           name={`orderDetails[${index}].sizeOfFish`}
-                          className="mb-[22px] w-full px-2 md:w-1/2"
                           onChange={(e) =>
                             handleOrderDetailChange(
                               index,
@@ -956,17 +978,30 @@ function OrderPage() {
                               e.target.value.replace(",", "."),
                             )
                           }
+                          className="mb-[22px] w-full px-2"
                           rules={[
                             {
                               required: true,
                               message: "Please input size of fish in cm",
+                            },
+                            {
+                              validator: (_, value) => {
+                                if (value < 19.9 || value > 83) {
+                                  return Promise.reject(
+                                    new Error(
+                                      "Size of fish must be from 19.9 to 83 cm!",
+                                    ),
+                                  );
+                                }
+                                return Promise.resolve(); // No error if value is valid
+                              },
                             },
                           ]}
                           style={{ textAlign: "left" }}
                         >
                           <Input
                             type="number"
-                            min="1"
+                            min="19.9"
                             pattern="[0-9]+(\.[0-9]+)?"
                             placeholder="Size Of Fish In Cm"
                             className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
@@ -1016,6 +1051,7 @@ function OrderPage() {
                     </Button>
                   </Form.Item>
                 </Form>
+
                 <div>
                   <span className="absolute right-1 top-1">
                     <svg

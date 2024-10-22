@@ -17,20 +17,22 @@ function LoginPage() {
   const handleLogin = async (values) => {
     try {
       setLoading(true);
+
       const response = await api.post("/authentication/login", values);
       toast.success("Successfully login account");
+
       console.log(response.data);
       dispatch(login(response.data));
       const { role, token } = response.data;
       localStorage.setItem("token", token);
       if (role === "CUSTOMER") {
         navigate("/");
-      } else if (
-        role === "MANAGER" ||
-        role === "SALES_STAFF" ||
-        role === "DELIVERY_STAFF"
-      ) {
+      } else if (role === "MANAGER") {
         navigate("/dashboard");
+      } else if (role === "SALE_STAFF") {
+        navigate("/dashboard");
+      } else if (role === "DELIVERING_STAFF") {
+        navigate("/deliveryStaff");
       }
     } catch (err) {
       toast.error(err.response.data || "Failed to login account");
@@ -146,8 +148,14 @@ function LoginPage() {
                     />
                   </a>
                 </div>
-                <Form onFinish={handleLogin} title="Login" form={form}>
+                <Form
+                  onFinish={handleLogin}
+                  title="Login"
+                  form={form}
+                  layout="vertical"
+                >
                   <Form.Item
+                    label="Username"
                     name="username"
                     className="mb-[22px]"
                     rules={[
@@ -168,6 +176,7 @@ function LoginPage() {
                     />
                   </Form.Item>
                   <Form.Item
+                    label="Password"
                     name="password"
                     className="mb-[14px]"
                     rules={[
