@@ -25,7 +25,7 @@ function OrderDetailsInfoStaff() {
   
     const fetchOrder = async () => {
       try {
-        const response = await api.get(`order/allOrder`);
+        const response = await api.get(`order/allOrder?page=1&size=1000000000`);
         const foundOrder = response.data.find(
           (order) => order.id === parseInt(id),
         ); // Find order that matches id

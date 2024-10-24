@@ -115,7 +115,14 @@ const OrderList = () => {
     setDeletingOrderId(null); // Reset delete state after action
   };
 
-
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
   const getPaymentMethodIcon = (method) => {
     if (!method) {
       return null;
@@ -229,6 +236,12 @@ const OrderList = () => {
                     )}
                     <p className="mt-1 text-sm text-gray-800">
                       Volume: {order.totalVolume}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-800">
+                    From: {order.originLocation}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-800">
+                    To: {order.destinationLocation}
                     </p>
                   </div>
 
