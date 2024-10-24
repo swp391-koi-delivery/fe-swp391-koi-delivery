@@ -99,9 +99,9 @@ function ForgotPasswordPage() {
                   layout="vertical"
                 >
                   <Form.Item
-                    label="Email"
+                    label={<span className="dark:text-white">Email</span>}
                     name="email"
-                    className="mb-[22px]"
+                    className="mb-4"
                     rules={[
                       {
                         required: true,
@@ -116,7 +116,7 @@ function ForgotPasswordPage() {
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
-                  <Form.Item className="mb-[22px]">
+                  <Form.Item className="mb-4">
                     <Button
                       onClick={() => form.submit()}
                       className="primaryButton"

@@ -1,12 +1,27 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import { Alert, Button, Form, Input, Modal, Pagination, Popover, Rate, Steps } from "antd";
+import {
+  Alert,
+  Button,
+  Form,
+  Input,
+  Modal,
+  Pagination,
+  Rate,
+  Steps,
+} from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
 import { useForm } from "antd/es/form/Form";
 import { toast } from "react-toastify";
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 function OrderListPage() {
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -198,6 +213,24 @@ function OrderListPage() {
     setOpenModal(false);
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
+
+  const formatDistance = (distance) => {
+    return (
+      new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(distance) + " km"
+    );
+  };
+
   const fetchOrder = async () => {
     try {
       const response = await api.get("/customer/order/each-user");
@@ -207,99 +240,59 @@ function OrderListPage() {
     }
   };
 
-  const customDot = (dot, { status, index }) => (
-    <Popover
-      content={
-        <span>
-          step {index} status: {status}
-        </span>
-      }
-    >
-      {dot}
-    </Popover>
-  );
-
-  const steps = [
-    {
-      title: "Finished",
-      description: "hello world",
-      status: "finish", // Mark this as finished
-    },
-    {
-      title: "In Progress",
-      description: "hello world",
-      status: "process", // Currently in progress
-    },
-    {
-      title: "Waiting",
-      description: "hello world",
-      status: "wait", // Waiting status
-    },
-    {
-      title: "Error",
-      description: "hello world",
-      status: "error", // Error occurred
-    },
-    {
-      title: "Pending",
-      description: "hello world",
-      status: "wait", // Pending (waiting for approval)
-    },
-  ];
-
   const generateTables = (orderDetails) => {
     return (
       <div>
-        <table className="table-container w-full overflow-hidden text-nowrap text-center text-sm">
-          <thead>
+        <table className="table-container w-full overflow-hidden text-nowrap rounded-xl text-center text-sm shadow-pricing">
+          <thead className="bg-gray-200 dark:bg-slate-800">
             <tr>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Fish ID
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Farm Name
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Farm Address
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Fish Species
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Number of Fish
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Size of Fish (cm)
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Total Box
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Total Volume (L)
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Price ($)
                 </span>
               </th>
               <th className="px-3 py-2">
-                <span className="block py-4 text-base font-medium text-dark dark:text-white">
+                <span className="block py-3 text-base font-medium text-dark dark:text-white">
                   Health Status
                 </span>
               </th>
@@ -347,6 +340,8 @@ function OrderListPage() {
     try {
       setLoading(true);
       const response = await api.post("/customer/payment", values);
+      console.log(response);
+      window.open(response.data);
       toast.success("Successfully pay for order");
     } catch (err) {
       toast.error(err.response.data || "Failed to pay for order");
@@ -355,13 +350,15 @@ function OrderListPage() {
     }
   };
 
+  const { Step } = Steps;
+
   const Order = ({ order }) => {
     return (
       <>
         <div className="order my-8">
           <div className="-mx-4 flex flex-wrap rounded-xl p-6 shadow-pricing">
             <div className="mx-auto w-full px-4 md:px-5 lg:px-5">
-              <div className="inline-flex w-full flex-col items-start justify-start gap-12">
+              <div className="inline-flex w-full flex-col items-start justify-start gap-4">
                 <div className="flex w-full flex-row items-center justify-between gap-4">
                   <div className="inline-flex w-full flex-col justify-center gap-1 md:w-1/2 md:items-start md:justify-start">
                     <h2 className="mb-2 text-2xl font-semibold leading-9 text-dark dark:text-white">
@@ -375,7 +372,8 @@ function OrderListPage() {
                     </span>
                   </div>
                   <div className="flex w-full flex-col items-end justify-between md:w-1/2">
-                    {order.orderStatus === "ACCEPTED" && (
+                    {(order.orderStatus === "PAID" ||
+                      order.orderStatus === "DELIVERED") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
                         {order.orderStatus}
                       </p>
@@ -421,10 +419,14 @@ function OrderListPage() {
                   <Form layout="vertical">
                     <div className="flex w-full flex-wrap justify-between">
                       <Form.Item
-                        label="Origin Location"
+                        label={
+                          <span className="dark:text-white">
+                            Origin Location
+                          </span>
+                        }
                         initialValue={order.originLocation}
                         name="originLocation"
-                        className="mb-[22px] w-full md:w-1/2 md:pr-4"
+                        className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
                         <Input
                           readOnly
@@ -433,10 +435,14 @@ function OrderListPage() {
                         />
                       </Form.Item>
                       <Form.Item
-                        label="Destination Location"
+                        label={
+                          <span className="dark:text-white">
+                            Destination Location
+                          </span>
+                        }
                         initialValue={order.destinationLocation}
                         name="destinationLocation"
-                        className="mb-[22px] w-full md:w-1/2 md:pl-4"
+                        className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
                         <Input
                           readOnly
@@ -445,10 +451,14 @@ function OrderListPage() {
                         />
                       </Form.Item>
                       <Form.Item
-                        label="Customer Notes"
+                        label={
+                          <span className="dark:text-white">
+                            Customer Notes
+                          </span>
+                        }
                         initialValue={order.customerNotes}
                         name="customerNotes"
-                        className="mb-[22px] w-full md:w-1/2 md:pr-4"
+                        className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
                         <Input.TextArea
                           readOnly
@@ -457,10 +467,14 @@ function OrderListPage() {
                         />
                       </Form.Item>
                       <Form.Item
-                        label="Recipient Info"
+                        label={
+                          <span className="dark:text-white">
+                            Recipient Info
+                          </span>
+                        }
                         initialValue={order.recipientInfo}
                         name="recipientInfo"
-                        className="mb-[22px] w-full md:w-1/2 md:pl-4"
+                        className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
                         <Input.TextArea
                           readOnly
@@ -469,10 +483,14 @@ function OrderListPage() {
                         />
                       </Form.Item>
                       <Form.Item
-                        label="Transport Method"
+                        label={
+                          <span className="dark:text-white">
+                            Transport Method
+                          </span>
+                        }
                         initialValue={order.methodTransPort}
                         name="methodTransport"
-                        className="mb-[22px] w-full md:w-1/2 md:pr-4"
+                        className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
                         <Input
                           readOnly
@@ -481,10 +499,14 @@ function OrderListPage() {
                         />
                       </Form.Item>
                       <Form.Item
-                        label="Payment Method"
+                        label={
+                          <span className="dark:text-white">
+                            Payment Method
+                          </span>
+                        }
                         initialValue={order.paymentMethod}
                         name="paymentMethod"
-                        className="mb-[22px] w-full md:w-1/2 md:pl-4"
+                        className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
                         <Input
                           readOnly
@@ -493,10 +515,14 @@ function OrderListPage() {
                         />
                       </Form.Item>
                       <Form.Item
-                        label="Total Distance (Km)"
-                        initialValue={order.totalDistance}
+                        label={
+                          <span className="dark:text-white">
+                            Total Distance (Km)
+                          </span>
+                        }
+                        initialValue={formatDistance(order.totalDistance)}
                         name="totalDistance"
-                        className="mb-[22px] w-full md:w-1/2 md:pr-4"
+                        className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
                         <Input
                           readOnly
@@ -514,18 +540,104 @@ function OrderListPage() {
                         Order Tracking
                       </h2>
                       <div className="w-full flex-col items-center justify-center md:flex-row">
-                        <div className="pt-10">
-                          <Steps
-                            current={1}
-                            progressDot={customDot}
-                            items={steps}
+                        <Steps current={4}>
+                          <Step
+                            title={
+                              <span className="dark:text-white">
+                                In Progress
+                              </span>
+                            }
+                            description={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            subTitle={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            icon={
+                              <LoadingOutlined
+                                style={{
+                                  color: " rgb(59 130 246)",
+                                }}
+                              />
+                            }
                           />
-                        </div>
+                          <Step
+                            title={
+                              <span className="dark:text-white">Waiting</span>
+                            }
+                            subTitle={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            description={
+                              <div>
+                                <span className="dark:text-white">hello</span>
+                                <img
+                                  src="./assets/images/blog/blog-01.jpg"
+                                  alt="Waiting"
+                                  className="mt-2"
+                                />
+                              </div>
+                            }
+                            icon={
+                              <ClockCircleOutlined
+                                style={{ color: "rgb(107 114 128)" }}
+                              />
+                            }
+                          />
+                          <Step
+                            title={
+                              <span className="dark:text-white">Waiting</span>
+                            }
+                            subTitle={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            description={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            icon={
+                              <ClockCircleOutlined
+                                style={{ color: "rgb(107 114 128)" }}
+                              />
+                            }
+                          />
+                          <Step
+                            title={
+                              <span className="dark:text-white">Rejected</span>
+                            }
+                            subTitle={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            description={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            icon={
+                              <CloseCircleOutlined
+                                style={{ color: "rgb(239 68 68)" }}
+                              />
+                            }
+                          />
+                          <Step
+                            title={
+                              <span className="dark:text-white">Done</span>
+                            }
+                            subTitle={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            description={
+                              <span className="dark:text-white">hello</span>
+                            }
+                            icon={
+                              <CheckCircleOutlined
+                                style={{ color: "rgb(16 185 129)" }}
+                              />
+                            }
+                          />
+                        </Steps>
                       </div>
                     </div>
                     <div className="flex w-full flex-col items-start justify-start gap-5 rounded-xl bg-white dark:bg-dark">
                       <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
-                        Order Info
+                        Order Details
                       </h2>
                       <div className="table-list flex w-full flex-wrap items-center justify-center">
                         {generateTables(order.orderDetails)}
@@ -609,10 +721,10 @@ function OrderListPage() {
                                       className="flex w-full max-w-[200px] justify-between text-wrap"
                                     >
                                       <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                        $ {box.price} x {box.quantity}
+                                        ${box.price} x {box.quantity}
                                       </h4>
                                       <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                        $ {box.price * box.quantity}
+                                        ${box.price * box.quantity}
                                       </h4>
                                     </div>
                                   ),
@@ -640,45 +752,60 @@ function OrderListPage() {
                             Total
                           </h5>
                           <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
-                            ${order.totalPrice}
+                            {formatPrice(order.totalPrice)}
                           </h5>
                         </div>
                       </div>
                     </div>
                     <div className="flex w-full flex-row items-end justify-end gap-1.5">
-                      <Modal
-                        title="Feedback"
-                        loading={loading}
-                        onOk={() => form.submit()}
-                        open={openModal}
-                        onCancel={handleCloseModal}
-                      >
-                        <Form labelCol={{ span: 24 }} onFinish={handleFeedback}>
-                          <Alert
-                            message={`Feedback for ${selectedOrder?.id}`}
-                            type="info"
-                          />
-                          <Form.Item
-                            label="Order Id"
-                            name="orderId"
-                            initialValue={selectedOrder?.id}
+                      {order.orderStatus === "DELIVERED" && (
+                        <div className="">
+                          <Modal
+                            title="Feedback"
+                            loading={loading}
+                            onOk={() => form.submit()}
+                            open={openModal}
+                            onCancel={handleCloseModal}
                           >
-                            <Input hidden />
-                          </Form.Item>
-                          <Form.Item label="Rating Score" name="ratingScore">
-                            <Rate></Rate>
-                          </Form.Item>
-                          <Form.Item label="Comment" name="comment">
-                            <Input.TextArea />
-                          </Form.Item>
-                        </Form>
-                      </Modal>
-                      <Button onClick={() => handleOpenModal(order)}>
-                        Feedback
-                      </Button>
-                      <Button onClick={handlePayment(order)}>
-                        Feedback
-                      </Button>
+                            <Form
+                              labelCol={{ span: 24 }}
+                              onFinish={handleFeedback}
+                            >
+                              <Alert
+                                message={`Feedback for ${selectedOrder?.id}`}
+                                type="info"
+                              />
+                              <Form.Item
+                                label="Order Id"
+                                name="orderId"
+                                initialValue={selectedOrder?.id}
+                              >
+                                <Input hidden />
+                              </Form.Item>
+                              <Form.Item
+                                label="Rating Score"
+                                name="ratingScore"
+                              >
+                                <Rate></Rate>
+                              </Form.Item>
+                              <Form.Item label="Comment" name="comment">
+                                <Input.TextArea />
+                              </Form.Item>
+                            </Form>
+                          </Modal>
+                          <Button onClick={() => handleOpenModal(order)}>
+                            Feedback
+                          </Button>
+                        </div>
+                      )}
+                      {order.orderStatus === "AWAITING_PAYMENT" && (
+                        <Button
+                          onClick={() => handlePayment(order.id)}
+                          loading={loading}
+                        >
+                          Payment
+                        </Button>
+                      )}
                     </div>
                     <div className="flex w-full flex-col items-start justify-start gap-1.5">
                       <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
@@ -893,7 +1020,7 @@ function OrderListPage() {
                   />
                   <span
                     className="block text-dark dark:hidden dark:text-white"
-                    onClick={handleDarkMode}
+                    onClick={() => handleDarkMode()}
                   >
                     <svg
                       className="fill-current"
@@ -1003,8 +1130,7 @@ function OrderListPage() {
                   Order List Page
                 </h1>
                 <p className="mb-5 text-base text-body-color dark:text-dark-6">
-                  There are many variations of passages of Lorem Ipsum
-                  available.
+                  All of your order information are here.
                 </p>
 
                 <ul className="flex items-center justify-center gap-[10px]">

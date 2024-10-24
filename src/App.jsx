@@ -25,6 +25,8 @@ import ManageBox from "./pages/manager/manage-box";
 import ManageWarehouse from "./pages/manager/manage-warehouse";
 import "./index.css";
 import "./App.css";
+import SuccessPage from "./pages/success/Success";
+import ErrorPage from "./pages/error/ErrorPage";
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -92,8 +94,8 @@ function App() {
       path: "order",
       element: (
         <ProtectRouteCustomerAuth>
-        <OrderPage />
-       </ProtectRouteCustomerAuth>
+          <OrderPage />
+        </ProtectRouteCustomerAuth>
       ),
     },
     {
@@ -103,6 +105,14 @@ function App() {
           <OrderListPage />
         </ProtectRouteCustomerAuth>
       ),
+    },
+    {
+      path: "success",
+      element: <SuccessPage />,
+    },
+    {
+      path: "error",
+      element: <ErrorPage />,
     },
     {
       path: "dashboard",

@@ -147,9 +147,9 @@ function RegisterPage() {
                   layout="vertical"
                 >
                   <Form.Item
-                    label="Username"
+                    label={<span className="dark:text-white">Username</span>}
                     name="username"
-                    className="mb-[22px]"
+                    className="mb-4"
                     rules={[
                       {
                         required: true,
@@ -169,9 +169,9 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
-                    label="Password"
+                    label={<span className="dark:text-white">Password</span>}
                     name="password"
-                    className="mb-[22px]"
+                    className="mb-4"
                     rules={[
                       {
                         required: true,
@@ -196,9 +196,9 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
-                    label="Fullname"
+                    label={<span className="dark:text-white">Fulname</span>}
                     name="fullname"
-                    className="mb-[22px]"
+                    className="mb-4"
                     rules={[
                       {
                         required: true,
@@ -218,9 +218,9 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
-                    label="Address"
+                    label={<span className="dark:text-white">Address</span>}
                     name="address"
-                    className="mb-[22px]"
+                    className="mb-4"
                     rules={[
                       {
                         required: true,
@@ -236,9 +236,9 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
-                    label="Phone"
+                    label={<span className="dark:text-white">Phone</span>}
                     name="phone"
-                    className="mb-[22px]"
+                    className="mb-4"
                     rules={[
                       {
                         required: true,
@@ -259,9 +259,9 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
-                    label="Email"
+                    label={<span className="dark:text-white">Email</span>}
                     name="email"
-                    className="mb-[22px]"
+                    className="mb-4"
                     rules={[
                       {
                         required: true,
@@ -276,8 +276,13 @@ function RegisterPage() {
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
-                  <Form.Item label="Image" name="image" className="mb-[22px]">
+                  <Form.Item
+                    label={<span className="dark:text-white">Image</span>}
+                    name="image"
+                    className="mb-4"
+                  >
                     <Upload
+                    className="dark:text-white"
                       action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                       listType="picture-card"
                       fileList={fileList}
@@ -287,7 +292,7 @@ function RegisterPage() {
                       {fileList.length >= 8 ? null : uploadButton}
                     </Upload>
                   </Form.Item>
-                  <Form.Item className="mb-[22px]">
+                  <Form.Item className="mb-4">
                     <Button
                       onClick={() => form.submit()}
                       className="primaryButton"
@@ -319,21 +324,21 @@ function RegisterPage() {
                       Register
                     </Button>
                   </Form.Item>
+                  {previewImage && (
+                    <Image
+                      wrapperStyle={{
+                        display: "none",
+                      }}
+                      preview={{
+                        visible: previewOpen,
+                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                        afterOpenChange: (visible) =>
+                          !visible && setPreviewImage(""),
+                      }}
+                      src={previewImage}
+                    />
+                  )}
                 </Form>
-                {previewImage && (
-                  <Image
-                    wrapperStyle={{
-                      display: "none",
-                    }}
-                    preview={{
-                      visible: previewOpen,
-                      onVisibleChange: (visible) => setPreviewOpen(visible),
-                      afterOpenChange: (visible) =>
-                        !visible && setPreviewImage(""),
-                    }}
-                    src={previewImage}
-                  />
-                )}
                 <span className="z-1 relative mb-7 block text-center">
                   <span className="-z-1 absolute left-0 top-1/2 block h-px w-full bg-stroke dark:bg-dark-3"></span>
                   <span className="relative z-10 inline-block bg-white px-3 text-base text-body-secondary dark:bg-dark-2">

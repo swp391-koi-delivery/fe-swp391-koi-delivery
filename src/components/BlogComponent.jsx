@@ -2,7 +2,6 @@ import { Button, Form, Image, Input, Modal, Popconfirm, Upload } from "antd";
 import { PlusOutlined, DeleteOutlined, EditTwoTone } from "@ant-design/icons";
 import { useForm } from "antd/es/form/Form";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import api from "../config/axios";
 import { toast } from "react-toastify";
 import uploadFile from "../utils/file";

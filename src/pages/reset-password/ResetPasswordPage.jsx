@@ -4,7 +4,7 @@ import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { Link, useNavigate } from "react-router-dom";
-import useGetParams from "../../hooks/useGetParam";
+import useGetParams from "../../hooks/useGetParams";
 
 function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
@@ -107,9 +107,9 @@ function ResetPasswordPage() {
                   layout="vertical"
                 >
                   <Form.Item
-                    label="Password"
+                    label={<span className="dark:text-white">Password</span>}
                     name="password"
-                    className="mb-[22px]"
+                    className="mb-4"
                     rules={[
                       {
                         required: true,
@@ -133,11 +133,12 @@ function ResetPasswordPage() {
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
-
                   <Form.Item
-                    label="Password Confirm"
+                    label={
+                      <span className="dark:text-white">Password Confirm</span>
+                    }
                     name="passwordConfirm"
-                    className="mb-[22px]"
+                    className="mb-4"
                     dependencies={["password"]}
                     rules={[
                       {
@@ -172,7 +173,7 @@ function ResetPasswordPage() {
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
-                  <Form.Item className="mb-[22px]">
+                  <Form.Item className="mb-4">
                     <Button
                       onClick={() => form.submit()}
                       className="primaryButton"

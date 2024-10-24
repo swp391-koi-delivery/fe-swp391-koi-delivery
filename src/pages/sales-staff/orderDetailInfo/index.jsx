@@ -66,6 +66,14 @@ function OrderDetailsInfoStaff() {
       );
     }
   
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(price);
+    };
     const inputVariants = {
       hover: { scale: 1.05, transition: { duration: 0.3 } },
       tap: { scale: 0.95 },
@@ -282,7 +290,7 @@ function OrderDetailsInfoStaff() {
                   </label>
                   <input
                     type="text"
-                    value={`$${order.totalPrice}`}
+                    value={`${formatPrice(order.totalPrice)}`}
                     readOnly
                     className="w-2/3 rounded-md bg-gray-100 p-2 text-black transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     aria-label="Total Price"
