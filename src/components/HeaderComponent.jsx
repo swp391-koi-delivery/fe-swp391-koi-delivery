@@ -361,7 +361,7 @@ function HeaderComponent() {
                   />
                   <span
                     className="block text-white dark:hidden"
-                    onClick={handleDarkMode}
+                    onClick={() => handleDarkMode()}
                   >
                     <svg
                       className="fill-current"
