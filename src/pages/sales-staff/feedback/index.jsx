@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaUser, FaStar, FaCalendar, FaReply, FaBriefcase } from "react-icons/fa";
 //import axios from 'axios'; // or use fetch
 import api from "../../../config/axios";
+import { Rate } from "antd";
 const FeedbackForm = ({id}) => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [expandedFeedback, setExpandedFeedback] = useState(null);
@@ -111,8 +112,8 @@ const FeedbackForm = ({id}) => {
                   <span className="font-semibold text-gray-800">{feedback.name}</span>
                 </div>
                 <div className="flex items-center">
-                  <FaStar className="text-yellow-400 mr-1" />
-                  <span className="text-gray-600">{feedback.rating}</span>
+                  {/* <FaStar className="text-yellow-400 mr-1" /> */}
+                  <span className="text-gray-600"><Rate disabled value={parseInt(feedback.rating)} /></span>
                 </div>
               </div>
               <div className="flex items-center text-sm text-gray-500 mb-2">
