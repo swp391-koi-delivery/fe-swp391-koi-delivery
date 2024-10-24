@@ -373,7 +373,7 @@ function OrderDetailsInfoStaff() {
                   <div className="flex w-2/3 items-center">
                     <input
                       type="text"
-                      value={order.healthFishStatus}
+                      value={detail.healthFishStatus}
                       readOnly
                       className="w-full rounded-l-md bg-gray-100 p-2 text-black transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       aria-label="Health Fish Status"
