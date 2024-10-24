@@ -4,7 +4,7 @@ import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { Link, useNavigate } from "react-router-dom";
-import useGetParams from "../../hooks/useGetParam";
+import useGetParams from "../../hooks/useGetParams";
 
 function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);

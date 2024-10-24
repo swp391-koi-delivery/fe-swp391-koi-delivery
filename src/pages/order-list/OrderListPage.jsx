@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import { Alert, Button, Form, Input, Modal, Pagination, Popover, Rate, Steps } from "antd";
+import {
+  Alert,
+  Button,
+  Form,
+  Input,
+  Modal,
+  Pagination,
+  Rate,
+  Steps,
+} from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
@@ -207,46 +216,6 @@ function OrderListPage() {
     }
   };
 
-  const customDot = (dot, { status, index }) => (
-    <Popover
-      content={
-        <span>
-          step {index} status: {status}
-        </span>
-      }
-    >
-      {dot}
-    </Popover>
-  );
-
-  const steps = [
-    {
-      title: "Finished",
-      description: "hello world",
-      status: "finish", // Mark this as finished
-    },
-    {
-      title: "In Progress",
-      description: "hello world",
-      status: "process", // Currently in progress
-    },
-    {
-      title: "Waiting",
-      description: "hello world",
-      status: "wait", // Waiting status
-    },
-    {
-      title: "Error",
-      description: "hello world",
-      status: "error", // Error occurred
-    },
-    {
-      title: "Pending",
-      description: "hello world",
-      status: "wait", // Pending (waiting for approval)
-    },
-  ];
-
   const generateTables = (orderDetails) => {
     return (
       <div>
@@ -355,6 +324,17 @@ function OrderListPage() {
     }
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
+
+  const description = "This is a description.";
+
   const Order = ({ order }) => {
     return (
       <>
@@ -375,7 +355,8 @@ function OrderListPage() {
                     </span>
                   </div>
                   <div className="flex w-full flex-col items-end justify-between md:w-1/2">
-                    {order.orderStatus === "ACCEPTED" && (
+                    {(order.orderStatus === "PAID" ||
+                      order.orderStatus === "DELIVERED") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
                         {order.orderStatus}
                       </p>
@@ -517,8 +498,26 @@ function OrderListPage() {
                         <div className="pt-10">
                           <Steps
                             current={1}
-                            progressDot={customDot}
-                            items={steps}
+                            items={[
+                              {
+                                title: "Finished",
+                                description,
+                              },
+                              {
+                                title: "In Progress",
+                                description,
+                                subTitle: "Left 00:00:08",
+                              },
+                              {
+                                title: "Waiting",
+                                description,
+                              },
+                              {
+                                title: "Rejected",
+                                description,
+                                status: "error",
+                              },
+                            ]}
                           />
                         </div>
                       </div>
@@ -640,45 +639,60 @@ function OrderListPage() {
                             Total
                           </h5>
                           <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
-                            ${order.totalPrice}
+                            {formatPrice(order.totalPrice)}
                           </h5>
                         </div>
                       </div>
                     </div>
                     <div className="flex w-full flex-row items-end justify-end gap-1.5">
-                      <Modal
-                        title="Feedback"
-                        loading={loading}
-                        onOk={() => form.submit()}
-                        open={openModal}
-                        onCancel={handleCloseModal}
-                      >
-                        <Form labelCol={{ span: 24 }} onFinish={handleFeedback}>
-                          <Alert
-                            message={`Feedback for ${selectedOrder?.id}`}
-                            type="info"
-                          />
-                          <Form.Item
-                            label="Order Id"
-                            name="orderId"
-                            initialValue={selectedOrder?.id}
+                      {order.orderStatus === "DELIVERED" && (
+                        <div className="">
+                          <Modal
+                            title="Feedback"
+                            loading={loading}
+                            onOk={() => form.submit()}
+                            open={openModal}
+                            onCancel={handleCloseModal}
                           >
-                            <Input hidden />
-                          </Form.Item>
-                          <Form.Item label="Rating Score" name="ratingScore">
-                            <Rate></Rate>
-                          </Form.Item>
-                          <Form.Item label="Comment" name="comment">
-                            <Input.TextArea />
-                          </Form.Item>
-                        </Form>
-                      </Modal>
-                      <Button onClick={() => handleOpenModal(order)}>
-                        Feedback
-                      </Button>
-                      <Button onClick={handlePayment(order)}>
-                        Feedback
-                      </Button>
+                            <Form
+                              labelCol={{ span: 24 }}
+                              onFinish={handleFeedback}
+                            >
+                              <Alert
+                                message={`Feedback for ${selectedOrder?.id}`}
+                                type="info"
+                              />
+                              <Form.Item
+                                label="Order Id"
+                                name="orderId"
+                                initialValue={selectedOrder?.id}
+                              >
+                                <Input hidden />
+                              </Form.Item>
+                              <Form.Item
+                                label="Rating Score"
+                                name="ratingScore"
+                              >
+                                <Rate></Rate>
+                              </Form.Item>
+                              <Form.Item label="Comment" name="comment">
+                                <Input.TextArea />
+                              </Form.Item>
+                            </Form>
+                          </Modal>
+                          <Button onClick={() => handleOpenModal(order)}>
+                            Feedback
+                          </Button>
+                        </div>
+                      )}
+                      {order.orderStatus === "AWAITING_PAYMENT" && (
+                        <Button
+                          onClick={() => handlePayment(order.id)}
+                          loading={loading}
+                        >
+                          Payment
+                        </Button>
+                      )}
                     </div>
                     <div className="flex w-full flex-col items-start justify-start gap-1.5">
                       <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">

@@ -2,7 +2,6 @@ import { Button, Form, Image, Input, Modal, Popconfirm, Upload } from "antd";
 import { PlusOutlined, DeleteOutlined, EditTwoTone } from "@ant-design/icons";
 import { useForm } from "antd/es/form/Form";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import api from "../config/axios";
 import { toast } from "react-toastify";
 import uploadFile from "../utils/file";
@@ -187,7 +186,7 @@ function BlogComponent() {
             </div>
             <div className="w-full px-4 md:w-1/2 lg:w-1/3">
               <div className="wow fadeInUp group mb-10" data-wow-delay=".1s">
-                <div className="mb-8 overflow-hidden rounded-[5px]">
+                <div className="mb-8 overflow-hidden rounded-[5px] w-[370px] h-[220px]">
                   <a href="blog-details.html" className="block">
                     <img
                       src="./assets/images/blog/blog-01.jpg"

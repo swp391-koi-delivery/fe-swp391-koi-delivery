@@ -50,10 +50,10 @@ function LoginPage() {
           const token = credential.accessToken;
           const user = result.user;
           const { accessToken } = user;
-          const response = await api.post(
-            "/authentication/login-google",
-            accessToken,
-          );
+          const response = await api.post("/authentication/login-google", {
+            token: accessToken,
+          });
+          dispatch(login(response.data));
           console.log(response.data);
           navigate("/");
         } catch (err) {
