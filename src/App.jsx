@@ -20,6 +20,8 @@ import ManageStatistic from "./pages/manager/manage-statistic";
 import LayoutTemplate from "./components/layout/LayoutTemplate";
 import "./index.css";
 import "./App.css";
+import SuccessPage from "./pages/success/Success";
+import ErrorPage from "./pages/error/ErrorPage";
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -88,8 +90,8 @@ function App() {
       path: "order",
       element: (
         <ProtectRouteCustomerAuth>
-        <OrderPage />
-       </ProtectRouteCustomerAuth>
+          <OrderPage />
+        </ProtectRouteCustomerAuth>
       ),
     },
     {
@@ -99,6 +101,14 @@ function App() {
           <OrderListPage />
         </ProtectRouteCustomerAuth>
       ),
+    },
+    {
+      path: "success",
+      element: <SuccessPage />,
+    },
+    {
+      path: "error",
+      element: <ErrorPage />,
     },
     {
       path: "dashboard",

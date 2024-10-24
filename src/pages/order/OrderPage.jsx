@@ -196,16 +196,18 @@ function OrderPage() {
     navigate("/login");
   };
 
-  const validateRecipientInfo = (e) => {
-    const value = e.target.value;
+  const validateRecipientInfo = (_, value) => {
     const emailRegex = /\S+@\S+\.\S+/;
-    const phoneRegex = /^\+?[0-9]{7,15}$/;
+    const phoneRegex = /^(84|0[3|5|7|8|9])(\d{8})$/;
 
-    if (!emailRegex.test(value) && !phoneRegex.test(value)) {
-      toast.info(
-        "Recipient Info must contain contact information of receiver such as email or phone number",
+    if (!value || (!emailRegex.test(value) && !phoneRegex.test(value))) {
+      return Promise.reject(
+        new Error(
+          "Recipient Info must contain a valid email or phone number (starting with 84 or 0 followed by 9 digits)",
+        ),
       );
     }
+    return Promise.resolve();
   };
 
   const handleOrderDescribeChange = (value) => {
@@ -715,11 +717,13 @@ function OrderPage() {
                           required: true,
                           message: "Please input recipient info",
                         },
+                        {
+                          validator: validateRecipientInfo, // custom validation rule with the updated phone regex
+                        },
                       ]}
                       style={{ textAlign: "left" }}
                     >
                       <Input.TextArea
-                        onBlur={validateRecipientInfo}
                         placeholder="Recipient Info"
                         className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                       />
@@ -729,9 +733,7 @@ function OrderPage() {
                       name="describeOrder"
                       className="mb-[22px] w-full px-2 md:w-1/2"
                       rules={[
-                        { required: true, 
-                          message: "Please select order type",
-                         },
+                        { required: true, message: "Please select order type" },
                       ]}
                       style={{ textAlign: "left" }}
                     >
@@ -796,7 +798,6 @@ function OrderPage() {
                             .localeCompare((optionB?.label ?? "").toLowerCase())
                         }
                         options={[
-                          { value: "VISA", label: "Visa" },
                           { value: "BANK_TRANSFER", label: "Bank Transfer" },
                         ]}
                       />
