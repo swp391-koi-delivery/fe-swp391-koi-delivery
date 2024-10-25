@@ -1,0 +1,43 @@
+.btn-save_3 {
+  background-color: #28a745 !important;
+  display: flex;
+  justify-content: end;
+  color: white;
+  /* Green button for save */
+}
+
+.btn-save_3:hover {
+  background-color: #218838 !important;
+  /* Darker green on hover */
+}
+
+.btn-edit_3 {
+  background-color: #007bff !important;
+  /* Blue button for edit */
+  color: white;
+}
+
+.btn-edit_3:hover {
+  background-color: #0168d5 !important;
+}
+
+.btn-cancel_3 {
+  background-color: rgb(232, 55, 55) !important;
+  color: white;
+}
+
+.btn-cancel_3:hover {
+  background-color: rgb(199, 42, 42) !important;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.space-x-4 {
+  gap: 1rem; /* Tạo khoảng cách giữa các nút */
+}
