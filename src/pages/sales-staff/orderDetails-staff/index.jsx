@@ -11,7 +11,7 @@ function OrderDetailStaff() {
 
   const fetchOrder = async () => {
     try {
-      const response = await api.get(`order/allOrder`);
+      const response = await api.get(`order/allOrder?page=1&size=1000000000`);
       const foundOrder = response.data.find(
         (order) => order.id === parseInt(id)
       ); // Find order that matches id
@@ -31,6 +31,15 @@ function OrderDetailStaff() {
   useEffect(() => {
     fetchOrder();
   }, [id]);
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -77,7 +86,7 @@ function OrderDetailStaff() {
             <span className="text-gray-700">Size of fish: {detail.sizeOfFish} cm</span>
           </div><div className="flex items-center space-x-2">
             <FaDollarSign className="text-green-500" />
-            <span className="text-gray-700">Price of fish: {detail.priceOfFish}$</span>
+            <span className="text-gray-700">Price of fish: {formatPrice(detail.priceOfFish)}</span>
           </div>        
         </div>
         <Link  to = {`/dashboard/orderDetailsInfo/${order.id}`} className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-300 ease-in-out flex items-center justify-center space-x-2">

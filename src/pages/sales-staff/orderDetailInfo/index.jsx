@@ -25,7 +25,7 @@ function OrderDetailsInfoStaff() {
   
     const fetchOrder = async () => {
       try {
-        const response = await api.get(`order/allOrder`);
+        const response = await api.get(`order/allOrder?page=1&size=1000000000`);
         const foundOrder = response.data.find(
           (order) => order.id === parseInt(id),
         ); // Find order that matches id
@@ -66,6 +66,14 @@ function OrderDetailsInfoStaff() {
       );
     }
   
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(price);
+    };
     const inputVariants = {
       hover: { scale: 1.05, transition: { duration: 0.3 } },
       tap: { scale: 0.95 },
@@ -282,7 +290,7 @@ function OrderDetailsInfoStaff() {
                   </label>
                   <input
                     type="text"
-                    value={`$${order.totalPrice}`}
+                    value={`${formatPrice(order.totalPrice)}`}
                     readOnly
                     className="w-2/3 rounded-md bg-gray-100 p-2 text-black transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     aria-label="Total Price"
@@ -365,7 +373,7 @@ function OrderDetailsInfoStaff() {
                   <div className="flex w-2/3 items-center">
                     <input
                       type="text"
-                      value={order.healthFishStatus}
+                      value={detail.healthFishStatus}
                       readOnly
                       className="w-full rounded-l-md bg-gray-100 p-2 text-black transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       aria-label="Health Fish Status"

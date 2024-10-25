@@ -41,18 +41,6 @@ function App() {
     toast.error("You are not allow to access this");
     return <Navigate to={"/login"} />;
   };
-
-  const ProtectRouteDeliveryAuth = ({ children }) => {
-    const user = useSelector((store) => store);
-    console.log(user);
-    console.log(user.user);
-    if (user.user && user.user?.role === "DELIVERING_STAFF") {
-      return children;
-    }
-    toast.error("You are not allow to access this");
-    return <Navigate to={"/login"} />;
-  };
-
   const ProtectRouteCustomerAuth = ({ children }) => {
     const user = useSelector((store) => store);
     console.log(user);

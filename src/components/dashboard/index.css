@@ -34,7 +34,6 @@ body {
     overflow: hidden; /* Ẩn phần bị tràn */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho bảng */
   }
-  .ant-layout-sider-children{}
   /* Nội dung bảng */
   .ant-table-content {
     background-color: #fff; /* Màu nền trắng */

@@ -281,6 +281,9 @@ function ManageUser() {
       fixed: 'right',
       key: "id",
       render: (id, record) => {
+        if (record.deleted === true) {
+          return null; // Không hiển thị nút khi trạng thái là 'Inactive'
+        }
         return (
           <>
             <Button icon={<EditTwoTone/>} onClick={() => handleOpenModal(record)}/>

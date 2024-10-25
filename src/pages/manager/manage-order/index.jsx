@@ -11,9 +11,12 @@ import {
   FaTruck,
   FaCheckCircle,
   FaEdit,
+  FaChevronDown,
+  FaChevronUp,
 } from "react-icons/fa";
 import { MdDeliveryDining } from "react-icons/md";
 import api from "../../../config/axios";
+import FeedbackForm from "../../sales-staff/feedback";
 function ManageOrder() {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,6 +25,7 @@ function ManageOrder() {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [newOrderStatus, setNewOrderStatus] = useState("");
+  const [expandedOrderId, setExpandedOrderId] = useState(null); // Tạo state để lưu ID của order đang được mở
   const ordersPerPage = 3;
 
   const fetchOrders = async () => {
@@ -91,6 +95,23 @@ function ManageOrder() {
 
   const handleOrderStatusChange = (value) => {
     setNewOrderStatus(value);
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
+  const toggleContent = (orderId) => {
+    // Toggle trạng thái mở/đóng nội dung của từng order
+    if (expandedOrderId === orderId) {
+      setExpandedOrderId(null); // Đóng nếu đang mở
+    } else {
+      setExpandedOrderId(orderId); // Mở thẻ hiện tại
+    }
   };
 
   const getPaymentMethodIcon = (method) => {
@@ -185,15 +206,6 @@ function ManageOrder() {
                       Order ID: {order.id}
                     </h2>
                     <hr className="my-2 border-black" />
-                    <p className="mt-1 text-sm text-gray-800">
-                      Price: ${order.totalPrice}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-800">
-                      Quantity: {order.totalQuantity}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-800">
-                      Box: {order.totalBox}
-                    </p>
                     {order.eachUserResponse && (
                       <>
                         <p className="mt-1 text-sm text-gray-800">
@@ -205,7 +217,13 @@ function ManageOrder() {
                       </>
                     )}
                     <p className="mt-1 text-sm text-gray-800">
-                      Volume: {order.totalVolume}
+                      From: {order.originLocation}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-800">
+                      To: {order.destinationLocation}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-800">
+                      Total Price: ${formatPrice(order.totalPrice)}
                     </p>
                   </div>
 
@@ -253,7 +271,9 @@ function ManageOrder() {
                   </div>
                 </div>
                 <div className="mt-0.5 flex items-center justify-between">
-                  <p className="text-sm text-gray-800">Order Date: {order.orderDate}</p>
+                  <p className="text-sm text-gray-800">
+                    Order Date: {order.orderDate}
+                  </p>
                   <Link
                     to={`/dashboard/orderDetails/${order.id}`}
                     className="flex items-center space-x-1 rounded-md bg-blue-500 px-2 py-1 text-xs text-white transition-colors duration-300 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -261,6 +281,28 @@ function ManageOrder() {
                     <span>Order Details</span>
                     <FaChevronRight />
                   </Link>
+                </div>
+                {/* Toggle nội dung riêng biệt cho từng order */}
+                {expandedOrderId === order.id && (
+                  <div className="mt-4 text-center text-lg text-gray-700">
+                    Hello, this is extra content for Order ID: {order.id}
+                    <FeedbackForm id={order.id} />
+                  </div>
+                )}
+
+                {/* Icon toggle */}
+                <div className="mt-2 flex justify-center">
+                  {expandedOrderId === order.id ? (
+                    <FaChevronUp
+                      className="cursor-pointer text-gray-500"
+                      onClick={() => toggleContent(order.id)}
+                    />
+                  ) : (
+                    <FaChevronDown
+                      className="cursor-pointer text-gray-500"
+                      onClick={() => toggleContent(order.id)}
+                    />
+                  )}
                 </div>
               </div>
             ))}
@@ -281,4 +323,4 @@ function ManageOrder() {
   );
 }
 
-export default ManageOrder
+export default ManageOrder;
