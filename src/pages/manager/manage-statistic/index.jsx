@@ -37,10 +37,13 @@ const ManageStatistic = () => {
     customers: 1200,
     orders: 3500,
   };
-  const activeCustomers = user.filter(
-    (user) => user.role === "CUSTOMER" && user.deleted === false,
-  );
+  // const activeCustomers = user.filter(
+  //   (user) => user.role === "CUSTOMER" && user.deleted === false,
+  // );
 
+  const activeCustomers = Array.isArray(user)
+  ? user.filter((user) => user.role === "CUSTOMER" && user.deleted === false)
+  : [];
   const handleFilterChange = (event) => {
     setFilterType(event.target.value);
   };
