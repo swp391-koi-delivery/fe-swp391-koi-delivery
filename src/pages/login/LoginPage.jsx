@@ -25,7 +25,7 @@ function LoginPage() {
       dispatch(login(response.data));
       const { role, token } = response.data;
       localStorage.setItem("token", token);
-      if (role === "CUSTOMER") {
+     if (role === "CUSTOMER") {
         navigate("/");
       } else if (role === "MANAGER") {
         navigate("/dashboard");
