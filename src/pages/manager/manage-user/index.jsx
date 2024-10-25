@@ -18,9 +18,15 @@ import Search from "antd/es/transfer/search";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { render } from "react-dom";
-import { createStyles } from 'antd-style';
+import { createStyles } from "antd-style";
 import { toast } from "react-toastify";
-import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  DeleteOutlined,
+  EditTwoTone,
+  PlusOutlined,
+} from "@ant-design/icons";
 import api from "../../../config/axios";
 import uploadFile from "../../../utils/file";
 import "boxicons";
@@ -39,7 +45,7 @@ function ManageUser() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
-  
+
   const useStyle = createStyles(({ css, token }) => {
     const { antCls } = token;
     return {
@@ -61,8 +67,11 @@ function ManageUser() {
     try {
       const response = await api.get("manager/allUser?page=1&size=1000000000");
       //lấy dữ liệu từ BE và set nó
-      setUsers(response.data);
-      setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
+      // setUsers(response.data);
+      // setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
+      setUsers(Array.isArray(response.data.content) ? response.data.content : []);
+      setFilteredUsers(Array.isArray(response.data.content) ? response.data.content : []);
+      console.log(response.data.content);
     } catch (error) {
       toast.error(error.response.data);
     }
@@ -76,7 +85,7 @@ function ManageUser() {
   const handleSearch = (value) => {
     setSearchText(value); // Cập nhật giá trị search text
     const filteredData = users.filter(
-      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()) // Lọc theo tên người dùng
+      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()), // Lọc theo tên người dùng
     );
     setFilteredUsers(filteredData); // Cập nhật danh sách đã lọc
   };
@@ -90,15 +99,15 @@ function ManageUser() {
     }
     try {
       setSubmitting(true);
-      const response = await api.post("manager/user",user);
+      const response = await api.post("manager/user", user);
       toast.success("Submit successfully");
-      setFileList([])
+      setFileList([]);
       formAdd.resetFields();
       setShowModal(false);
       fetchUser();
     } catch (error) {
       toast.error(error.response.data);
-    }finally{
+    } finally {
       setSubmitting(false);
     }
   };
@@ -130,15 +139,15 @@ function ManageUser() {
       //await axios.put(`${api}/${editingUser.userId}`, updatedUser);
       //console.log(editingUser.userId);
       await api.put(`manager/${editingUser.id}`, {
-        "image": updatedUser.image,
-        "role": updatedUser.role,
-        "loyaltyPoint": updatedUser.loyaltyPoint,
-        "deleted": updatedUser.deleted
+        image: updatedUser.image,
+        role: updatedUser.role,
+        loyaltyPoint: updatedUser.loyaltyPoint,
+        deleted: updatedUser.deleted,
       });
       toast.success("Updated successfully");
       fetchUser(); // Cập nhật lại danh sách sau khi sửa
       handleCloseModal();
-      setFileList([])
+      setFileList([]);
     } catch (error) {
       toast.error("Failed to update!");
     } finally {
@@ -192,14 +201,12 @@ function ManageUser() {
   );
   const columns = [
     {
-      
       title: <span className="custom-table-header">ID</span>,
       dataIndex: "id",
       key: "id",
       align: "left",
     },
     {
-      
       title: <span className="custom-table-header">Image</span>,
       dataIndex: "image",
       key: "image",
@@ -242,20 +249,23 @@ function ManageUser() {
       dataIndex: "loyaltyPoint",
       key: "loyaltyPoint",
       align: "left",
-      sorter: (a, b) => a.loyaltyPoint - b.loyaltyPoint, // Sắp xếp theo loyaltyPoint
+      sorter: (a, b) => a.loyaltyPoint - b.loyaltyPoint,
     },
     {
-      title:  <span className="custom-table-header">User Status</span>,
+      title: <span className="custom-table-header">User Status</span>,
       dataIndex: "deleted",
       key: "deleted",
       align: "left",
-      
-      render: (userstatus) => (<Tag style={{fontSize:"22px"}}
-        icon={userstatus ? <CloseCircleOutlined /> : <CheckCircleOutlined />} 
-        color={userstatus ? 'error' : 'success'} // Màu đỏ cho Inactive, xanh cho Active
-      >
-        {userstatus ? 'Inactive' : 'Active'}
-      </Tag>),
+
+      render: (userstatus) => (
+        <Tag
+          style={{ fontSize: "22px" }}
+          icon={userstatus ? <CloseCircleOutlined /> : <CheckCircleOutlined />}
+          color={userstatus ? "error" : "success"} // Màu đỏ cho Inactive, xanh cho Active
+        >
+          {userstatus ? "Inactive" : "Active"}
+        </Tag>
+      ),
       filters: [
         { text: "Inactive", value: true },
         { text: "Active", value: false },
@@ -278,7 +288,7 @@ function ManageUser() {
     {
       title: <span className="custom-table-header">Action</span>,
       dataIndex: "id",
-      fixed: 'right',
+      fixed: "right",
       key: "id",
       render: (id, record) => {
         if (record.deleted === true) {
@@ -286,13 +296,16 @@ function ManageUser() {
         }
         return (
           <>
-            <Button icon={<EditTwoTone/>} onClick={() => handleOpenModal(record)}/>
+            <Button
+              icon={<EditTwoTone />}
+              onClick={() => handleOpenModal(record)}
+            />
             <Popconfirm
               title="Delete"
               description="Are you sure want to delete?"
               onConfirm={() => handleDeleteUser(id)}
             >
-              <Button icon={<DeleteOutlined />}danger />
+              <Button icon={<DeleteOutlined />} danger />
             </Popconfirm>
           </>
         );
@@ -301,23 +314,36 @@ function ManageUser() {
   ];
 
   return (
-    <div className="p-8 min-h-screen bg-gradient-to-br from-blue-100 to-purple-200">
-      <h1 className="text-2xl font-bold mb-6">User Management</h1>
-      <div  className="mb-4" style={{width:"350px"}}>
-
-      <Search
-        placeholder="Search by fullname"
-        onSearch={handleSearch}
-        onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
-        value={searchText}
-        // Thêm style cho input search
-        className="w-full max-w-md"
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-8">
+      <h1 className="mb-6 text-2xl font-bold">User Management</h1>
+      <div className="mb-4" style={{ width: "350px" }}>
+        <Search
+          placeholder="Search by fullname"
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)} // Cập nhật khi người dùng gõ
+          value={searchText}
+          // Thêm style cho input search
+          className="w-full max-w-md"
         />
-        </div>
-      <Button icon={<PlusOutlined/>} onClick={() => setShowModal(true)} className="mb-4" style={{marginLeft:"20px"}}>Add</Button>
-      <Table className={styles.customTable} columns={columns} dataSource={filteredUsers} rowKey="id" size="middle" scroll={{
-        x: 'max-content',
-      }} />
+      </div>
+      <Button
+        icon={<PlusOutlined />}
+        onClick={() => setShowModal(true)}
+        className="mb-4"
+        style={{ marginLeft: "20px" }}
+      >
+        Add
+      </Button>
+      <Table
+        className={styles.customTable}
+        columns={columns}
+        dataSource={filteredUsers}
+        rowKey="id"
+        size="middle"
+        scroll={{
+          x: "max-content",
+        }}
+      />
       <Modal
         confirmLoading={submitting}
         open={openModal}
@@ -421,7 +447,6 @@ function ManageUser() {
               {
                 type: "number",
                 min: 0,
-                max: 100,
                 message: "Invalid loyalty point",
               },
             ]}
@@ -438,7 +463,7 @@ function ManageUser() {
             <Select>
               <Select.Option value="SALE_STAFF">SALE_STAFF</Select.Option>
               <Select.Option value=" DELIVERING_STAFF">
-              DELIVERING_STAFF
+                DELIVERING_STAFF
               </Select.Option>
             </Select>
           </Form.Item>
@@ -584,7 +609,7 @@ function ManageUser() {
             <Select>
               <Select.Option value="SALE_STAFF">SALE_STAFF</Select.Option>
               <Select.Option value="DELIVERING_STAFF">
-              DELIVERING_STAFF
+                DELIVERING_STAFF
               </Select.Option>
             </Select>
           </Form.Item>

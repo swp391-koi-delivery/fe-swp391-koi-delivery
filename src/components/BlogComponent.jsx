@@ -57,15 +57,25 @@ function BlogComponent() {
     </button>
   );
 
+  // const fetchPosts = async () => {
+  //   //const response = await axios.get(api);
+  //   //console.log(response.data);
+  //   const response = await api.get("free-access/allBlog?page=1&size=1000000000");
+  //   setPosts(response.data);
+  // };
+  // useEffect(() => {
+  //   fetchPosts();
+  // }, []);
+
   const fetchPosts = async () => {
-    //const response = await axios.get(api);
-    //console.log(response.data);
-    const response = await api.get("free-access/allBlog?page=1&size=1000000000");
-    setPosts(response.data);
+    try {
+      const response = await api.get("free-access/allBlog?page=1&size=1000000000");
+      setPosts(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      setPosts([]); // Set to empty array on error
+    }
   };
-  useEffect(() => {
-    fetchPosts();
-  }, []);
   const handleSubmitPosts = async (blog) => {
     if (fileList.length > 0) {
       const file = fileList[0];
@@ -185,7 +195,7 @@ function BlogComponent() {
               </Modal>
             </div>
             
-            {posts.map((post) => (
+            {Array.isArray(posts) && posts.map((post) => (
               <div key={post.blogId} className="w-full px-4 md:w-1/2 lg:w-1/3">
                 <div className="wow fadeInUp group mb-10" data-wow-delay=".1s">
                   <div className="mb-8 overflow-hidden rounded-[5px]" >

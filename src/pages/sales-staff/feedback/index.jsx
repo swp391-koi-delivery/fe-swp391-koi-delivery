@@ -12,7 +12,8 @@ const FeedbackForm = ({id}) => {
 
   const fetchFeedbacks = async () => {
     try {
-      const response = await api.get(`feedBack/order/${id}/feedbacks?page=1&size=10`);
+      const response = await api.get(`feedBack/order/${id}/feedbacks`);
+      //console.log(response.data);
       const fetchedData = response.data.map((feedback) => ({
         id: feedback.id,
         name: feedback.eachUserResponse.username,
@@ -23,7 +24,7 @@ const FeedbackForm = ({id}) => {
         replies: feedback.replies.map(reply => ({
           id: reply.id,
           staffName: reply.repliedBy,
-          date: reply.replyDate.split("T")[0], // Extract date
+          // date: reply.replyDate.split("T")[0], // Extract date
           content: reply.replyContent,
         })),
       }));

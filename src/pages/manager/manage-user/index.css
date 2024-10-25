@@ -139,4 +139,27 @@
     font-size: 1.5rem;
     color: #1890ff;
   }
+  .loyalty-silver {
+    background: linear-gradient(45deg, #c0c0c0, #f0f0f0);
+    animation: shine 2s infinite linear;
+  }
+  
+  .loyalty-gold {
+    background: linear-gradient(45deg, #ffd700, #ffec8b);
+    animation: shine 2s infinite linear;
+  }
+  
+  .loyalty-diamond {
+    background: linear-gradient(45deg, #b9f2ff, #e0ffff);
+    animation: shine 2s infinite linear;
+  }
+  
+  @keyframes shine {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 100% 50%;
+    }
+  }
   
