@@ -60,7 +60,7 @@ function BlogComponent() {
   const fetchPosts = async () => {
     //const response = await axios.get(api);
     //console.log(response.data);
-    const response = await api.get("Blog");
+    const response = await api.get("free-access/allBlog?page=1&size=1000000000");
     setPosts(response.data);
   };
   useEffect(() => {
@@ -71,15 +71,15 @@ function BlogComponent() {
       const file = fileList[0];
       //console.log(file);
       const url = await uploadFile(file.originFileObj);
-      blog.image = url;
+      blog.img = url;
     }
     try {
       setSubmitting(true);
       //const response = await axios.post(api, blog);
       if (blog.blogId) {
-        const response = await api.put(`Blog/${blog.blogId}`, blog);
+        const response = await api.put(`customer/blog/${blog.id}`, blog);
       } else {
-        const response = await api.post("Blog", blog);
+        const response = await api.post("customer/blog", blog);
       }
       toast.success("Sucessfully create a new post");
       setOpenModal(false);
@@ -93,7 +93,7 @@ function BlogComponent() {
   };
   const handleDeletePost = async (id) => {
     try {
-      const response = await api.delete(`Blog/${id}`);
+      const response = await api.delete(`customer/${id}`);
       toast.success("Deleted successfully");
       fetchPosts();
     } catch (error) {
@@ -184,107 +184,18 @@ function BlogComponent() {
                 </Form>
               </Modal>
             </div>
-            <div className="w-full px-4 md:w-1/2 lg:w-1/3">
-              <div className="wow fadeInUp group mb-10" data-wow-delay=".1s">
-                <div className="mb-8 overflow-hidden rounded-[5px] w-[370px] h-[220px]">
-                  <a href="blog-details.html" className="block">
-                    <img
-                      src="./assets/images/blog/blog-01.jpg"
-                      alt="image"
-                      className="w-full transition group-hover:rotate-6 group-hover:scale-125"
-                    />
-                  </a>
-                </div>
-                <div>
-                  <span className="mb-6 inline-block rounded-[5px] bg-primary px-4 py-0.5 text-center text-xs font-medium leading-loose text-white">
-                    Dec 22, 2023
-                  </span>
-                  <h3>
-                    <a
-                      href="javascript:void(0)"
-                      className="mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl"
-                    >
-                      Meet AutoManage, the best AI management tools
-                    </a>
-                  </h3>
-                  <p className="max-w-[370px] text-base text-body-color dark:text-dark-6">
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="w-full px-4 md:w-1/2 lg:w-1/3">
-              <div className="wow fadeInUp group mb-10" data-wow-delay=".15s">
-                <div className="mb-8 overflow-hidden rounded-[5px]">
-                  <a href="blog-details.html" className="block">
-                    <img
-                      src="./assets/images/blog/blog-02.jpg"
-                      alt="image"
-                      className="w-full transition group-hover:rotate-6 group-hover:scale-125"
-                    />
-                  </a>
-                </div>
-                <div>
-                  <span className="mb-6 inline-block rounded-[5px] bg-primary px-4 py-0.5 text-center text-xs font-medium leading-loose text-white">
-                    Mar 15, 2023
-                  </span>
-                  <h3>
-                    <a
-                      href="javascript:void(0)"
-                      className="mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl"
-                    >
-                      How to earn more money as a wellness coach
-                    </a>
-                  </h3>
-                  <p className="max-w-[370px] text-base text-body-color dark:text-dark-6">
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="w-full px-4 md:w-1/2 lg:w-1/3">
-              <div className="wow fadeInUp group mb-10" data-wow-delay=".2s">
-                <div className="mb-8 overflow-hidden rounded-[5px]">
-                  <a href="blog-details.html" className="block">
-                    <img
-                      src="./assets/images/blog/blog-03.jpg"
-                      alt="image"
-                      className="w-full transition group-hover:rotate-6 group-hover:scale-125"
-                    />
-                  </a>
-                </div>
-                <div>
-                  <span className="mb-6 inline-block rounded-[5px] bg-primary px-4 py-0.5 text-center text-xs font-medium leading-loose text-white">
-                    Jan 05, 2023
-                  </span>
-                  <h3>
-                    <a
-                      href="javascript:void(0)"
-                      className="mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl"
-                    >
-                      The no-fuss guide to upselling and cross selling
-                    </a>
-                  </h3>
-                  <p className="max-w-[370px] text-base text-body-color dark:text-dark-6">
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry.
-                  </p>
-                </div>
-              </div>
-            </div>
+            
             {posts.map((post) => (
               <div key={post.blogId} className="w-full px-4 md:w-1/2 lg:w-1/3">
                 <div className="wow fadeInUp group mb-10" data-wow-delay=".1s">
-                  <div className="mb-8 overflow-hidden rounded-[5px]">
+                  <div className="mb-8 overflow-hidden rounded-[5px]" >
                     <a href="javascript:void(0)" className="block">
                       <img
                         src={
-                          post.image || "./assets/images/blog/default-image.jpg"
+                          post.img
                         } // Nếu không có ảnh, dùng ảnh mặc định
                         alt={post.post}
-                        className="w-full transition group-hover:rotate-6 group-hover:scale-125"
+                        className="w-full transition group-hover:rotate-6 group-hover:scale-125 w-[370px] h-[220px]"
                       />
                     </a>
                   </div>

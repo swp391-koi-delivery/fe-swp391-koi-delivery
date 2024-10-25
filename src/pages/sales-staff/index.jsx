@@ -12,8 +12,11 @@ import {
   FaCheckCircle,
   FaEdit,
   FaTrash,
+  FaChevronDown,
+  FaChevronUp,
 } from "react-icons/fa";
 import { MdDeliveryDining } from "react-icons/md";
+import FeedbackForm from "./feedback";
 import api from "../../config/axios";
 
 
@@ -26,6 +29,8 @@ const OrderList = () => {
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [newOrderStatus, setNewOrderStatus] = useState("");
   const [deletingOrderId, setDeletingOrderId] = useState(null);
+  const [expandedOrderId, setExpandedOrderId] = useState(null); // Tạo state để lưu ID của order đang được mở
+
   const ordersPerPage = 3;
 
   const fetchOrders = async () => {
@@ -68,6 +73,14 @@ const OrderList = () => {
     setSearchTerm(value);
   };
 
+  const toggleContent = (orderId) => {
+    // Toggle trạng thái mở/đóng nội dung của từng order
+    if (expandedOrderId === orderId) {
+      setExpandedOrderId(null); // Đóng nếu đang mở
+    } else {
+      setExpandedOrderId(orderId); // Mở thẻ hiện tại
+    }
+  };
   const handlePriceRangeChange = (value) => {
     setPriceRange(value);
   };
@@ -115,7 +128,14 @@ const OrderList = () => {
     setDeletingOrderId(null); // Reset delete state after action
   };
 
-
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
   const getPaymentMethodIcon = (method) => {
     if (!method) {
       return null;
@@ -208,15 +228,6 @@ const OrderList = () => {
                       Order ID: {order.id}
                     </h2>
                     <hr className="my-2 border-black" />
-                    <p className="mt-1 text-sm text-gray-800">
-                      Price: ${order.totalPrice}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-800">
-                      Quantity: {order.totalQuantity}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-800">
-                      Box: {order.totalBox}
-                    </p>
                     {order.eachUserResponse && (
                       <>
                         <p className="mt-1 text-sm text-gray-800">
@@ -228,7 +239,13 @@ const OrderList = () => {
                       </>
                     )}
                     <p className="mt-1 text-sm text-gray-800">
-                      Volume: {order.totalVolume}
+                    From: {order.originLocation}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-800">
+                    To: {order.destinationLocation}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-800">
+                     Total Price: {formatPrice(order.totalPrice)}
                     </p>
                   </div>
 
@@ -289,7 +306,30 @@ const OrderList = () => {
                     <FaChevronRight />
                   </Link>
                 </div>
+                {/* Toggle nội dung riêng biệt cho từng order */}
+                {expandedOrderId === order.id && (
+                  <div className="mt-4 text-center text-lg text-gray-700">
+                    Hello, this is extra content for Order ID: {order.id}
+                    <FeedbackForm id={order.id}/>
+                  </div>
+                )}
+
+                {/* Icon toggle */}
+                <div className="flex justify-center mt-2">
+                  {expandedOrderId === order.id ? (
+                    <FaChevronUp
+                      className="text-gray-500 cursor-pointer"
+                      onClick={() => toggleContent(order.id)}
+                    />
+                  ) : (
+                    <FaChevronDown
+                      className="text-gray-500 cursor-pointer"
+                      onClick={() => toggleContent(order.id)}
+                    />
+                  )}
+                </div>
               </div>
+              
             ))}
           </div>
         )}
@@ -304,6 +344,7 @@ const OrderList = () => {
           />
         </div>
       </div>
+
     </div>
   );
 };

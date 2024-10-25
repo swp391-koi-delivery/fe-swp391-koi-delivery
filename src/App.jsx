@@ -57,7 +57,6 @@ function App() {
     return <Navigate to={"/login"} />;
   };
 
-
   const ProtectRouteCustomerAuth = ({ children }) => {
     const user = useSelector((store) => store);
     console.log(user);

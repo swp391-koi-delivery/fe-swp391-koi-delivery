@@ -6,7 +6,6 @@ function ManageWarehouse() {
     const columns = [
         { title: "ID", dataIndex: "id", key: "id",align: "left", },
         { title: "Location", dataIndex: "location", key: "location",align: "left", },
-        { title: "Progresses", dataIndex: "progresses", key: "progresses",align: "left", },
         { title: "Available", dataIndex: "available", key: "available",align: "left", render: (available) => (<Tag style={{fontSize:"22px"}}
             icon={available ? <CloseCircleOutlined /> : <CheckCircleOutlined />} 
             color={available ? 'success' : 'error'} // Màu đỏ cho Inactive, xanh cho Active
