@@ -22,7 +22,6 @@ import {
   ClockCircleOutlined,
   CloseCircleOutlined,
   LoadingOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
 
 function OrderSearchPage() {
@@ -63,21 +62,21 @@ function OrderSearchPage() {
       }
 
       // Logo Change on Sticky Header
-      if (logo.length) {
-        const logoSrc = ud_header.classList.contains("sticky")
-          ? "assets/images/logo/logo.svg"
-          : "assets/images/logo/logo-white.svg";
+      // if (logo.length) {
+      //   const logoSrc = ud_header.classList.contains("sticky")
+      //     ? "assets/images/logo/logo.svg"
+      //     : "assets/images/logo/logo-white.svg";
 
-        document.querySelector(".header-logo").src = logoSrc;
-      }
+      //   document.querySelector(".header-logo").src = logoSrc;
+      // }
 
       // Handle logo change for dark mode
-      if (document.documentElement.classList.contains("dark")) {
-        if (logo.length && ud_header.classList.contains("sticky")) {
-          document.querySelector(".header-logo").src =
-            "assets/images/logo/logo-white.svg";
-        }
-      }
+      // if (document.documentElement.classList.contains("dark")) {
+      //   if (logo.length && ud_header.classList.contains("sticky")) {
+      //     document.querySelector(".header-logo").src =
+      //       "assets/images/logo/logo-white.svg";
+      //   }
+      // }
 
       // Show or hide the back-to-top button
       const backToTop = document.querySelector(".back-to-top");
@@ -211,11 +210,6 @@ function OrderSearchPage() {
     };
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
-  };
-
   const handleOpenModal = (values) => {
     setSelectedOrder(values);
     setOpenModal(true);
@@ -225,14 +219,6 @@ function OrderSearchPage() {
     setOpenModal(false);
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
 
   const formatDistance = (distance) => {
     return (
@@ -339,7 +325,7 @@ function OrderSearchPage() {
   const handleFeedback = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("feedback", values);
+      const response = await api.post("feedBack", values);
       toast.success("Successfully send feedback");
     } catch (err) {
       toast.error(err.response.data || "Failed to send feedback");
@@ -726,69 +712,67 @@ function OrderSearchPage() {
             <div className="w-full px-4">
               <div className="text-center">
                 <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Login Page
+                  Order Search Page
                 </h1>
-                <p className="mb-5 text-base text-body-color dark:text-dark-6">
-                  There are many variations of passages of Lorem Ipsum
-                  available.
-                </p>
-
-                <ul className="flex items-center justify-center gap-[10px]">
-                  <li>
-                    <Link
-                      to="/"
-                      className="flex items-center gap-[10px] text-base font-medium text-dark dark:text-white"
+                <div className="flex w-full justify-center py-2">
+                  <Form
+                    title="Search"
+                    className="flex w-full justify-center"
+                    onFinish={handleSearch}
+                    form={form}
+                  >
+                    <Form.Item
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input password",
+                        },
+                      ]}
+                      style={{ textAlign: "left", width: "50%" }}
                     >
-                      Home
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/login"
-                      href="javascript:void(0)"
-                      className="flex items-center gap-[10px] text-base font-medium text-body-color"
-                    >
-                      <span className="text-body-color dark:text-dark-6">
-                        {" "}
-                        /{" "}
-                      </span>
-                      Login
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="relative z-10 overflow-hidden pb-[60px] pt-[120px] dark:bg-dark md:pt-[130px] lg:pt-[160px]">
-        <div className="absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-stroke/0 via-stroke to-stroke/0 dark:via-dark-3"></div>
-        <div className="container">
-          <div className="-mx-4 flex flex-wrap items-center">
-            <div className="w-full px-4">
-              <div className="text-center">
-                <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Order List Page
-                </h1>
-                <div className="flex w-full items-center justify-center py-2">
-                  <div className="flex w-1/2">
-                    <Input
-                      placeholder="Search..."
-                      allowClear
-                      onPressEnter={(e) => handleSearch(e.target.value)}
-                      className="w-full"
-                    />
-                    <Button
-                      style={{ marginLeft: "0" }}
-                      type="primary"
-                      icon={<SearchOutlined />}
-                      onClick={() =>
-                        handleSearch(document.querySelector("input").value)
-                      }
-                    >
-                      Search
-                    </Button>
-                  </div>
+                      <Input
+                        placeholder="Search order"
+                        className="w-full rounded-l-md border border-stroke bg-transparent px-5 py-2 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        style={{
+                          borderTopRightRadius: 0,
+                          borderBottomRightRadius: 0,
+                        }}
+                      />
+                    </Form.Item>
+                    <Form.Item>
+                      <Button
+                        onClick={() => form.submit()}
+                        className="primaryButton rounded-r-md"
+                        loading={loading}
+                        style={{
+                          marginLeft: "0",
+                          color: "#fff",
+                          border: "none",
+                          padding: "1.3rem 1.75rem",
+                          fontSize: "1rem",
+                          lineHeight: "1.5rem",
+                          transitionDuration: "300ms",
+                          fontWeight: "500",
+                          transitionProperty:
+                            "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                          transitionTimingFunction:
+                            "cubic-bezier(0.4, 0, 0.2, 1)",
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(234, 88, 12, 1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(249, 115, 22, 1)";
+                        }}
+                      >
+                        Estimate
+                      </Button>
+                    </Form.Item>
+                  </Form>
                 </div>
                 <ul className="flex items-center justify-center gap-[10px]">
                   <Link>
@@ -801,7 +785,7 @@ function OrderSearchPage() {
                   </Link>
                   <li>
                     <Link
-                      to="/order-list"
+                      to="/order-search"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -809,7 +793,7 @@ function OrderSearchPage() {
                         {" "}
                         /{" "}
                       </span>
-                      Order List Page
+                      Order Search Page
                     </Link>
                   </li>
                 </ul>
@@ -827,9 +811,15 @@ function OrderSearchPage() {
             <div className="w-full px-4">
               {/*  */}
               <div className="order-list">
-                {orders.map((order) => (
-                  <Order key={order.id} order={order} />
-                ))}
+                <div className="order-list">
+                  {loading ? (
+                    <LoadingOutlined /> // Show loading icon when loading
+                  ) : (
+                    orders.map((order) => (
+                      <Order key={order.id} order={order} />
+                    ))
+                  )}
+                </div>
               </div>
               {/*  */}
               <div className="flex justify-end">
@@ -839,7 +829,6 @@ function OrderSearchPage() {
           </div>
         </div>
       </section>
-      <FooterComponent />
     </>
   );
 }

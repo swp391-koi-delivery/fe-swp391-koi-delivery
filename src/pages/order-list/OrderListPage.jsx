@@ -213,14 +213,31 @@ function OrderListPage() {
     setOpenModal(false);
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
+ const formatVND = (amount) => {
+   // Convert the number to a string without decimals
+   const amountString = amount.toFixed(0);
+
+   // Check if the number is less than 1000
+   if (amountString.length <= 3) {
+     return amountString; // No need for dot or comma formatting
+   }
+
+   // Separate the number into the last three digits and the rest
+   const lastThree = amountString.slice(-3);
+   const beforeLastThree = amountString.slice(0, -3);
+
+   // Format the first part with commas every three digits
+   const formattedBeforeLastThree = beforeLastThree.replace(
+     /\B(?=(\d{3})+(?!\d))/g,
+     ",",
+   );
+
+   // Combine with a dot before the last three digits
+   const formattedVND = `${formattedBeforeLastThree}.${lastThree}`;
+
+   return formattedVND;
+ };
+
 
   const formatDistance = (distance) => {
     return (
@@ -233,7 +250,7 @@ function OrderListPage() {
 
   const fetchOrder = async () => {
     try {
-      const response = await api.get("/customer/order/each-user");
+      const response = await api.get("user/order/each-user");
       setOrders(response.data);
     } catch (err) {
       console.log("Failed to fetch order", err);
@@ -242,7 +259,7 @@ function OrderListPage() {
 
   const generateTables = (orderDetails) => {
     return (
-      <div>
+      <div className="overflow-x-auto">
         <table className="table-container w-full overflow-hidden text-nowrap rounded-xl text-center text-sm shadow-pricing">
           <thead className="bg-gray-200 dark:bg-slate-800">
             <tr>
@@ -327,7 +344,7 @@ function OrderListPage() {
   const handleFeedback = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("feedback", values);
+      const response = await api.post("feedBack", values);
       toast.success("Successfully send feedback");
     } catch (err) {
       toast.error(err.response.data || "Failed to send feedback");
@@ -339,7 +356,7 @@ function OrderListPage() {
   const handlePayment = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("/customer/payment", values);
+      const response = await api.post(`customer/orderPaymentUrl/${values}`);
       console.log(response);
       window.open(response.data);
       toast.success("Successfully pay for order");
@@ -501,28 +518,12 @@ function OrderListPage() {
                       <Form.Item
                         label={
                           <span className="dark:text-white">
-                            Payment Method
-                          </span>
-                        }
-                        initialValue={order.paymentMethod}
-                        name="paymentMethod"
-                        className="mb-1 w-full md:w-1/2 md:pl-4"
-                      >
-                        <Input
-                          readOnly
-                          placeholder="Payment Method"
-                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        label={
-                          <span className="dark:text-white">
                             Total Distance (Km)
                           </span>
                         }
                         initialValue={formatDistance(order.totalDistance)}
                         name="totalDistance"
-                        className="mb-1 w-full md:w-1/2 md:pr-4"
+                        className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
                         <Input
                           readOnly
@@ -665,12 +666,12 @@ function OrderListPage() {
                                   const boxSummary = order.orderDetails.reduce(
                                     (acc, detail) => {
                                       detail.boxDetails.forEach((boxDetail) => {
-                                        const boxType = boxDetail.box?.type;
+                                        const boxType = boxDetail.boxes?.type;
                                         if (!acc[boxType]) {
                                           acc[boxType] = {
                                             type: boxType,
                                             quantity: 0,
-                                            price: boxDetail.box?.price || 0,
+                                            price: boxDetail.boxes?.price || 0,
                                           };
                                         }
                                         acc[boxType].quantity +=
@@ -698,12 +699,12 @@ function OrderListPage() {
                                 const boxSummary = order.orderDetails.reduce(
                                   (acc, detail) => {
                                     detail.boxDetails.forEach((boxDetail) => {
-                                      const boxType = boxDetail.box?.type;
+                                      const boxType = boxDetail.boxes?.type;
                                       if (!acc[boxType]) {
                                         acc[boxType] = {
                                           type: boxType,
                                           quantity: 0,
-                                          price: boxDetail.box?.price || 0,
+                                          price: boxDetail.boxes?.price || 0,
                                         };
                                       }
                                       acc[boxType].quantity +=
@@ -718,13 +719,13 @@ function OrderListPage() {
                                   (box, idx) => (
                                     <div
                                       key={idx}
-                                      className="flex w-full max-w-[200px] justify-between text-wrap"
+                                      className="flex w-full max-w-[300px] justify-between text-wrap"
                                     >
                                       <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                        ${box.price} x {box.quantity}
+                                       {formatVND(box.price)} x {box.quantity}
                                       </h4>
                                       <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                        ${box.price * box.quantity}
+                                        {formatVND(box.price * box.quantity)} VND
                                       </h4>
                                     </div>
                                   ),
@@ -743,7 +744,15 @@ function OrderListPage() {
                               0.22 USD per km for Normal Delivery)
                             </h6>
                             <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              ???
+                              {formatVND(order.distancePrice)} VND
+                            </h6>
+                          </div>
+                          <div className="inline-flex w-full items-start justify-between gap-6">
+                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
+                              Discount price (5% of wholesale order)
+                            </h6>
+                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              -{formatVND(order.discountPrice)} VND
                             </h6>
                           </div>
                         </div>
@@ -752,7 +761,7 @@ function OrderListPage() {
                             Total
                           </h5>
                           <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
-                            {formatPrice(order.totalPrice)}
+                            {formatVND(order.totalPrice)} VND
                           </h5>
                         </div>
                       </div>
@@ -768,6 +777,7 @@ function OrderListPage() {
                             onCancel={handleCloseModal}
                           >
                             <Form
+                              form={form}
                               labelCol={{ span: 24 }}
                               onFinish={handleFeedback}
                             >
@@ -786,7 +796,7 @@ function OrderListPage() {
                                 label="Rating Score"
                                 name="ratingScore"
                               >
-                                <Rate></Rate>
+                                <Rate />
                               </Form.Item>
                               <Form.Item label="Comment" name="comment">
                                 <Input.TextArea />
@@ -835,14 +845,9 @@ function OrderListPage() {
             <div className="w-60 max-w-full px-4">
               <Link to="/" className="navbar-logo block w-full py-5">
                 <img
-                  src="assets/images/logo/logo.svg"
+                  src="assets/images/logo/logo-v2.svg"
                   alt="logo"
-                  className="w-full dark:hidden"
-                />
-                <img
-                  src="assets/images/logo/logo-white.svg"
-                  alt="logo"
-                  className="hidden w-full dark:block"
+                  className="header-logo h-1/2 w-1/2 rounded-full"
                 />
               </Link>
             </div>

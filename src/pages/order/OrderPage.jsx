@@ -218,7 +218,7 @@ function OrderPage() {
       );
     } else if (value === "WHOLESALE_ORDER") {
       toast.info(
-        "If total number of fish more than 10, wholesale order price will be cheaper with 10% disconut",
+        "If total number of fish more than 10, wholesale order price will be cheaper with 5% disconut",
       );
     }
   };
@@ -237,7 +237,6 @@ function OrderPage() {
       recipientInfo: values.recipientInfo,
       methodTransPort: values.methodTransPort,
       customerNotes: values.customerNotes,
-      paymentMethod: values.paymentMethod,
       orderDetailRequestList: orderDetails.map((detail) => ({
         priceOfFish: parseInt(detail.priceOfFish),
         nameFarm: detail.nameFarm,
@@ -774,35 +773,7 @@ function OrderPage() {
                         ]}
                       />
                     </Form.Item>
-                    <Form.Item
-                      label="Payment Method"
-                      name="paymentMethod"
-                      className="mb-4 w-full px-2 md:w-1/2"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please choose payment method",
-                        },
-                      ]}
-                      style={{ textAlign: "left" }}
-                    >
-                      <Select
-                        showSearch
-                        style={{
-                          width: "100%",
-                        }}
-                        placeholder="Select payment method"
-                        optionFilterProp="label"
-                        filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? "")
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? "").toLowerCase())
-                        }
-                        options={[
-                          { value: "BANK_TRANSFER", label: "Bank Transfer" },
-                        ]}
-                      />
-                    </Form.Item>
+          
                   </div>
 
                   <div className="flex w-full flex-wrap">

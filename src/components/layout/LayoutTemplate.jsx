@@ -17,21 +17,21 @@ function LayoutTemplate() {
       }
 
       // Logo Change on Sticky Header
-      if (logo.length) {
-        const logoSrc = ud_header.classList.contains("sticky")
-          ? "assets/images/logo/logo.svg"
-          : "assets/images/logo/logo-white.svg";
+      // if (logo.length) {
+      //   const logoSrc = ud_header.classList.contains("sticky")
+      //     ? "assets/images/logo/logo.svg"
+      //     : "assets/images/logo/logo-white.svg";
 
-        document.querySelector(".header-logo").src = logoSrc;
-      }
+      //   document.querySelector(".header-logo").src = logoSrc;
+      // }
 
       // Handle logo change for dark mode
-      if (document.documentElement.classList.contains("dark")) {
-        if (logo.length && ud_header.classList.contains("sticky")) {
-          document.querySelector(".header-logo").src =
-            "assets/images/logo/logo-white.svg";
-        }
-      }
+      // if (document.documentElement.classList.contains("dark")) {
+      //   if (logo.length && ud_header.classList.contains("sticky")) {
+      //     document.querySelector(".header-logo").src =
+      //       "assets/images/logo/logo-white.svg";
+      //   }
+      // }
 
       // Show or hide the back-to-top button
       const backToTop = document.querySelector(".back-to-top");
@@ -176,14 +176,9 @@ function LayoutTemplate() {
             <div className="w-60 max-w-full px-4">
               <Link to="/" className="navbar-logo block w-full py-5">
                 <img
-                  src="assets/images/logo/logo.svg"
+                  src="assets/images/logo/logo-v2.svg"
                   alt="logo"
-                  className="w-full dark:hidden"
-                />
-                <img
-                  src="assets/images/logo/logo-white.svg"
-                  alt="logo"
-                  className="hidden w-full dark:block"
+                  className="header-logo h-1/2 w-1/2 rounded-full"
                 />
               </Link>
             </div>

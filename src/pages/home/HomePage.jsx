@@ -13,7 +13,7 @@ function HomePage() {
       <BannerComponent />
       <ContentComponent />
       <PricingComponent />
-      <BlogComponent />
+      {/* <BlogComponent /> */}
       <FooterComponent />
     </>
   );
