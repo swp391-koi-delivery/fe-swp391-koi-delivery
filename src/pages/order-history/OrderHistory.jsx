@@ -10,6 +10,7 @@ import {
   Rate,
   Steps,
 } from "antd";
+
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
@@ -22,7 +23,7 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
-function OrderListPage() {
+function OrderHistoryPage() {
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
@@ -213,31 +214,14 @@ function OrderListPage() {
     setOpenModal(false);
   };
 
- const formatVND = (amount) => {
-   // Convert the number to a string without decimals
-   const amountString = amount.toFixed(0);
-
-   // Check if the number is less than 1000
-   if (amountString.length <= 3) {
-     return amountString; // No need for dot or comma formatting
-   }
-
-   // Separate the number into the last three digits and the rest
-   const lastThree = amountString.slice(-3);
-   const beforeLastThree = amountString.slice(0, -3);
-
-   // Format the first part with commas every three digits
-   const formattedBeforeLastThree = beforeLastThree.replace(
-     /\B(?=(\d{3})+(?!\d))/g,
-     ",",
-   );
-
-   // Combine with a dot before the last three digits
-   const formattedVND = `${formattedBeforeLastThree}.${lastThree}`;
-
-   return formattedVND;
- };
-
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
 
   const formatDistance = (distance) => {
     return (
@@ -250,7 +234,7 @@ function OrderListPage() {
 
   const fetchOrder = async () => {
     try {
-      const response = await api.get("user/order/each-user");
+      const response = await api.get("/customer/order/each-user");
       setOrders(response.data);
     } catch (err) {
       console.log("Failed to fetch order", err);
@@ -344,7 +328,7 @@ function OrderListPage() {
   const handleFeedback = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("feedBack", values);
+      const response = await api.post("feedback", values);
       toast.success("Successfully send feedback");
     } catch (err) {
       toast.error(err.response.data || "Failed to send feedback");
@@ -356,7 +340,7 @@ function OrderListPage() {
   const handlePayment = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post(`customer/orderPaymentUrl/${values}`);
+      const response = await api.post("/customer/payment", values);
       console.log(response);
       window.open(response.data);
       toast.success("Successfully pay for order");
@@ -373,7 +357,7 @@ function OrderListPage() {
     return (
       <>
         <div className="order my-8">
-          <div className="-mx-4 flex flex-wrap rounded-xl p-6 shadow-pricing">
+          <div className="-mx-4 flex flex-wrap rounded-sm p-6 shadow-pricing">
             <div className="mx-auto w-full px-4 md:px-5 lg:px-5">
               <div className="inline-flex w-full flex-col items-start justify-start gap-4">
                 <div className="flex w-full flex-row items-center justify-between gap-4">
@@ -381,33 +365,34 @@ function OrderListPage() {
                     <h2 className="mb-2 text-2xl font-semibold leading-9 text-dark dark:text-white">
                       Order ID:{" "}
                       <span className="text-dark dark:text-white">
-                        {order.id}
+                        {order?.id}
                       </span>
                     </h2>
                     <span className="text-base font-medium leading-relaxed text-dark dark:text-white">
-                      {order.orderDate}
+                      {order?.orderDate}
                     </span>
                   </div>
                   <div className="flex w-full flex-col items-end justify-between md:w-1/2">
-                    {(order.orderStatus === "PAID" ||
-                      order.orderStatus === "DELIVERED") && (
+                    {(order?.orderStatus === "PAID" ||
+                      order?.orderStatus === "DELIVERED") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
-                        {order.orderStatus}
+                        {order?.orderStatus}
                       </p>
                     )}
-                    {order.orderStatus === "PENDING" && (
+                    {(order?.orderStatus === "PENDING" ||
+                      order?.orderStatus === "SHIPPING") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
-                        {order.orderStatus}
+                        {order?.orderStatus}
                       </p>
                     )}
-                    {order.orderStatus === "REJECTED" && (
+                    {order?.orderStatus === "REJECTED" && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
-                        {order.orderStatus}
+                        {order?.orderStatus}
                       </p>
                     )}
-                    {order.orderStatus === "AWAITING_PAYMENT" && (
+                    {order?.orderStatus === "AWAITING_PAYMENT" && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-yellow-50 px-3 py-0.5 text-sm font-medium leading-6 text-yellow-600 lg:mt-3">
-                        {order.orderStatus}
+                        {order?.orderStatus}
                       </p>
                     )}
                     <button className="primaryButton flex w-full items-center justify-center rounded-lg py-2 transition-all duration-700 ease-in-out sm:w-fit md:w-1/2">
@@ -441,7 +426,7 @@ function OrderListPage() {
                             Origin Location
                           </span>
                         }
-                        initialValue={order.originLocation}
+                        initialValue={order?.originLocation}
                         name="originLocation"
                         className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
@@ -457,7 +442,7 @@ function OrderListPage() {
                             Destination Location
                           </span>
                         }
-                        initialValue={order.destinationLocation}
+                        initialValue={order?.destinationLocation}
                         name="destinationLocation"
                         className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
@@ -473,7 +458,7 @@ function OrderListPage() {
                             Customer Notes
                           </span>
                         }
-                        initialValue={order.customerNotes}
+                        initialValue={order?.customerNotes}
                         name="customerNotes"
                         className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
@@ -489,7 +474,7 @@ function OrderListPage() {
                             Recipient Info
                           </span>
                         }
-                        initialValue={order.recipientInfo}
+                        initialValue={order?.recipientInfo}
                         name="recipientInfo"
                         className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
@@ -505,7 +490,7 @@ function OrderListPage() {
                             Transport Method
                           </span>
                         }
-                        initialValue={order.methodTransPort}
+                        initialValue={order?.methodTransPort}
                         name="methodTransport"
                         className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
@@ -518,12 +503,28 @@ function OrderListPage() {
                       <Form.Item
                         label={
                           <span className="dark:text-white">
+                            Payment Method
+                          </span>
+                        }
+                        initialValue={order?.paymentMethod}
+                        name="paymentMethod"
+                        className="mb-1 w-full md:w-1/2 md:pl-4"
+                      >
+                        <Input
+                          readOnly
+                          placeholder="Payment Method"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
                             Total Distance (Km)
                           </span>
                         }
-                        initialValue={formatDistance(order.totalDistance)}
+                        initialValue={formatDistance(order?.totalDistance)}
                         name="totalDistance"
-                        className="mb-1 w-full md:w-1/2 md:pl-4"
+                        className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
                         <Input
                           readOnly
@@ -641,7 +642,7 @@ function OrderListPage() {
                         Order Details
                       </h2>
                       <div className="table-list flex w-full flex-wrap items-center justify-center">
-                        {generateTables(order.orderDetails)}
+                        {generateTables(order?.orderDetails)}
                       </div>
                       <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
                         Order Price
@@ -666,12 +667,12 @@ function OrderListPage() {
                                   const boxSummary = order.orderDetails.reduce(
                                     (acc, detail) => {
                                       detail.boxDetails.forEach((boxDetail) => {
-                                        const boxType = boxDetail.boxes?.type;
+                                        const boxType = boxDetail.box?.type;
                                         if (!acc[boxType]) {
                                           acc[boxType] = {
                                             type: boxType,
                                             quantity: 0,
-                                            price: boxDetail.boxes?.price || 0,
+                                            price: boxDetail.box?.price || 0,
                                           };
                                         }
                                         acc[boxType].quantity +=
@@ -699,12 +700,12 @@ function OrderListPage() {
                                 const boxSummary = order.orderDetails.reduce(
                                   (acc, detail) => {
                                     detail.boxDetails.forEach((boxDetail) => {
-                                      const boxType = boxDetail.boxes?.type;
+                                      const boxType = boxDetail.box?.type;
                                       if (!acc[boxType]) {
                                         acc[boxType] = {
                                           type: boxType,
                                           quantity: 0,
-                                          price: boxDetail.boxes?.price || 0,
+                                          price: boxDetail.box?.price || 0,
                                         };
                                       }
                                       acc[boxType].quantity +=
@@ -719,13 +720,13 @@ function OrderListPage() {
                                   (box, idx) => (
                                     <div
                                       key={idx}
-                                      className="flex w-full max-w-[300px] justify-between text-wrap"
+                                      className="flex w-full max-w-[200px] justify-between text-wrap"
                                     >
                                       <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                       {formatVND(box.price)} x {box.quantity}
+                                        ${box.price} x {box.quantity}
                                       </h4>
                                       <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                        {formatVND(box.price * box.quantity)} VND
+                                        ${box.price * box.quantity}
                                       </h4>
                                     </div>
                                   ),
@@ -744,15 +745,7 @@ function OrderListPage() {
                               0.22 USD per km for Normal Delivery)
                             </h6>
                             <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              {formatVND(order.distancePrice)} VND
-                            </h6>
-                          </div>
-                          <div className="inline-flex w-full items-start justify-between gap-6">
-                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Discount price (5% of wholesale order)
-                            </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              -{formatVND(order.discountPrice)} VND
+                              ???
                             </h6>
                           </div>
                         </div>
@@ -761,13 +754,13 @@ function OrderListPage() {
                             Total
                           </h5>
                           <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
-                            {formatVND(order.totalPrice)} VND
+                            {formatPrice(order?.totalPrice)}
                           </h5>
                         </div>
                       </div>
                     </div>
                     <div className="flex w-full flex-row items-end justify-end gap-1.5">
-                      {order.orderStatus === "DELIVERED" && (
+                      {order?.orderStatus === "DELIVERED" && (
                         <div className="">
                           <Modal
                             title="Feedback"
@@ -777,7 +770,6 @@ function OrderListPage() {
                             onCancel={handleCloseModal}
                           >
                             <Form
-                              form={form}
                               labelCol={{ span: 24 }}
                               onFinish={handleFeedback}
                             >
@@ -796,7 +788,7 @@ function OrderListPage() {
                                 label="Rating Score"
                                 name="ratingScore"
                               >
-                                <Rate />
+                                <Rate></Rate>
                               </Form.Item>
                               <Form.Item label="Comment" name="comment">
                                 <Input.TextArea />
@@ -808,9 +800,9 @@ function OrderListPage() {
                           </Button>
                         </div>
                       )}
-                      {order.orderStatus === "AWAITING_PAYMENT" && (
+                      {order?.orderStatus === "AWAITING_PAYMENT" && (
                         <Button
-                          onClick={() => handlePayment(order.id)}
+                          onClick={() => handlePayment(order?.id)}
                           loading={loading}
                         >
                           Payment
@@ -845,9 +837,14 @@ function OrderListPage() {
             <div className="w-60 max-w-full px-4">
               <Link to="/" className="navbar-logo block w-full py-5">
                 <img
-                  src="assets/images/logo/logo-v2.svg"
+                  src="assets/images/logo/logo.svg"
                   alt="logo"
-                  className="header-logo h-1/2 w-1/2 rounded-full"
+                  className="w-full dark:hidden"
+                />
+                <img
+                  src="assets/images/logo/logo-white.svg"
+                  alt="logo"
+                  className="hidden w-full dark:block"
                 />
               </Link>
             </div>
@@ -1192,4 +1189,4 @@ function OrderListPage() {
   );
 }
 
-export default OrderListPage;
+export default OrderHistoryPage;

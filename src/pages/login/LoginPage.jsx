@@ -134,17 +134,12 @@ function LoginPage() {
                 <div className="mb-10 text-center">
                   <a
                     href="javascript:void(0)"
-                    className="mx-auto inline-block max-w-[160px]"
+                    className="mx-auto flex justify-center max-w-[160px]"
                   >
                     <img
-                      src="assets/images/logo/logo.svg"
+                      src="assets/images/logo/logo-v2.svg"
                       alt="logo"
-                      className="dark:hidden"
-                    />
-                    <img
-                      src="assets/images/logo/logo-white.svg"
-                      alt="logo"
-                      className="hidden dark:block"
+                      className="header-logo h-1/2 w-1/2 rounded-full"
                     />
                   </a>
                 </div>
@@ -176,9 +171,7 @@ function LoginPage() {
                     />
                   </Form.Item>
                   <Form.Item
-                    label={
-                      <span className="dark:text-white">Password</span>
-                    }
+                    label={<span className="dark:text-white">Password</span>}
                     name="password"
                     className="mb-[14px]"
                     rules={[

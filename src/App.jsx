@@ -42,6 +42,8 @@ import "./index.css";
 import "./App.css";
 import SuccessPage from "./pages/success/Success";
 import ErrorPage from "./pages/error/ErrorPage";
+import OrderSearchPage from "./pages/order-search/OrderSearch";
+
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -103,6 +105,10 @@ function App() {
         {
           path: "reset-password",
           element: <ResetPasswordPage />,
+        },
+        {
+          path: "order-search",
+          element: <OrderSearchPage />,
         },
       ],
     },

@@ -228,7 +228,7 @@ function PricingComponent() {
                   </span>
                   <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
                     <span className="-ml-1 -tracking-[2px]">
-                      {data?.totalPrice}$
+                      {data?.totalPrice} VND
                     </span>
                   </h2>
                 </div>
