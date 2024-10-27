@@ -12,9 +12,6 @@ import {
 } from "antd";
 
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../redux/features/userSlice";
-import FooterComponent from "../../components/FooterComponent";
 import { useForm } from "antd/es/form/Form";
 import { toast } from "react-toastify";
 import {
@@ -29,8 +26,6 @@ function OrderSearchPage() {
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const navigate = useNavigate();
-  const user = useSelector((store) => store.user);
-  const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -218,7 +213,6 @@ function OrderSearchPage() {
   const handleCloseModal = () => {
     setOpenModal(false);
   };
-
 
   const formatDistance = (distance) => {
     return (
@@ -811,15 +805,19 @@ function OrderSearchPage() {
             <div className="w-full px-4">
               {/*  */}
               <div className="order-list">
-                <div className="order-list">
-                  {loading ? (
-                    <LoadingOutlined /> // Show loading icon when loading
-                  ) : (
-                    orders.map((order) => (
-                      <Order key={order.id} order={order} />
-                    ))
-                  )}
-                </div>
+                {loading ? (
+                  <div className="flex justify-center">
+                    <LoadingOutlined
+                      style={{
+                        fontSize: "10vw",
+                        textAlign: "center",
+                        color: "#F97316",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  orders.map((order) => <Order key={order.id} order={order} />)
+                )}
               </div>
               {/*  */}
               <div className="flex justify-end">

@@ -183,12 +183,12 @@ function App() {
           element: <OrderDetailsInfoStaff />,
         },
         {
-          path:"box",
-          element:<ManageBox/>
+          path: "box",
+          element: <ManageBox />,
         },
         {
-          path:"warehouse",
-          element:<ManageWarehouse/>
+          path: "warehouse",
+          element: <ManageWarehouse />,
         },
         {
           path: "statistic",
@@ -248,7 +248,6 @@ function App() {
         },
       ],
     },
-   
   ]);
   return <RouterProvider router={router} />;
 }
