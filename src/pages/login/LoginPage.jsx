@@ -134,12 +134,12 @@ function LoginPage() {
                 <div className="mb-10 text-center">
                   <a
                     href="javascript:void(0)"
-                    className="mx-auto flex justify-center max-w-[160px]"
+                    className="mx-auto flex max-w-[160px] justify-center"
                   >
                     <img
                       src="assets/images/logo/logo-v2.svg"
                       alt="logo"
-                      className="header-logo h-1/2 w-1/2 rounded-full"
+                      className="header-logo h-2/5 w-2/5 rounded-full"
                     />
                   </a>
                 </div>

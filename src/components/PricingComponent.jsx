@@ -60,6 +60,37 @@ function PricingComponent() {
     }
   };
 
+const formatVND = (amount) => {
+  // Ensure amount is a valid number
+  if (typeof amount !== "number" || isNaN(amount)) {
+    return "0"; // or return a default value like "0" or "N/A"
+  }
+
+  // Convert the number to a string without decimals
+  const amountString = amount.toFixed(0);
+
+  // Check if the number is less than 1000
+  if (amountString.length <= 3) {
+    return amountString; // No need for dot or comma formatting
+  }
+
+  // Separate the number into the last three digits and the rest
+  const lastThree = amountString.slice(-3);
+  const beforeLastThree = amountString.slice(0, -3);
+
+  // Format the first part with commas every three digits
+  const formattedBeforeLastThree = beforeLastThree.replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    ",",
+  );
+
+  // Combine with a dot before the last three digits
+  const formattedVND = `${formattedBeforeLastThree}.${lastThree}`;
+
+  return formattedVND;
+};
+
+
   return (
     <>
       <section
@@ -210,12 +241,14 @@ function PricingComponent() {
                   <span className="mb-5 block text-xl font-medium text-dark dark:text-white">
                     Number of boxes you need
                   </span>
-                  <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
-                    <span className="-ml-1 -tracking-[2px]">
-                      {data?.Small} small boxes, {data?.Medium} medium boxes,{" "}
-                      {data?.Large} large boxes
-                    </span>
-                  </h2>
+                  {data?.boxMessage?.map((item, index) => (
+                    <h2
+                      key={index}
+                      className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]"
+                    >
+                      <span className="-ml-1 -tracking-[2px]">{item}</span>
+                    </h2>
+                  ))}
                 </div>
                 <div className="z-10 mb-10 flex w-full flex-col items-center overflow-hidden rounded-xl bg-white px-6 py-6 shadow-pricing dark:bg-dark-2 sm:p-12 lg:px-6 lg:py-10 xl:p-14">
                   <img
@@ -228,7 +261,7 @@ function PricingComponent() {
                   </span>
                   <h2 className="text-xl font-semibold text-primary md:text-3xl xl:text-[42px] xl:leading-[1.21]">
                     <span className="-ml-1 -tracking-[2px]">
-                      {data?.totalPrice} VND
+                      {formatVND(data?.totalPrice)} VND
                     </span>
                   </h2>
                 </div>

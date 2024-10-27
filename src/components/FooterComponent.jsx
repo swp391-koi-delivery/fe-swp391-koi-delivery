@@ -17,9 +17,9 @@ function Footer() {
                   className="mb-6 inline-block max-w-[160px]"
                 >
                   <img
-                    src="assets/images/logo/logo-white.svg"
+                    src="assets/images/logo/logo-v2.svg"
                     alt="logo"
-                    className="max-w-full"
+                    className="header-logo h-1/2 w-1/2 rounded-full"
                   />
                 </a>
                 <p className="mb-8 max-w-[270px] text-base text-gray-7">
@@ -229,7 +229,7 @@ function Footer() {
                       />
                     </div>
                     <span className="max-w-[180px] text-base text-gray-7 group-hover:text-white">
-                     Koi fish shipping process...
+                      Koi fish shipping process...
                     </span>
                   </a>
                   <a className="group flex items-center gap-[22px]">
@@ -240,7 +240,7 @@ function Footer() {
                       />
                     </div>
                     <span className="max-w-[180px] text-base text-gray-7 group-hover:text-white">
-                     Feedback for us to improve our service...
+                      Feedback for us to improve our service...
                     </span>
                   </a>
                 </div>
@@ -281,7 +281,6 @@ function Footer() {
                   <p className="text-base text-gray-7">
                     Precision delivery by
                     <a
-                      href="https://tailgrids.com"
                       rel="nofollow noopner"
                       target="_blank"
                       className="text-gray-1 hover:underline"
