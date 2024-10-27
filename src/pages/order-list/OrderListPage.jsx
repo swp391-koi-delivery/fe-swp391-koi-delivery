@@ -22,6 +22,7 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
+
 function OrderListPage() {
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,23 +49,6 @@ function OrderListPage() {
         ud_header.classList.add("sticky");
       } else {
         ud_header.classList.remove("sticky");
-      }
-
-      // Logo Change on Sticky Header
-      if (logo.length) {
-        const logoSrc = ud_header.classList.contains("sticky")
-          ? "assets/images/logo/logo.svg"
-          : "assets/images/logo/logo-white.svg";
-
-        document.querySelector(".header-logo").src = logoSrc;
-      }
-
-      // Handle logo change for dark mode
-      if (document.documentElement.classList.contains("dark")) {
-        if (logo.length && ud_header.classList.contains("sticky")) {
-          document.querySelector(".header-logo").src =
-            "assets/images/logo/logo-white.svg";
-        }
       }
 
       // Show or hide the back-to-top button
@@ -213,31 +197,35 @@ function OrderListPage() {
     setOpenModal(false);
   };
 
- const formatVND = (amount) => {
-   // Convert the number to a string without decimals
-   const amountString = amount.toFixed(0);
+  const formatVND = (amount) => {
+    // Ensure amount is a valid number
+    if (typeof amount !== "number" || isNaN(amount)) {
+      return "0"; // or return a default value like "0" or "N/A"
+    }
 
-   // Check if the number is less than 1000
-   if (amountString.length <= 3) {
-     return amountString; // No need for dot or comma formatting
-   }
+    // Convert the number to a string without decimals
+    const amountString = amount.toFixed(0);
 
-   // Separate the number into the last three digits and the rest
-   const lastThree = amountString.slice(-3);
-   const beforeLastThree = amountString.slice(0, -3);
+    // Check if the number is less than 1000
+    if (amountString.length <= 3) {
+      return amountString; // No need for dot or comma formatting
+    }
 
-   // Format the first part with commas every three digits
-   const formattedBeforeLastThree = beforeLastThree.replace(
-     /\B(?=(\d{3})+(?!\d))/g,
-     ",",
-   );
+    // Separate the number into the last three digits and the rest
+    const lastThree = amountString.slice(-3);
+    const beforeLastThree = amountString.slice(0, -3);
 
-   // Combine with a dot before the last three digits
-   const formattedVND = `${formattedBeforeLastThree}.${lastThree}`;
+    // Format the first part with commas every three digits
+    const formattedBeforeLastThree = beforeLastThree.replace(
+      /\B(?=(\d{3})+(?!\d))/g,
+      ",",
+    );
 
-   return formattedVND;
- };
+    // Combine with a dot before the last three digits
+    const formattedVND = `${formattedBeforeLastThree}.${lastThree}`;
 
+    return formattedVND;
+  };
 
   const formatDistance = (distance) => {
     return (
@@ -249,11 +237,14 @@ function OrderListPage() {
   };
 
   const fetchOrder = async () => {
+    setLoading(true);
     try {
-      const response = await api.get("user/order/each-user");
+      const response = await api.get("/customer/order/each-user");
       setOrders(response.data);
     } catch (err) {
       console.log("Failed to fetch order", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -648,19 +639,19 @@ function OrderListPage() {
                       </h2>
                       <div className="flex w-full flex-col items-start justify-start gap-5 border-b border-gray-200 pb-5">
                         <div className="flex w-full flex-col items-center justify-start gap-4 md:flex-row lg:gap-8">
-                          <div className="flex items-center justify-start md:w-2/12 md:flex-row lg:gap-5">
+                          <div className="flex h-[170px] w-[170px] items-center justify-start md:w-2/12 md:flex-row lg:gap-5">
                             <img
-                              className="h-[140px] w-[140px] rounded-md object-cover"
+                              className="rounded-md object-cover"
                               src="./assets/images/order-list/box.jpg"
                               alt="Boxes"
                             />
                           </div>
                           <div className="flex w-full md:w-10/12">
                             <div className="flex w-full flex-col items-start justify-center gap-3 sm:w-1/2">
-                              <h4 className="text-center text-xl font-medium leading-8 text-dark dark:text-white">
+                              <h4 className="text-nowrap text-center text-xl font-medium leading-8 text-dark dark:text-white">
                                 Number of boxes
                               </h4>
-                              <div className="flex flex-col items-center justify-start gap-0.5 md:items-start">
+                              <div className="flex flex-col items-start justify-start gap-0.5 md:items-start">
                                 {/* Accumulate box quantities */}
                                 {(() => {
                                   const boxSummary = order.orderDetails.reduce(
@@ -692,6 +683,11 @@ function OrderListPage() {
                                     ),
                                   );
                                 })()}
+                                <div>
+                                  <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
+                                    Total box: {order.totalBox}
+                                  </h6>
+                                </div>
                               </div>
                             </div>
                             <div className="flex w-full flex-col items-end justify-center pt-10 sm:w-1/2">
@@ -721,16 +717,23 @@ function OrderListPage() {
                                       key={idx}
                                       className="flex w-full max-w-[300px] justify-between text-wrap"
                                     >
-                                      <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                       {formatVND(box.price)} x {box.quantity}
+                                      <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8">
+                                        {formatVND(box.price)} x {box.quantity}
                                       </h4>
-                                      <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                        {formatVND(box.price * box.quantity)} VND
+                                      <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8">
+                                        {formatVND(box.price * box.quantity)}{" "}
+                                        VND
                                       </h4>
                                     </div>
                                   ),
                                 );
                               })()}
+                              <div className="flex w-full max-w-[300px] justify-between text-wrap">
+                                <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8"></h4>
+                                <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8">
+                                  {formatVND(order.totalBoxPrice)} VND
+                                </h4>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -740,10 +743,9 @@ function OrderListPage() {
                         <div className="flex w-full flex-col items-start justify-start gap-4 pb-1.5">
                           <div className="inline-flex w-full items-start justify-between gap-6">
                             <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Delivery fee (0.42 USD per km for Fast Delivery /
-                              0.22 USD per km for Normal Delivery)
+                              Delivery fee
                             </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                            <h6 className="text-nowrap text-right text-base font-medium leading-relaxed text-dark dark:text-white">
                               {formatVND(order.distancePrice)} VND
                             </h6>
                           </div>
@@ -751,7 +753,7 @@ function OrderListPage() {
                             <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
                               Discount price (5% of wholesale order)
                             </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                            <h6 className="text-nowrap text-right text-base font-medium leading-relaxed text-dark dark:text-white">
                               -{formatVND(order.discountPrice)} VND
                             </h6>
                           </div>
@@ -817,16 +819,6 @@ function OrderListPage() {
                         </Button>
                       )}
                     </div>
-                    <div className="flex w-full flex-col items-start justify-start gap-1.5">
-                      <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                        Order Note:
-                      </h6>
-                      <p className="text-sm font-normal leading-normal text-dark dark:text-dark-6">
-                        Make sure to ship all the ordered items together by
-                        Friday. I`ve emailed you the details, so please check it
-                        an review it. Thank You!
-                      </p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -847,7 +839,7 @@ function OrderListPage() {
                 <img
                   src="assets/images/logo/logo-v2.svg"
                   alt="logo"
-                  className="header-logo h-1/2 w-1/2 rounded-full"
+                  className="header-logo h-2/5 w-2/5 rounded-full"
                 />
               </Link>
             </div>
@@ -1175,9 +1167,19 @@ function OrderListPage() {
             <div className="w-full px-4">
               {/*  */}
               <div className="order-list">
-                {orders.map((order) => (
-                  <Order key={order.id} order={order} />
-                ))}
+                {loading ? (
+                  <div className="flex justify-center">
+                    <LoadingOutlined
+                      style={{
+                        fontSize: "10vw",
+                        textAlign: "center",
+                        color: "#F97316",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  orders.map((order) => <Order key={order.id} order={order} />)
+                )}
               </div>
               {/*  */}
               <div className="flex justify-end">
