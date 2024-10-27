@@ -83,7 +83,7 @@ function ForgotPasswordPage() {
                     <img
                       src="assets/images/logo/logo-v2.svg"
                       alt="logo"
-                      className="header-logo h-1/2 w-1/2 rounded-full"
+                      className="header-logo h-2/5 w-2/5 rounded-full"
                     />
                   </a>
                 </div>

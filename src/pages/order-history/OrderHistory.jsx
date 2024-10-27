@@ -837,14 +837,9 @@ function OrderHistoryPage() {
             <div className="w-60 max-w-full px-4">
               <Link to="/" className="navbar-logo block w-full py-5">
                 <img
-                  src="assets/images/logo/logo.svg"
+                  src="assets/images/logo/logo-v2.svg"
                   alt="logo"
-                  className="w-full dark:hidden"
-                />
-                <img
-                  src="assets/images/logo/logo-white.svg"
-                  alt="logo"
-                  className="hidden w-full dark:block"
+                  className="header-logo h-2/5 w-2/5 rounded-full"
                 />
               </Link>
             </div>
