@@ -43,6 +43,7 @@ import "./App.css";
 import SuccessPage from "./pages/success/Success";
 import ErrorPage from "./pages/error/ErrorPage";
 import OrderSearchPage from "./pages/order-search/OrderSearch";
+import OrderHistoryPage from "./pages/order-history/OrderHistory";
 
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
@@ -125,6 +126,14 @@ function App() {
       element: (
         <ProtectRouteCustomerAuth>
           <OrderListPage />
+        </ProtectRouteCustomerAuth>
+      ),
+    },
+    {
+      path: "order-history",
+      element: (
+        <ProtectRouteCustomerAuth>
+          <OrderHistoryPage />
         </ProtectRouteCustomerAuth>
       ),
     },

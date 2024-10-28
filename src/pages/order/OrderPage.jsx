@@ -206,7 +206,7 @@ function OrderPage() {
     }
   };
 
-  const handleLocationChange = (value) => {
+  const handleLocationChange = () => {
       toast.info(
         "The more specific the location, the more accurate the shipping price.",
       );
@@ -444,6 +444,18 @@ function OrderPage() {
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Order List Page
+                          </Link>
+                          <Link
+                            to="/order-history"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order History Page
+                          </Link>
+                          <Link
+                            to="/order-search"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order Search Page
                           </Link>
                         </div>
                       )}

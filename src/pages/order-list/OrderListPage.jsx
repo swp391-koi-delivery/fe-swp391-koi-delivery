@@ -24,18 +24,16 @@ import {
 } from "@ant-design/icons";
 
 function OrderListPage() {
-  const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form] = useForm();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     handleDarkMode();
-    fetchOrder();
+    fetchOrder(1);
   }, []);
 
   const handleDarkMode = () => {
@@ -188,15 +186,6 @@ function OrderListPage() {
     navigate("/login");
   };
 
-  const handleOpenModal = (values) => {
-    setSelectedOrder(values);
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
-
   const formatVND = (amount) => {
     // Ensure amount is a valid number
     if (typeof amount !== "number" || isNaN(amount)) {
@@ -236,11 +225,16 @@ function OrderListPage() {
     );
   };
 
-  const fetchOrder = async () => {
+  const fetchOrder = async (values) => {
+    console.log(values);
     setLoading(true);
     try {
-      const response = await api.get("/customer/order/each-user");
-      setOrders(response.data);
+      const response = await api.get(
+        `/customer/order/each-user?page=${values}&size=5`,
+      );
+      console.log(response);
+      setTotalPages(response.data.totalPages);
+      setOrders(response.data.content);
     } catch (err) {
       console.log("Failed to fetch order", err);
     } finally {
@@ -332,18 +326,6 @@ function OrderListPage() {
     );
   };
 
-  const handleFeedback = async (values) => {
-    try {
-      setLoading(true);
-      const response = await api.post("feedBack", values);
-      toast.success("Successfully send feedback");
-    } catch (err) {
-      toast.error(err.response.data || "Failed to send feedback");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handlePayment = async (values) => {
     try {
       setLoading(true);
@@ -372,33 +354,32 @@ function OrderListPage() {
                     <h2 className="mb-2 text-2xl font-semibold leading-9 text-dark dark:text-white">
                       Order ID:{" "}
                       <span className="text-dark dark:text-white">
-                        {order.id}
+                        {order?.id}
                       </span>
                     </h2>
                     <span className="text-base font-medium leading-relaxed text-dark dark:text-white">
-                      {order.orderDate}
+                      {order?.orderDate}
                     </span>
                   </div>
                   <div className="flex w-full flex-col items-end justify-between md:w-1/2">
-                    {(order.orderStatus === "PAID" ||
-                      order.orderStatus === "DELIVERED") && (
+                    {(order?.orderStatus === "PAID" || order?.orderStatus === "DELIVERED") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
-                        {order.orderStatus}
+                        {order?.orderStatus}
                       </p>
                     )}
-                    {order.orderStatus === "PENDING" && (
+                    {order?.orderStatus === "PENDING" && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
-                        {order.orderStatus}
+                        {order?.orderStatus}
                       </p>
                     )}
-                    {order.orderStatus === "REJECTED" && (
+                    {order?.orderStatus === "REJECTED" && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
                         {order.orderStatus}
                       </p>
                     )}
-                    {order.orderStatus === "AWAITING_PAYMENT" && (
+                    {order?.orderStatus === "AWAITING_PAYMENT" && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-yellow-50 px-3 py-0.5 text-sm font-medium leading-6 text-yellow-600 lg:mt-3">
-                        {order.orderStatus}
+                        {order?.orderStatus}
                       </p>
                     )}
                     <button className="primaryButton flex w-full items-center justify-center rounded-lg py-2 transition-all duration-700 ease-in-out sm:w-fit md:w-1/2">
@@ -432,7 +413,7 @@ function OrderListPage() {
                             Origin Location
                           </span>
                         }
-                        initialValue={order.originLocation}
+                        initialValue={order?.originLocation}
                         name="originLocation"
                         className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
@@ -448,7 +429,7 @@ function OrderListPage() {
                             Destination Location
                           </span>
                         }
-                        initialValue={order.destinationLocation}
+                        initialValue={order?.destinationLocation}
                         name="destinationLocation"
                         className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
@@ -464,7 +445,7 @@ function OrderListPage() {
                             Customer Notes
                           </span>
                         }
-                        initialValue={order.customerNotes}
+                        initialValue={order?.customerNotes}
                         name="customerNotes"
                         className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
@@ -480,7 +461,7 @@ function OrderListPage() {
                             Recipient Info
                           </span>
                         }
-                        initialValue={order.recipientInfo}
+                        initialValue={order?.recipientInfo}
                         name="recipientInfo"
                         className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
@@ -496,7 +477,7 @@ function OrderListPage() {
                             Transport Method
                           </span>
                         }
-                        initialValue={order.methodTransPort}
+                        initialValue={order?.methodTransPort}
                         name="methodTransport"
                         className="mb-1 w-full md:w-1/2 md:pr-4"
                       >
@@ -512,7 +493,7 @@ function OrderListPage() {
                             Total Distance (Km)
                           </span>
                         }
-                        initialValue={formatDistance(order.totalDistance)}
+                        initialValue={formatDistance(order?.totalDistance)}
                         name="totalDistance"
                         className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
@@ -632,7 +613,7 @@ function OrderListPage() {
                         Order Details
                       </h2>
                       <div className="table-list flex w-full flex-wrap items-center justify-center">
-                        {generateTables(order.orderDetails)}
+                        {generateTables(order?.orderDetails)}
                       </div>
                       <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
                         Order Price
@@ -654,15 +635,15 @@ function OrderListPage() {
                               <div className="flex flex-col items-start justify-start gap-0.5 md:items-start">
                                 {/* Accumulate box quantities */}
                                 {(() => {
-                                  const boxSummary = order.orderDetails.reduce(
+                                  const boxSummary = order?.orderDetails.reduce(
                                     (acc, detail) => {
-                                      detail.boxDetails.forEach((boxDetail) => {
-                                        const boxType = boxDetail.boxes?.type;
+                                      detail?.boxDetails.forEach((boxDetail) => {
+                                        const boxType = boxDetail?.boxes.type;
                                         if (!acc[boxType]) {
                                           acc[boxType] = {
                                             type: boxType,
                                             quantity: 0,
-                                            price: boxDetail.boxes?.price || 0,
+                                            price: boxDetail?.boxes.price || 0,
                                           };
                                         }
                                         acc[boxType].quantity +=
@@ -685,22 +666,22 @@ function OrderListPage() {
                                 })()}
                                 <div>
                                   <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
-                                    Total box: {order.totalBox}
+                                    Total box: {order?.totalBox}
                                   </h6>
                                 </div>
                               </div>
                             </div>
                             <div className="flex w-full flex-col items-end justify-center pt-10 sm:w-1/2">
                               {(() => {
-                                const boxSummary = order.orderDetails.reduce(
+                                const boxSummary = order?.orderDetails.reduce(
                                   (acc, detail) => {
                                     detail.boxDetails.forEach((boxDetail) => {
-                                      const boxType = boxDetail.boxes?.type;
+                                      const boxType = boxDetail?.boxes.type;
                                       if (!acc[boxType]) {
                                         acc[boxType] = {
                                           type: boxType,
                                           quantity: 0,
-                                          price: boxDetail.boxes?.price || 0,
+                                          price: boxDetail?.boxes.price || 0,
                                         };
                                       }
                                       acc[boxType].quantity +=
@@ -731,7 +712,7 @@ function OrderListPage() {
                               <div className="flex w-full max-w-[300px] justify-between text-wrap">
                                 <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8"></h4>
                                 <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8">
-                                  {formatVND(order.totalBoxPrice)} VND
+                                  {formatVND(order?.totalBoxPrice)} VND
                                 </h4>
                               </div>
                             </div>
@@ -746,7 +727,7 @@ function OrderListPage() {
                               Delivery fee
                             </h6>
                             <h6 className="text-nowrap text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              {formatVND(order.distancePrice)} VND
+                              {formatVND(order?.distancePrice)} VND
                             </h6>
                           </div>
                           <div className="inline-flex w-full items-start justify-between gap-6">
@@ -754,7 +735,7 @@ function OrderListPage() {
                               Discount price (5% of wholesale order)
                             </h6>
                             <h6 className="text-nowrap text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              -{formatVND(order.discountPrice)} VND
+                              -{formatVND(order?.discountPrice)} VND
                             </h6>
                           </div>
                         </div>
@@ -763,53 +744,12 @@ function OrderListPage() {
                             Total
                           </h5>
                           <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
-                            {formatVND(order.totalPrice)} VND
+                            {formatVND(order?.totalPrice)} VND
                           </h5>
                         </div>
                       </div>
                     </div>
                     <div className="flex w-full flex-row items-end justify-end gap-1.5">
-                      {order.orderStatus === "DELIVERED" && (
-                        <div className="">
-                          <Modal
-                            title="Feedback"
-                            loading={loading}
-                            onOk={() => form.submit()}
-                            open={openModal}
-                            onCancel={handleCloseModal}
-                          >
-                            <Form
-                              form={form}
-                              labelCol={{ span: 24 }}
-                              onFinish={handleFeedback}
-                            >
-                              <Alert
-                                message={`Feedback for ${selectedOrder?.id}`}
-                                type="info"
-                              />
-                              <Form.Item
-                                label="Order Id"
-                                name="orderId"
-                                initialValue={selectedOrder?.id}
-                              >
-                                <Input hidden />
-                              </Form.Item>
-                              <Form.Item
-                                label="Rating Score"
-                                name="ratingScore"
-                              >
-                                <Rate />
-                              </Form.Item>
-                              <Form.Item label="Comment" name="comment">
-                                <Input.TextArea />
-                              </Form.Item>
-                            </Form>
-                          </Modal>
-                          <Button onClick={() => handleOpenModal(order)}>
-                            Feedback
-                          </Button>
-                        </div>
-                      )}
                       {order.orderStatus === "AWAITING_PAYMENT" && (
                         <Button
                           onClick={() => handlePayment(order.id)}
@@ -996,6 +936,18 @@ function OrderListPage() {
                           >
                             Order List Page
                           </Link>
+                          <Link
+                            to="/order-history"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order History Page
+                          </Link>
+                          <Link
+                            to="/order-search"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order Search Page
+                          </Link>
                         </div>
                       )}
                     </li>
@@ -1163,7 +1115,7 @@ function OrderListPage() {
         className="relative bg-white pb-12 pt-20 dark:bg-dark lg:pb-[90px] lg:pt-[120px]"
       >
         <div className="container mx-auto">
-          <div className="-mx-4 flex flex-wrap">
+          <div className="mx-2 flex flex-wrap">
             <div className="w-full px-4">
               {/*  */}
               <div className="order-list">
@@ -1183,7 +1135,12 @@ function OrderListPage() {
               </div>
               {/*  */}
               <div className="flex justify-end">
-                <Pagination defaultCurrent={1} total={50} />
+                <Pagination
+                  initialValue={1}
+                  defaultCurrent={1}
+                  total={totalPages * 5}
+                  onChange={fetchOrder}
+                />
               </div>
             </div>
           </div>

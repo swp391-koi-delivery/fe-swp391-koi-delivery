@@ -25,7 +25,6 @@ function OrderSearchPage() {
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
-  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -39,171 +38,8 @@ function OrderSearchPage() {
   };
 
   useEffect(() => {
-    handleDarkMode();
     fetchOrder();
   }, []);
-
-  const handleDarkMode = () => {
-    // ======= Sticky Header and Back-to-Top Button Scroll Behavior
-    const handleScroll = () => {
-      const ud_header = document.querySelector(".ud-header");
-      const logo = document.querySelectorAll(".header-logo");
-      const sticky = ud_header ? ud_header.offsetTop : 0;
-
-      if (window.pageYOffset > sticky) {
-        ud_header.classList.add("sticky");
-      } else {
-        ud_header.classList.remove("sticky");
-      }
-
-      // Logo Change on Sticky Header
-      // if (logo.length) {
-      //   const logoSrc = ud_header.classList.contains("sticky")
-      //     ? "assets/images/logo/logo.svg"
-      //     : "assets/images/logo/logo-white.svg";
-
-      //   document.querySelector(".header-logo").src = logoSrc;
-      // }
-
-      // Handle logo change for dark mode
-      // if (document.documentElement.classList.contains("dark")) {
-      //   if (logo.length && ud_header.classList.contains("sticky")) {
-      //     document.querySelector(".header-logo").src =
-      //       "assets/images/logo/logo-white.svg";
-      //   }
-      // }
-
-      // Show or hide the back-to-top button
-      const backToTop = document.querySelector(".back-to-top");
-      if (backToTop) {
-        if (window.scrollY > 50) {
-          backToTop.style.display = "flex";
-        } else {
-          backToTop.style.display = "none";
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    // ===== Navbar Toggle Behavior
-    const navbarToggler = document.querySelector("#navbarToggler");
-    const navbarCollapse = document.querySelector("#navbarCollapse");
-
-    const handleNavbarToggle = () => {
-      navbarToggler.classList.toggle("navbarTogglerActive");
-      navbarCollapse.classList.toggle("hidden");
-    };
-
-    if (navbarToggler) {
-      navbarToggler.addEventListener("click", handleNavbarToggle);
-    }
-
-    // Close Navbar on Link Click
-    const closeNavbarOnClick = () => {
-      navbarToggler.classList.remove("navbarTogglerActive");
-      navbarCollapse.classList.add("hidden");
-    };
-
-    const navbarLinks = document.querySelectorAll(
-      "#navbarCollapse ul li:not(.submenu-item) a",
-    );
-    navbarLinks.forEach((link) =>
-      link.addEventListener("click", closeNavbarOnClick),
-    );
-
-    // ===== Sub-menu Toggle
-    const submenuItems = document.querySelectorAll(".submenu-item");
-    submenuItems.forEach((el) => {
-      el.querySelector("a").addEventListener("click", () => {
-        el.querySelector(".submenu").classList.toggle("hidden");
-      });
-    });
-
-    // ===== FAQ Accordion
-    const faqs = document.querySelectorAll(".single-faq");
-    faqs.forEach((el) => {
-      el.querySelector(".faq-btn").addEventListener("click", () => {
-        el.querySelector(".icon").classList.toggle("rotate-180");
-        el.querySelector(".faq-content").classList.toggle("hidden");
-      });
-    });
-
-    // ===== wow.js for animations
-    // new WOW.WOW().init();
-
-    // ===== Scroll-to-Top Functionality
-    const scrollTo = (element, to = 0, duration = 500) => {
-      const start = element.scrollTop;
-      const change = to - start;
-      const increment = 20;
-      let currentTime = 0;
-
-      const animateScroll = () => {
-        currentTime += increment;
-        const val = Math.easeInOutQuad(currentTime, start, change, duration);
-        element.scrollTop = val;
-
-        if (currentTime < duration) {
-          setTimeout(animateScroll, increment);
-        }
-      };
-
-      animateScroll();
-    };
-
-    Math.easeInOutQuad = function (t, b, c, d) {
-      t /= d / 2;
-      if (t < 1) return (c / 2) * t * t + b;
-      t--;
-      return (-c / 2) * (t * (t - 2) - 1) + b;
-    };
-
-    const backToTopButton = document.querySelector(".back-to-top");
-    if (backToTopButton) {
-      backToTopButton.onclick = () => scrollTo(document.documentElement);
-    }
-
-    // ===== Theme Switcher
-    const themeSwitcher = document.getElementById("themeSwitcher");
-    const userTheme = localStorage.getItem("theme");
-    const systemTheme = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-
-    const themeCheck = () => {
-      if (userTheme === "dark" || (!userTheme && systemTheme)) {
-        document.documentElement.classList.add("dark");
-      }
-    };
-
-    const themeSwitch = () => {
-      if (document.documentElement.classList.contains("dark")) {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      } else {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      }
-    };
-
-    if (themeSwitcher) {
-      themeSwitcher.addEventListener("click", themeSwitch);
-    }
-
-    themeCheck();
-
-    // Cleanup on unmount
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (navbarToggler) {
-        navbarToggler.removeEventListener("click", handleNavbarToggle);
-      }
-      navbarLinks.forEach((link) =>
-        link.removeEventListener("click", closeNavbarOnClick),
-      );
-    };
-  };
 
   const handleOpenModal = (values) => {
     setSelectedOrder(values);
@@ -223,14 +59,20 @@ function OrderSearchPage() {
     );
   };
 
-  const fetchOrder = async () => {
-    try {
-      const response = await api.get("/customer/order/each-user");
-      setOrders(response.data);
-    } catch (err) {
-      console.log("Failed to fetch order", err);
-    }
-  };
+ const fetchOrder = async () => {
+   setLoading(true);
+   try {
+     const response = await api.get("/customer/order/each-user");
+     // Ensure that orders is always an array
+     setOrders(Array.isArray(response.data) ? response.data : []);
+   } catch (err) {
+     console.log("Failed to fetch order", err);
+     setOrders([]); // Set orders to an empty array if fetching fails
+   } finally {
+     setLoading(false);
+   }
+ };
+
 
   const generateTables = (orderDetails) => {
     return (
