@@ -2131,12 +2131,14 @@ body {
   opacity: 1;
 }
 
-.sticky .loginBtn {
+.sticky .loginBtn,
+.loginBtnLayout {
   --tw-text-opacity: 1;
   color: rgb(17 25 40 / var(--tw-text-opacity));
 }
 
-.sticky .loginBtn:hover {
+.sticky .loginBtn:hover,
+.loginBtnLayout:hover {
   --tw-text-opacity: 1;
   color: rgb(234 88 12 / var(--tw-text-opacity));
   opacity: 1;
@@ -2152,14 +2154,16 @@ body {
   color: rgb(234 88 12 / var(--tw-text-opacity));
 }
 
-.sticky .signUpBtn {
+.sticky .signUpBtn,
+.signUpBtnLayout {
   --tw-bg-opacity: 1;
   background-color: rgb(249 115 22 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.sticky .signUpBtn:hover {
+.sticky .signUpBtn:hover,
+.signUpBtnLayout:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(234 88 12 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
@@ -3285,6 +3289,5 @@ a.back-to-top:hover span {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity)) /* #9ca3af */;
 }
-
 
 /* Custom End */

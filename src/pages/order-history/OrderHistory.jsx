@@ -10,7 +10,6 @@ import {
   Rate,
   Steps,
 } from "antd";
-
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
@@ -23,6 +22,7 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
+
 function OrderHistoryPage() {
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,10 +32,11 @@ function OrderHistoryPage() {
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     handleDarkMode();
-    fetchOrder();
+    fetchOrder(1);
   }, []);
 
   const handleDarkMode = () => {
@@ -49,23 +50,6 @@ function OrderHistoryPage() {
         ud_header.classList.add("sticky");
       } else {
         ud_header.classList.remove("sticky");
-      }
-
-      // Logo Change on Sticky Header
-      if (logo.length) {
-        const logoSrc = ud_header.classList.contains("sticky")
-          ? "assets/images/logo/logo.svg"
-          : "assets/images/logo/logo-white.svg";
-
-        document.querySelector(".header-logo").src = logoSrc;
-      }
-
-      // Handle logo change for dark mode
-      if (document.documentElement.classList.contains("dark")) {
-        if (logo.length && ud_header.classList.contains("sticky")) {
-          document.querySelector(".header-logo").src =
-            "assets/images/logo/logo-white.svg";
-        }
       }
 
       // Show or hide the back-to-top button
@@ -214,13 +198,34 @@ function OrderHistoryPage() {
     setOpenModal(false);
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
+  const formatVND = (amount) => {
+    // Ensure amount is a valid number
+    if (typeof amount !== "number" || isNaN(amount)) {
+      return "0"; // or return a default value like "0" or "N/A"
+    }
+
+    // Convert the number to a string without decimals
+    const amountString = amount.toFixed(0);
+
+    // Check if the number is less than 1000
+    if (amountString.length <= 3) {
+      return amountString; // No need for dot or comma formatting
+    }
+
+    // Separate the number into the last three digits and the rest
+    const lastThree = amountString.slice(-3);
+    const beforeLastThree = amountString.slice(0, -3);
+
+    // Format the first part with commas every three digits
+    const formattedBeforeLastThree = beforeLastThree.replace(
+      /\B(?=(\d{3})+(?!\d))/g,
+      ",",
+    );
+
+    // Combine with a dot before the last three digits
+    const formattedVND = `${formattedBeforeLastThree}.${lastThree}`;
+
+    return formattedVND;
   };
 
   const formatDistance = (distance) => {
@@ -232,12 +237,20 @@ function OrderHistoryPage() {
     );
   };
 
-  const fetchOrder = async () => {
+  const fetchOrder = async (values) => {
+    console.log(values);
+    setLoading(true);
     try {
-      const response = await api.get("/customer/order/each-user");
-      setOrders(response.data);
+      const response = await api.get(
+        `/customer/order/orderHistory?page=${values}&size=5`,
+      );
+      console.log(response);
+      setTotalPages(response.data.totalPages);
+      setOrders(response.data.content);
     } catch (err) {
       console.log("Failed to fetch order", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -328,24 +341,10 @@ function OrderHistoryPage() {
   const handleFeedback = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("feedback", values);
+      const response = await api.post("feedBack", values);
       toast.success("Successfully send feedback");
     } catch (err) {
       toast.error(err.response.data || "Failed to send feedback");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePayment = async (values) => {
-    try {
-      setLoading(true);
-      const response = await api.post("/customer/payment", values);
-      console.log(response);
-      window.open(response.data);
-      toast.success("Successfully pay for order");
-    } catch (err) {
-      toast.error(err.response.data || "Failed to pay for order");
     } finally {
       setLoading(false);
     }
@@ -357,7 +356,7 @@ function OrderHistoryPage() {
     return (
       <>
         <div className="order my-8">
-          <div className="-mx-4 flex flex-wrap rounded-sm p-6 shadow-pricing">
+          <div className="-mx-4 flex flex-wrap rounded-xl p-6 shadow-pricing">
             <div className="mx-auto w-full px-4 md:px-5 lg:px-5">
               <div className="inline-flex w-full flex-col items-start justify-start gap-4">
                 <div className="flex w-full flex-row items-center justify-between gap-4">
@@ -373,25 +372,8 @@ function OrderHistoryPage() {
                     </span>
                   </div>
                   <div className="flex w-full flex-col items-end justify-between md:w-1/2">
-                    {(order?.orderStatus === "PAID" ||
-                      order?.orderStatus === "DELIVERED") && (
+                    {order?.orderStatus === "DELIVERED" && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
-                        {order?.orderStatus}
-                      </p>
-                    )}
-                    {(order?.orderStatus === "PENDING" ||
-                      order?.orderStatus === "SHIPPING") && (
-                      <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
-                        {order?.orderStatus}
-                      </p>
-                    )}
-                    {order?.orderStatus === "REJECTED" && (
-                      <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
-                        {order?.orderStatus}
-                      </p>
-                    )}
-                    {order?.orderStatus === "AWAITING_PAYMENT" && (
-                      <p className="mb-3 whitespace-nowrap rounded-full bg-yellow-50 px-3 py-0.5 text-sm font-medium leading-6 text-yellow-600 lg:mt-3">
                         {order?.orderStatus}
                       </p>
                     )}
@@ -503,28 +485,12 @@ function OrderHistoryPage() {
                       <Form.Item
                         label={
                           <span className="dark:text-white">
-                            Payment Method
-                          </span>
-                        }
-                        initialValue={order?.paymentMethod}
-                        name="paymentMethod"
-                        className="mb-1 w-full md:w-1/2 md:pl-4"
-                      >
-                        <Input
-                          readOnly
-                          placeholder="Payment Method"
-                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        label={
-                          <span className="dark:text-white">
                             Total Distance (Km)
                           </span>
                         }
                         initialValue={formatDistance(order?.totalDistance)}
                         name="totalDistance"
-                        className="mb-1 w-full md:w-1/2 md:pr-4"
+                        className="mb-1 w-full md:w-1/2 md:pl-4"
                       >
                         <Input
                           readOnly
@@ -649,35 +615,38 @@ function OrderHistoryPage() {
                       </h2>
                       <div className="flex w-full flex-col items-start justify-start gap-5 border-b border-gray-200 pb-5">
                         <div className="flex w-full flex-col items-center justify-start gap-4 md:flex-row lg:gap-8">
-                          <div className="flex items-center justify-start md:w-2/12 md:flex-row lg:gap-5">
+                          <div className="flex h-[170px] w-[170px] items-center justify-start md:w-2/12 md:flex-row lg:gap-5">
                             <img
-                              className="h-[140px] w-[140px] rounded-md object-cover"
+                              className="rounded-md object-cover"
                               src="./assets/images/order-list/box.jpg"
                               alt="Boxes"
                             />
                           </div>
                           <div className="flex w-full md:w-10/12">
                             <div className="flex w-full flex-col items-start justify-center gap-3 sm:w-1/2">
-                              <h4 className="text-center text-xl font-medium leading-8 text-dark dark:text-white">
+                              <h4 className="text-nowrap text-center text-xl font-medium leading-8 text-dark dark:text-white">
                                 Number of boxes
                               </h4>
-                              <div className="flex flex-col items-center justify-start gap-0.5 md:items-start">
+                              <div className="flex flex-col items-start justify-start gap-0.5 md:items-start">
                                 {/* Accumulate box quantities */}
                                 {(() => {
-                                  const boxSummary = order.orderDetails.reduce(
+                                  const boxSummary = order?.orderDetails.reduce(
                                     (acc, detail) => {
-                                      detail.boxDetails.forEach((boxDetail) => {
-                                        const boxType = boxDetail.box?.type;
-                                        if (!acc[boxType]) {
-                                          acc[boxType] = {
-                                            type: boxType,
-                                            quantity: 0,
-                                            price: boxDetail.box?.price || 0,
-                                          };
-                                        }
-                                        acc[boxType].quantity +=
-                                          boxDetail.quantity;
-                                      });
+                                      detail?.boxDetails.forEach(
+                                        (boxDetail) => {
+                                          const boxType = boxDetail?.boxes.type;
+                                          if (!acc[boxType]) {
+                                            acc[boxType] = {
+                                              type: boxType,
+                                              quantity: 0,
+                                              price:
+                                                boxDetail?.boxes.price || 0,
+                                            };
+                                          }
+                                          acc[boxType].quantity +=
+                                            boxDetail.quantity;
+                                        },
+                                      );
                                       return acc;
                                     },
                                     {},
@@ -693,19 +662,24 @@ function OrderHistoryPage() {
                                     ),
                                   );
                                 })()}
+                                <div>
+                                  <h6 className="whitespace-nowrap text-base font-normal leading-relaxed text-dark dark:text-white">
+                                    Total box: {order?.totalBox}
+                                  </h6>
+                                </div>
                               </div>
                             </div>
                             <div className="flex w-full flex-col items-end justify-center pt-10 sm:w-1/2">
                               {(() => {
-                                const boxSummary = order.orderDetails.reduce(
+                                const boxSummary = order?.orderDetails.reduce(
                                   (acc, detail) => {
                                     detail.boxDetails.forEach((boxDetail) => {
-                                      const boxType = boxDetail.box?.type;
+                                      const boxType = boxDetail?.boxes.type;
                                       if (!acc[boxType]) {
                                         acc[boxType] = {
                                           type: boxType,
                                           quantity: 0,
-                                          price: boxDetail.box?.price || 0,
+                                          price: boxDetail?.boxes.price || 0,
                                         };
                                       }
                                       acc[boxType].quantity +=
@@ -720,18 +694,25 @@ function OrderHistoryPage() {
                                   (box, idx) => (
                                     <div
                                       key={idx}
-                                      className="flex w-full max-w-[200px] justify-between text-wrap"
+                                      className="flex w-full max-w-[300px] justify-between text-wrap"
                                     >
-                                      <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                        ${box.price} x {box.quantity}
+                                      <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8">
+                                        {formatVND(box.price)} x {box.quantity}
                                       </h4>
-                                      <h4 className="text-xl font-semibold leading-8 text-dark dark:text-white">
-                                        ${box.price * box.quantity}
+                                      <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8">
+                                        {formatVND(box.price * box.quantity)}{" "}
+                                        VND
                                       </h4>
                                     </div>
                                   ),
                                 );
                               })()}
+                              <div className="flex w-full max-w-[300px] justify-between text-wrap">
+                                <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8"></h4>
+                                <h4 className="text-md text-nowrap font-semibold leading-6 text-dark dark:text-white md:text-xl md:leading-8">
+                                  {formatVND(order?.totalBoxPrice)} VND
+                                </h4>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -741,11 +722,18 @@ function OrderHistoryPage() {
                         <div className="flex w-full flex-col items-start justify-start gap-4 pb-1.5">
                           <div className="inline-flex w-full items-start justify-between gap-6">
                             <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
-                              Delivery fee (0.42 USD per km for Fast Delivery /
-                              0.22 USD per km for Normal Delivery)
+                              Delivery fee
                             </h6>
-                            <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                              ???
+                            <h6 className="text-nowrap text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              {formatVND(order?.distancePrice)} VND
+                            </h6>
+                          </div>
+                          <div className="inline-flex w-full items-start justify-between gap-6">
+                            <h6 className="text-base font-normal leading-relaxed text-dark dark:text-white">
+                              Discount price (5% of wholesale order)
+                            </h6>
+                            <h6 className="text-nowrap text-right text-base font-medium leading-relaxed text-dark dark:text-white">
+                              -{formatVND(order?.discountPrice)} VND
                             </h6>
                           </div>
                         </div>
@@ -754,13 +742,13 @@ function OrderHistoryPage() {
                             Total
                           </h5>
                           <h5 className="text-right text-lg font-semibold leading-relaxed text-dark dark:text-white">
-                            {formatPrice(order?.totalPrice)}
+                            {formatVND(order?.totalPrice)} VND
                           </h5>
                         </div>
                       </div>
                     </div>
                     <div className="flex w-full flex-row items-end justify-end gap-1.5">
-                      {order?.orderStatus === "DELIVERED" && (
+                      {order.orderStatus === "AWAITING_PAYMENT" && (
                         <div className="">
                           <Modal
                             title="Feedback"
@@ -770,6 +758,7 @@ function OrderHistoryPage() {
                             onCancel={handleCloseModal}
                           >
                             <Form
+                              form={form}
                               labelCol={{ span: 24 }}
                               onFinish={handleFeedback}
                             >
@@ -788,7 +777,7 @@ function OrderHistoryPage() {
                                 label="Rating Score"
                                 name="ratingScore"
                               >
-                                <Rate></Rate>
+                                <Rate />
                               </Form.Item>
                               <Form.Item label="Comment" name="comment">
                                 <Input.TextArea />
@@ -800,24 +789,6 @@ function OrderHistoryPage() {
                           </Button>
                         </div>
                       )}
-                      {order?.orderStatus === "AWAITING_PAYMENT" && (
-                        <Button
-                          onClick={() => handlePayment(order?.id)}
-                          loading={loading}
-                        >
-                          Payment
-                        </Button>
-                      )}
-                    </div>
-                    <div className="flex w-full flex-col items-start justify-start gap-1.5">
-                      <h6 className="text-right text-base font-medium leading-relaxed text-dark dark:text-white">
-                        Order Note:
-                      </h6>
-                      <p className="text-sm font-normal leading-normal text-dark dark:text-dark-6">
-                        Make sure to ship all the ordered items together by
-                        Friday. I`ve emailed you the details, so please check it
-                        an review it. Thank You!
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -996,6 +967,18 @@ function OrderHistoryPage() {
                           >
                             Order List Page
                           </Link>
+                          <Link
+                            to="/order-history"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order History Page
+                          </Link>
+                          <Link
+                            to="/order-search"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order Search Page
+                          </Link>
                         </div>
                       )}
                     </li>
@@ -1163,17 +1146,32 @@ function OrderHistoryPage() {
         className="relative bg-white pb-12 pt-20 dark:bg-dark lg:pb-[90px] lg:pt-[120px]"
       >
         <div className="container mx-auto">
-          <div className="-mx-4 flex flex-wrap">
+          <div className="mx-2 flex flex-wrap">
             <div className="w-full px-4">
               {/*  */}
               <div className="order-list">
-                {orders.map((order) => (
-                  <Order key={order.id} order={order} />
-                ))}
+                {loading ? (
+                  <div className="flex justify-center">
+                    <LoadingOutlined
+                      style={{
+                        fontSize: "10vw",
+                        textAlign: "center",
+                        color: "#F97316",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  orders.map((order) => <Order key={order.id} order={order} />)
+                )}
               </div>
               {/*  */}
               <div className="flex justify-end">
-                <Pagination defaultCurrent={1} total={50} />
+                <Pagination
+                  initialValue={1}
+                  defaultCurrent={1}
+                  total={totalPages * 5}
+                  onChange={fetchOrder}
+                />
               </div>
             </div>
           </div>
