@@ -254,89 +254,89 @@ function OrderHistoryPage() {
     }
   };
 
-  const generateTables = (orderDetails) => {
-    return (
-      <div className="overflow-x-auto">
-        <table className="table-container w-full overflow-hidden text-nowrap rounded-xl text-center text-sm shadow-pricing">
-          <thead className="bg-gray-200 dark:bg-slate-800">
-            <tr>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Fish ID
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Farm Name
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Farm Address
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Fish Species
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Number of Fish
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Size of Fish (cm)
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Total Box
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Total Volume (L)
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Price ($)
-                </span>
-              </th>
-              <th className="px-3 py-2">
-                <span className="block py-3 text-base font-medium text-dark dark:text-white">
-                  Health Status
-                </span>
-              </th>
+const generateTables = (orderDetails) => {
+  return (
+    <div className="overflow-x-auto md:overflow-x-visible">
+      <table className="container w-full table-auto overflow-hidden text-nowrap rounded-xl text-center shadow-pricing">
+        <thead className="bg-gray-200 dark:bg-slate-600">
+          <tr>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Fish ID
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Farm Name
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Farm Address
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Fish Species
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Number of Fish
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Size of Fish (cm)
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Total Box
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Total Volume (L)
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Price ($)
+              </span>
+            </th>
+            <th className="px-3 py-1">
+              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                Health Status
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody className="text-base text-dark dark:text-white">
+          {orderDetails.map((detail, index) => (
+            <tr
+              key={index}
+              className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
+            >
+              <td className="font-small whitespace-nowrap px-2 py-1">
+                {detail.id}
+              </td>
+              <td className="text-wrap px-2 py-1">{detail.nameFarm}</td>
+              <td className="text-wrap px-2 py-1">{detail.farmAddress}</td>
+              <td className="px-2 py-1">{detail.fishSpecies}</td>
+              <td className="px-2 py-1">{detail.numberOfFish}</td>
+              <td className="px-2 py-1">{detail.sizeOfFish}</td>
+              <td className="px-2 py-1">{detail.totalBox}</td>
+              <td className="px-2 py-1">{detail.totalVolume}</td>
+              <td className="px-6 py-1">{detail.priceOfFish}</td>
+              <td className="px-2 py-1">{detail.healthFishStatus}</td>
             </tr>
-          </thead>
-          <tbody className="text-base text-dark dark:text-white">
-            {orderDetails.map((detail, index) => (
-              <tr
-                key={index}
-                className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
-              >
-                <td className="whitespace-nowrap px-6 py-2 font-medium">
-                  {detail.id}
-                </td>
-                <td className="text-wrap px-6 py-2">{detail.nameFarm}</td>
-                <td className="text-wrap px-6 py-2">{detail.farmAddress}</td>
-                <td className="px-6 py-2">{detail.fishSpecies}</td>
-                <td className="px-6 py-2">{detail.numberOfFish}</td>
-                <td className="px-6 py-2">{detail.sizeOfFish}</td>
-                <td className="px-6 py-2">{detail.totalBox}</td>
-                <td className="px-6 py-2">{detail.totalVolume}</td>
-                <td className="px-6 py-2">{detail.priceOfFish}</td>
-                <td className="px-6 py-2">{detail.healthFishStatus}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
   const handleFeedback = async (values) => {
     try {
