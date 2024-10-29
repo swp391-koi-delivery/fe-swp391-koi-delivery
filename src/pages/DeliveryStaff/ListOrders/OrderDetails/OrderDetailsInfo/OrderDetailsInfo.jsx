@@ -379,7 +379,7 @@ const OrderDetailsInfo = () => {
                             <span className="mr-2">Box ID: {box.id}</span>
                           </Link>
                           <span className="ml-auto text-white">
-                            Type: {box.type}
+                            Type: {box.box.type}
                           </span>
                         </div>
                       ))}

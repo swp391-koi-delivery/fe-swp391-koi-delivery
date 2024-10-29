@@ -41,8 +41,13 @@ function CRUDTemplate({ columns, formItems, path , path2}) {
       dataIndex: "id",
       key: "id",
       align: "left",
-      render: (id, record) => (
+      render: (id, record) => {
+        if (record.available === false) {
+          return null; // Không hiển thị nút khi trạng thái là 'Inactive'
+        }
+        return(
         <>
+
           {/* <Button
             icon={<EditTwoTone/>}
             onClick={() => {
@@ -58,7 +63,8 @@ function CRUDTemplate({ columns, formItems, path , path2}) {
             <Button icon={<DeleteOutlined/>} danger/>
           </Popconfirm>
         </>
-      ),
+        );
+      },
     },
   ];
   const fetchData = async () => {

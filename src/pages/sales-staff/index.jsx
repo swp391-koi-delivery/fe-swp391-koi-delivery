@@ -128,12 +128,18 @@ const OrderList = () => {
     setDeletingOrderId(null); // Reset delete state after action
   };
 
+  // const formatPrice = (price) => {
+  //   return new Intl.NumberFormat("en-US", {
+  //     style: "currency",
+  //     currency: "USD",
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   }).format(price);
+  // };
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-VN", {
       style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      currency: "VND",
     }).format(price);
   };
   const getPaymentMethodIcon = (method) => {
@@ -206,7 +212,7 @@ const OrderList = () => {
               style={{ height: "4px" }}
             />
             <div className="mt-1 text-xs text-gray-600">
-              Price Range: ${priceRange[0]} - ${priceRange[1]}
+              Price Range: {priceRange[0]} - {priceRange[1]}
             </div>
           </div>
         </div>
@@ -266,15 +272,15 @@ const OrderList = () => {
                           onChange={handleOrderStatusChange}
                           className="w-32"
                         >
-                          <Option value="PENDING">PENDING</Option>
+                          {/* <Option value="PENDING">PENDING</Option> */}
                           <Option value="ACCEPTED">ACCEPTED</Option>
                           <Option value="REJECTED">REJECTED</Option>
-                          <Option value=" CANCELED"> CANCELED</Option>
+                          {/* <Option value=" CANCELED"> CANCELED</Option> */}
                           {/* <Option value="AWAITING_RESPONSE">AWAITING_RESPONSE</Option> */}
                           {/* <Option value="AWAITING_PAYMENT">AWAITING PAYMENT</Option> */}
-                          <Option value="PAID">PAID</Option>
-                          <Option value="SHIPPING">SHIPPING</Option>
-                          <Option value="DELIVERED">DELIVERED</Option>
+                          {/* <Option value="PAID">PAID</Option> */}
+                          {/* <Option value="SHIPPING">SHIPPING</Option> */}
+                          {/* <Option value="DELIVERED">DELIVERED</Option>  */}
                         </Select>
                       ) : (
                         <>

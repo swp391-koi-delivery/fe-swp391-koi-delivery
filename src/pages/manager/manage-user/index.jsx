@@ -12,6 +12,7 @@ import {
   Upload,
   Image,
   Tag,
+  Input,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import Search from "antd/es/transfer/search";
@@ -510,11 +511,11 @@ function ManageUser() {
             rules={[
               {
                 required: true,
-                message: "Please imput username!",
+                message: "Please imput password!",
               },
             ]}
           >
-            <AntInput />
+            <Input.Password />
           </Form.Item>
           <Form.Item
             name="fullname"

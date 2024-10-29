@@ -66,12 +66,18 @@ function OrderDetailsInfoStaff() {
       );
     }
   
+    // const formatPrice = (price) => {
+    //   return new Intl.NumberFormat("en-US", {
+    //     style: "currency",
+    //     currency: "USD",
+    //     minimumFractionDigits: 2,
+    //     maximumFractionDigits: 2,
+    //   }).format(price);
+    // };
     const formatPrice = (price) => {
-      return new Intl.NumberFormat("en-US", {
+      return new Intl.NumberFormat("en-VN", {
         style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+        currency: "VND",
       }).format(price);
     };
     const inputVariants = {

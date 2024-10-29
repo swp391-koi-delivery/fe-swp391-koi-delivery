@@ -24,7 +24,7 @@ const FeedbackForm = ({id}) => {
         replies: feedback.replies.map(reply => ({
           id: reply.id,
           staffName: reply.repliedBy,
-          // date: reply.replyDate.split("T")[0], // Extract date
+          date: reply.replyDate.split("T")[0], // Extract date
           content: reply.replyContent,
         })),
       }));

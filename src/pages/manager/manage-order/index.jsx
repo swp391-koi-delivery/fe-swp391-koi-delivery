@@ -97,12 +97,18 @@ function ManageOrder() {
     setNewOrderStatus(value);
   };
 
+  // const formatPrice = (price) => {
+  //   return new Intl.NumberFormat("en-US", {
+  //     style: "currency",
+  //     currency: "USD",
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   }).format(price);
+  // };
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-VN", {
       style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      currency: "VND",
     }).format(price);
   };
   const toggleContent = (orderId) => {
@@ -223,7 +229,7 @@ function ManageOrder() {
                       To: {order.destinationLocation}
                     </p>
                     <p className="mt-1 text-sm text-gray-800">
-                      Total Price: ${formatPrice(order.totalPrice)}
+                      Total Price: {formatPrice(order.totalPrice)}
                     </p>
                   </div>
 
