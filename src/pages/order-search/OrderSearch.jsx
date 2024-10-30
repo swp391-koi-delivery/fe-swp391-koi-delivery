@@ -74,7 +74,7 @@ function OrderSearchPage() {
  };
 
 
-  const generateTables = (orderDetails) => {
+  const generateTable = (orderDetails) => {
     return (
       <div className="overflow-x-auto md:overflow-x-visible">
         <table className="container w-full table-auto overflow-hidden text-nowrap rounded-xl text-center shadow-pricing">

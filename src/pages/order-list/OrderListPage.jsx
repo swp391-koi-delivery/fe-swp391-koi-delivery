@@ -1,20 +1,10 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import {
-  Alert,
-  Button,
-  Form,
-  Input,
-  Modal,
-  Pagination,
-  Rate,
-  Steps,
-} from "antd";
+import { Button, Form, Input, Pagination, Steps } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
-import { useForm } from "antd/es/form/Form";
 import { toast } from "react-toastify";
 import {
   CheckCircleOutlined,
@@ -30,11 +20,7 @@ function OrderListPage() {
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
-
-  useEffect(() => {
-    handleDarkMode();
-    fetchOrder(1);
-  }, []);
+  const { Step } = Steps;
 
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
@@ -225,24 +211,21 @@ function OrderListPage() {
     );
   };
 
-  const fetchOrder = async (values) => {
-    console.log(values);
-    setLoading(true);
+  const handlePayment = async (values) => {
     try {
-      const response = await api.get(
-        `/customer/order/each-user?page=${values}&size=5`,
-      );
+      setLoading(true);
+      const response = await api.post(`customer/orderPaymentUrl/${values}`);
       console.log(response);
-      setTotalPages(response.data.totalPages);
-      setOrders(response.data.content);
+      window.open(response.data);
+      toast.success("Successfully pay for order");
     } catch (err) {
-      console.log("Failed to fetch order", err);
+      toast.error(err.response.data || "Failed to pay for order");
     } finally {
       setLoading(false);
     }
   };
 
-  const generateTables = (orderDetails) => {
+  const generateTable = (orderDetails) => {
     return (
       <div className="overflow-x-auto md:overflow-x-visible">
         <table className="container w-full table-auto overflow-hidden text-nowrap rounded-xl text-center shadow-pricing">
@@ -325,22 +308,35 @@ function OrderListPage() {
       </div>
     );
   };
-  
-  const handlePayment = async (values) => {
+
+  const fetchOrder = async (page) => {
+    console.log(page);
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await api.post(`customer/orderPaymentUrl/${values}`);
+      const response = await api.get(
+        `/customer/order/each-user?page=${page}&size=5`,
+      );
       console.log(response);
-      window.open(response.data);
-      toast.success("Successfully pay for order");
+      setTotalPages(response.data.totalElements);
+      setOrders(response.data.content);
     } catch (err) {
-      toast.error(err.response.data || "Failed to pay for order");
+      console.log("Failed to fetch order", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const { Step } = Steps;
+  const handlePageChange = (page) => {
+    localStorage.setItem("currentPage", page);
+    fetchOrder(page);
+  };
+
+  useEffect(() => {
+    handleDarkMode();
+
+    const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
+    fetchOrder(savedPage);
+  }, []);
 
   const Order = ({ order }) => {
     return (
@@ -362,7 +358,8 @@ function OrderListPage() {
                     </span>
                   </div>
                   <div className="flex w-full flex-col items-end justify-between md:w-1/2">
-                    {(order?.orderStatus === "PAID" || order?.orderStatus === "DELIVERED") && (
+                    {(order?.orderStatus === "PAID" ||
+                      order?.orderStatus === "DELIVERED") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
                         {order?.orderStatus}
                       </p>
@@ -613,7 +610,7 @@ function OrderListPage() {
                         Order Details
                       </h2>
                       <div className="table-list flex w-full flex-wrap items-center justify-center">
-                        {generateTables(order?.orderDetails)}
+                        {generateTable(order?.orderDetails)}
                       </div>
                       <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
                         Order Price
@@ -637,18 +634,21 @@ function OrderListPage() {
                                 {(() => {
                                   const boxSummary = order?.orderDetails.reduce(
                                     (acc, detail) => {
-                                      detail?.boxDetails.forEach((boxDetail) => {
-                                        const boxType = boxDetail?.boxes.type;
-                                        if (!acc[boxType]) {
-                                          acc[boxType] = {
-                                            type: boxType,
-                                            quantity: 0,
-                                            price: boxDetail?.boxes.price || 0,
-                                          };
-                                        }
-                                        acc[boxType].quantity +=
-                                          boxDetail.quantity;
-                                      });
+                                      detail?.boxDetails.forEach(
+                                        (boxDetail) => {
+                                          const boxType = boxDetail?.boxes.type;
+                                          if (!acc[boxType]) {
+                                            acc[boxType] = {
+                                              type: boxType,
+                                              quantity: 0,
+                                              price:
+                                                boxDetail?.boxes.price || 0,
+                                            };
+                                          }
+                                          acc[boxType].quantity +=
+                                            boxDetail.quantity;
+                                        },
+                                      );
                                       return acc;
                                     },
                                     {},
@@ -1033,7 +1033,7 @@ function OrderListPage() {
                         <a className="submenu-item group relative">
                           <div className="pl-6">
                             <img
-                              className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
+                              className="relative inline-block h-11 w-11 rounded-full"
                               src={
                                 user?.image ||
                                 "assets/images/navbar/default-avatar.jpg"
@@ -1136,10 +1136,15 @@ function OrderListPage() {
               {/*  */}
               <div className="flex justify-end">
                 <Pagination
-                  initialValue={1}
-                  defaultCurrent={1}
-                  total={totalPages * 5}
-                  onChange={fetchOrder}
+                  initialValue={
+                    parseInt(localStorage.getItem("currentPage")) || 1
+                  }
+                  defaultCurrent={
+                    parseInt(localStorage.getItem("currentPage")) || 1
+                  }
+                  total={totalPages}
+                  defaultPageSize={5}
+                  onChange={handlePageChange}
                 />
               </div>
             </div>
