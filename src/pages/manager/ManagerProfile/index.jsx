@@ -27,18 +27,18 @@ const ManageProfile = () => {
 
   const handleUpdateProfile = async (values) => {
     if (fileList.length > 0) {
-        const file = fileList[0];
-        const url = await uploadFile(file.originFileObj); // Gọi hàm upload file
-        //console.log(url);
-        values.image = url; // Cập nhật URL ảnh vào đối tượng người dùng
-      }
+      const file = fileList[0];
+      const url = await uploadFile(file.originFileObj); // Gọi hàm upload file
+      //console.log(url);
+      values.image = url; // Cập nhật URL ảnh vào đối tượng người dùng
+    }
     try {
       await api.put(`user/${profileData.id}`, values);
       toast.success("Profile updated successfully!");
       setProfileData((prev) => ({ ...prev, ...values }));
       setIsModalOpen(false);
     } catch (error) {
-      console.error("Error updating profile:", error);
+      //console.error("Error updating profile:", error);
       toast.error("Failed to update profile.");
     }
   };
@@ -95,57 +95,71 @@ const ManageProfile = () => {
       currency: "VND",
     }).format(price);
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-8">
-      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="mx-auto max-w-3xl overflow-hidden rounded-xl bg-white shadow-lg">
         <div className="p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Profile Information</h2>
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Profile Information
+            </h2>
           </div>
 
           <div className="mb-6 text-center">
             <div className="relative inline-block">
               <img
-                src={profileData.image || "https://via.placeholder.com/150"}
-                alt="Profile"
-                className="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
+                src={profileData.image || "../public/assets/images/vodanh.jpg"}
+                alt=""
+                className="h-32 w-32 rounded-full border-4 border-blue-100 object-cover"
               />
-              <div className="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full">
+              <div className="absolute bottom-0 right-0 rounded-full bg-blue-500 p-2">
                 <FaLock className="text-white" />
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="rounded-lg bg-gray-50 p-4">
               <p className="text-sm font-medium text-gray-500">Username</p>
-              <p className="text-lg font-semibold text-gray-900">{profileData.username}</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData.username}
+              </p>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="rounded-lg bg-gray-50 p-4">
               <p className="text-sm font-medium text-gray-500">Full Name</p>
-              <p className="text-lg font-semibold text-gray-900">{profileData.fullname}</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData.fullname}
+              </p>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="rounded-lg bg-gray-50 p-4">
               <p className="text-sm font-medium text-gray-500">Email</p>
-              <p className="text-lg font-semibold text-gray-900">{profileData.email}</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData.email}
+              </p>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="rounded-lg bg-gray-50 p-4">
               <p className="text-sm font-medium text-gray-500">Phone Number</p>
-              <p className="text-lg font-semibold text-gray-900">{profileData.phone}</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData.phone}
+              </p>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg md:col-span-2">
+            <div className="rounded-lg bg-gray-50 p-4 md:col-span-2">
               <p className="text-sm font-medium text-gray-500">Address</p>
-              <p className="text-lg font-semibold text-gray-900">{profileData.address}</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData.address}
+              </p>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="rounded-lg bg-gray-50 p-4">
               <p className="text-sm font-medium text-gray-500">Balance</p>
-              <p className="text-lg font-semibold text-gray-900">{formatPrice(profileData.balance)}</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {formatPrice(profileData.balance)}
+              </p>
             </div>
 
             {/* <div className="p-4 bg-gray-50 rounded-lg">
@@ -161,14 +175,16 @@ const ManageProfile = () => {
               <p className="text-lg font-semibold text-gray-900">{profileData.loyaltyPoint} pts</p>
             </div> */}
 
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm font-medium text-gray-500">Account Status</p>
+            <div className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-medium text-gray-500">
+                Account Status
+              </p>
               <p className="text-lg font-semibold text-gray-900">
                 {profileData.deleted ? "Inactive" : "Active"}
               </p>
             </div>
           </div>
-          <div className="text-center mt-8">
+          <div className="mt-8 text-center">
             <Button type="primary" onClick={openModal}>
               Update Profile
             </Button>
@@ -186,77 +202,101 @@ const ManageProfile = () => {
               onFinish={handleUpdateProfile}
               initialValues={profileData}
             >
-              <Form.Item label="Username" name="username" rules={[
-              {
-                required: true,
-                message: "Please imput username!",
-              },
-              {
-                min: 6,
-                message: "Username must be at least 6 characters",
-              },
-            ]}>
+              <Form.Item
+                label="Username"
+                name="username"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please imput username!",
+                  },
+                  {
+                    min: 6,
+                    message: "Username must be at least 6 characters",
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
-              <Form.Item label="Password" name="password" rules={[
-              {
-                required: true,
-                message: "Please imput password!",
-              },
-            ]}>
-              <Input.Password/>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please imput password!",
+                  },
+                ]}
+              >
+                <Input.Password />
               </Form.Item>
-              <Form.Item label="Full Name" name="fullname" rules={[
-              {
-                required: true,
-                message: "Please imput fullname!",
-              },
-            ]}>
+              <Form.Item
+                label="Full Name"
+                name="fullname"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please imput fullname!",
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
-              <Form.Item label="Email" name="email" rules={[
-              {
-                required: true,
-                message: "Please input email!",
-              },
-              {
-                type: "email",
-                message: "Invalid email's format!",
-              },
-            ]}>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input email!",
+                  },
+                  {
+                    type: "email",
+                    message: "Invalid email's format!",
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
-              <Form.Item label="Phone" name="phone" rules={[
-              {
-                required: true,
-                message: "Please input phone number!",
-              },
-              {
-                pattern: "^0[0-9]{9}$",
-                message: "Invalid format!(0*********)",
-              },
-            ]}>
+              <Form.Item
+                label="Phone"
+                name="phone"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input phone number!",
+                  },
+                  {
+                    pattern: "^0[0-9]{9}$",
+                    message: "Invalid format!(0*********)",
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
-              <Form.Item label="Address" name="address" rules={[
-              {
-                required: true,
-                message: "Please input address!",
-              },
-            ]}>
+              <Form.Item
+                label="Address"
+                name="address"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input address!",
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
               <Form.Item label="image" name="image">
-            <Upload
-              action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={handlePreview}
-              onChange={handleChange}
-            >
-              {fileList.length >= 8 ? null : uploadButton}
-            </Upload>
-          </Form.Item>
+                <Upload
+                  action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                  listType="picture-card"
+                  fileList={fileList}
+                  onPreview={handlePreview}
+                  onChange={handleChange}
+                >
+                  {fileList.length >= 8 ? null : uploadButton}
+                </Upload>
+              </Form.Item>
             </Form>
           </Modal>
         </div>

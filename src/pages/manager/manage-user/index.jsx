@@ -208,11 +208,11 @@ function ManageUser() {
       align: "left",
     },
     {
-      title: <span className="custom-table-header">Image</span>,
+      title: <span className="custom-table-header w-20 h-20">Image</span>,
       dataIndex: "image",
       key: "image",
       render: (image) => {
-        return <img src={image} alt="" width={130} height={150} />;
+        return <img src={image || "../public/assets/images/vodanh.jpg"} alt="" width={100} height={140} />;
       },
     },
     {

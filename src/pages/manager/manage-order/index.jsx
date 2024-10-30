@@ -24,19 +24,31 @@ function ManageOrder() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingOrderId, setEditingOrderId] = useState(null);
+  const [totalElement, setTotalElement] = useState(0);
   const [newOrderStatus, setNewOrderStatus] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null); // Tạo state để lưu ID của order đang được mở
   const ordersPerPage = 3;
 
   const fetchOrders = async () => {
     try {
-      const response = await api.get("order/allOrder?page=1&size=1000000000");
+      const response = await api.get(
+        `order/allOrder?page=${currentPage}&size=${ordersPerPage}`,
+      );
       const fetchedOrders = response.data;
-      setOrders(fetchedOrders);
-      setFilteredOrders(fetchedOrders);
+      console.log(response.data);
+      // console.log(fetchedOrders.totalElements);
+        
+      setOrders(response.data.content);
+      setFilteredOrders(response.data.content);
+      setTotalElement(response.data.totalElements)
+      // console.log(filteredOrders.totalElements);
       setPriceRange([
         0,
-        Math.max(...fetchedOrders.map((order) => order.totalPrice)),
+        // Math.max(...fetchedOrders.map((order) => order.totalPrice)),
+        Math.max(
+          Array.isArray(filteredOrders) &&
+            filteredOrders.map((order) => order.totalPrice),
+        ),
       ]);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -47,10 +59,7 @@ function ManageOrder() {
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
+ 
   useEffect(() => {
     const filtered = orders.filter((order) => {
       const orderId = String(order.id);
@@ -61,8 +70,8 @@ function ManageOrder() {
       );
     });
     setFilteredOrders(filtered);
-    setCurrentPage(1);
-  }, [searchTerm, priceRange, orders]);
+    fetchOrders();
+  }, [searchTerm, priceRange, orders,currentPage, ordersPerPage]);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -159,9 +168,9 @@ function ManageOrder() {
     }
   };
 
-  const startIndex = (currentPage - 1) * ordersPerPage;
-  const endIndex = startIndex + ordersPerPage;
-  const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * ordersPerPage;
+  // const endIndex = startIndex + ordersPerPage;
+  // const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-4">
@@ -195,78 +204,93 @@ function ManageOrder() {
           </div>
         </div>
 
-        {paginatedOrders.length === 0 ? (
+        {totalElement === 0 ? (
           <div className="mt-4 text-center text-sm text-gray-500">
             No orders found matching your criteria.
           </div>
         ) : (
           <div className="space-y-3">
-            {paginatedOrders.map((order) => (
-              <div
-                key={order.id}
-                className="hover:scale-102 rounded-md bg-gray-100 p-3 shadow-md transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 hover:shadow-xl"
-              >
-                <div className="flex flex-col items-start justify-between space-y-1 md:flex-row md:items-center md:space-y-0">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      Order ID: {order.id}
-                    </h2>
-                    <hr className="my-2 border-black" />
-                    {order.eachUserResponse && (
-                      <>
-                        <p className="mt-1 text-sm text-gray-800">
-                          Customer Name: {order.eachUserResponse.fullname}
-                        </p>
-                        <p className="mt-1 text-sm text-gray-800">
-                          Customer Phone: {order.eachUserResponse.phone}
-                        </p>
-                      </>
-                    )}
-                    <p className="mt-1 text-sm text-gray-800">
-                      From: {order.originLocation}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-800">
-                      To: {order.destinationLocation}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-800">
-                      Total Price: {formatPrice(order.totalPrice)}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1">
-                      {getPaymentMethodIcon(order.paymentMethod)}
-                      <span className="text-xs font-bold text-gray-700">
-                        {order.paymentMethod}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      {editingOrderId === order.id ? (
-                        <Select
-                          defaultValue={order.orderStatus}
-                          onChange={handleOrderStatusChange}
-                          className="w-32"
-                        >
-                          <Option value="PENDING">PENDING</Option>
-                          <Option value="ACCEPTED">ACCEPTED</Option>
-                          <Option value="REJECTED">REJECTED</Option>
-                          <Option value="CANCEL">CANCEL</Option>
-                          {/* <Option value="AWAITING_RESPONSE">AWAITING_RESPONSE</Option> */}
-                          {/* <Option value="AWAITING_PAYMENT">AWAITING PAYMENT</Option> */}
-                          <Option value="PAID">PAID</Option>
-                          <Option value="SHIPPING">SHIPPING</Option>
-                          <Option value="DELIVERED">DELIVERED</Option>
-                        </Select>
-                      ) : (
+            {Array.isArray(orders) &&
+              orders.map((order) => (
+                <div
+                  key={`${order.id}-${order.orderDate}`}
+                  className="hover:scale-102 rounded-md bg-gray-100 p-3 shadow-md transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 hover:shadow-xl"
+                >
+                  <div className="flex flex-col items-start justify-between space-y-1 md:flex-row md:items-center md:space-y-0">
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-800">
+                        Order ID: {order.id}
+                      </h2>
+                      <hr className="my-2 border-black" />
+                      {order.eachUserResponse && (
                         <>
-                          {getOrderStatusIcon(order.orderStatus)}
-                          <span className="text-xs font-bold text-gray-700">
-                            {order.orderStatus}
-                          </span>
+                          <p className="mt-1 text-sm text-gray-800">
+                            Customer Name: {order.eachUserResponse.fullname}
+                          </p>
+                          <p className="mt-1 text-sm text-gray-800">
+                            Customer Phone: {order.eachUserResponse.phone}
+                          </p>
                         </>
                       )}
+                      <p className="mt-1 text-sm text-gray-800">
+                        From: {order.originLocation}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-800">
+                        To: {order.destinationLocation}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-800">
+                        Total Price: {formatPrice(order.totalPrice)}
+                      </p>
                     </div>
-                    {/* <FaEdit
+
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1">
+                        {getPaymentMethodIcon(order.paymentMethod)}
+                        <span className="text-xs font-bold text-gray-700">
+                          {order.paymentMethod}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        {editingOrderId === order.id ? (
+                          <Select
+                            defaultValue={order.orderStatus}
+                            onChange={handleOrderStatusChange}
+                            className="w-32"
+                          >
+                            <Option key="PENDING" value="PENDING">
+                              PENDING
+                            </Option>
+                            <Option key="ACCEPTED" value="ACCEPTED">
+                              ACCEPTED
+                            </Option>
+                            <Option key="REJECTED" value="REJECTED">
+                              REJECTED
+                            </Option>
+                            <Option key="CANCELED" value="CANCELED">
+                              CANCELED
+                            </Option>
+                            {/* <Option value="AWAITING_RESPONSE">AWAITING_RESPONSE</Option> */}
+                            {/* <Option value="AWAITING_PAYMENT">AWAITING PAYMENT</Option> */}
+                            <Option key="PAID" value="PAID">
+                              PAID
+                            </Option>
+                            <Option key="SHIPPING" value="SHIPPING">
+                              SHIPPING
+                            </Option>
+                            <Option key="DELIVERED" value="DELIVERED">
+                              DELIVERED
+                            </Option>
+                          </Select>
+                        ) : (
+                          <>
+                            {getOrderStatusIcon(order.orderStatus)}
+                            <span className="text-xs font-bold text-gray-700">
+                              {order.orderStatus}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      {/* <FaEdit
                       className="text-gray-500 cursor-pointer"
                       onClick={() =>
                         editingOrderId === order.id
@@ -274,50 +298,50 @@ function ManageOrder() {
                           : setEditingOrderId(order.id)
                       }
                     /> */}
+                    </div>
                   </div>
-                </div>
-                <div className="mt-0.5 flex items-center justify-between">
-                  <p className="text-sm text-gray-800">
-                    Order Date: {order.orderDate}
-                  </p>
-                  <Link
-                    to={`/dashboard/orderDetails/${order.id}`}
-                    className="flex items-center space-x-1 rounded-md bg-blue-500 px-2 py-1 text-xs text-white transition-colors duration-300 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                  >
-                    <span>Order Details</span>
-                    <FaChevronRight />
-                  </Link>
-                </div>
-                {/* Toggle nội dung riêng biệt cho từng order */}
-                {expandedOrderId === order.id && (
-                  <div className="mt-4 text-center text-lg text-gray-700">
-                    Hello, this is extra content for Order ID: {order.id}
-                    <FeedbackForm id={order.id} />
+                  <div className="mt-0.5 flex items-center justify-between">
+                    <p className="text-sm text-gray-800">
+                      Order Date: {order.orderDate}
+                    </p>
+                    <Link
+                      to={`/dashboard/orderDetails/${order.id}`}
+                      className="flex items-center space-x-1 rounded-md bg-blue-500 px-2 py-1 text-xs text-white transition-colors duration-300 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    >
+                      <span>Order Details</span>
+                      <FaChevronRight />
+                    </Link>
                   </div>
-                )}
-
-                {/* Icon toggle */}
-                <div className="mt-2 flex justify-center">
-                  {expandedOrderId === order.id ? (
-                    <FaChevronUp
-                      className="cursor-pointer text-gray-500"
-                      onClick={() => toggleContent(order.id)}
-                    />
-                  ) : (
-                    <FaChevronDown
-                      className="cursor-pointer text-gray-500"
-                      onClick={() => toggleContent(order.id)}
-                    />
+                  {/* Toggle nội dung riêng biệt cho từng order */}
+                  {expandedOrderId === order.id && (
+                    <div className="mt-4 text-center text-lg text-gray-700">
+                      Hello, this is extra content for Order ID: {order.id}
+                      <FeedbackForm id={order.id} />
+                    </div>
                   )}
+
+                  {/* Icon toggle */}
+                  <div className="mt-2 flex justify-center">
+                    {expandedOrderId === order.id ? (
+                      <FaChevronUp
+                        className="cursor-pointer text-gray-500"
+                        onClick={() => toggleContent(order.id)}
+                      />
+                    ) : (
+                      <FaChevronDown
+                        className="cursor-pointer text-gray-500"
+                        onClick={() => toggleContent(order.id)}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
         <div className="mt-8 flex justify-center">
           <Pagination
             current={currentPage}
-            total={filteredOrders.length}
+            total={totalElement}
             pageSize={ordersPerPage}
             onChange={(page) => setCurrentPage(page)}
             showSizeChanger={false}

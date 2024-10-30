@@ -1,376 +1,207 @@
-import React, { useState, useEffect } from "react";
-import {
-  FaEye,
-  FaEyeSlash,
-  FaSpinner,
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Input, Button, Upload, Image } from "antd";
+import { FaLock } from "react-icons/fa";
 import api from "../../config/axios";
-import "./ProfileUser.css";
 import { toast } from "react-toastify";
+import { PlusOutlined } from "@ant-design/icons";
+import uploadFile from "../../utils/file";
 
+const UserProfile = ({ token }) => {
+  const [user, setUser] = useState({});
+  const [profileData, setProfileData] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [fileList, setFileList] = useState([]);
 
-const ProfileUser = ({ token }) => {
-  const [user, setUsers] = useState({});
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    fullname: "",
-    address: "",
-    phone: "",
-    email: "",
-    image: "", 
-  });
-  const [originalData, setOriginalData] = useState({});
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
-  // Fetch user data on component load
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchProfileData = async () => {
       try {
-        const response = await api.get(`customer/profile`, {
-          headers: {
-            Authorization: `bearer ${token}`,
-          },
-        }); // Fetch user data
-        console.log(response.data);
-        setUsers(response.data);
-        setFormData({
-          username: response.data.username,
-          fullname: response.data.fullname,
-          password: response.data.password,
-          address: response.data.address,
-          phone: response.data.phone,
-          email: response.data.email,
-          image: response.data.image,
-        }); // Set form data from fetched user data
-        setOriginalData({
-          username: response.data.username,
-          fullname: response.data.fullname,
-          password: response.data.password,
-          address: response.data.address,
-          phone: response.data.phone,
-          email: response.data.email,
-          image: response.data.image,
-        });
+        const response = await api.get(`user`);
+        if (response.data) {
+          setUser(response.data);
+          setProfileData(response.data);
+          console.log("Profile Data:", response.data);
+        } else {
+          console.warn("No data found in response");
+        }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Error fetching profile data:", error);
       }
     };
-    fetchUserData();
+    fetchProfileData();
   }, [token]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    validateField(name, value);
-  };
-
-  const validateField = (name, value) => {
-    let error = "";
-    switch (name) {
-      case "username":
-        error =
-          value.length < 3 ? "Username must be at least 3 characters long" : "";
-        break;
-      case "password":
-        error =
-          value.length < 8 ? "Password must be at least 8 characters long" : "";
-        break;
-      case "confirmPassword":
-        error = value !== formData.password ? "Passwords do not match" : "";
-        break;
-      case "email":
-        error = !/\S+@\S+\.\S+/.test(value) ? "Invalid email address" : "";
-        break;
-      case "phone":
-        error = !/^\d{10}$/.test(value) ? "Phone number must be 10 digits" : "";
-        break;
-      default:
-        break;
+  const handleUpdateProfile = async (values) => {
+    if (fileList.length > 0) {
+      const file = fileList[0];
+      const url = await uploadFile(file.originFileObj);
+      values.image = url;
     }
-    setErrors({ ...errors, [name]: error });
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
     try {
-      await api.put(`customer/${user.id}`, formData); // Send the updated data
-      setLoading(false);
-      setIsEditing(false);
-      toast.success("Profile have been updated successfully");
+      await api.put(`user/${profileData.id}`, values);
+      toast.success("Profile updated successfully!");
+      setProfileData((prev) => ({ ...prev, ...values }));
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Error updating profile:", error);
-      setLoading(false);
+      toast.error("Failed to update profile.");
     }
   };
 
-  const handleCancel = () => {
-    // Reset form data to the original state
-    setFormData(originalData);
-    setIsEditing(false);
+  const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
   };
 
-  const toggleEdit = () => {
-    setIsEditing(!isEditing);
+  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+      }}
+      type="button"
+    >
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </button>
+  );
+
+  const openModal = () => {
+    form.setFieldsValue(profileData); // Set default values
+    setIsModalOpen(true);
   };
+  console.log(profileData);
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  if (!profileData) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4 text-gray-100">
-    <div className="w-full max-w-5xl overflow-hidden rounded-lg bg-gray-800 shadow-xl">
-      <div className="p-8 md:p-10 lg:p-12">
-          <h2 className="mb-6 text-center text-3xl font-bold">
-            {isEditing ? "Update Profile" : user.username}
-          </h2>
-          <div className="mb-8 flex justify-center">
-            <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-gray-700">
-              {user.image ? (
-                <img
-                  src={user.image} // Display image from API
-                  alt="Profile"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <FaUser className="text-4xl text-gray-400" /> // Default icon if no image
-              )}
-              {isEditing && (
-                <label
-                  htmlFor="profile-image"
-                  className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity hover:opacity-100"
-                >
-                  <span className="text-sm text-white">Change Photo</span>
-                  <input
-                    type="file"
-                    id="profile-image"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </label>
-              )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-8">
+      <div className="mx-auto max-w-3xl overflow-hidden rounded-xl bg-white shadow-lg">
+        <div className="p-8">
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Profile Information
+            </h2>
+          </div>
+
+          <div className="mb-6 text-center">
+            <div className="relative inline-block">
+              <img
+                src={profileData?.image || "https://via.placeholder.com/150"}
+                alt="Profile"
+                className="h-32 w-32 rounded-full border-4 border-blue-100 object-cover"
+              />
+              <div className="absolute bottom-0 right-0 rounded-full bg-blue-500 p-2">
+                <FaLock className="text-white" />
+              </div>
             </div>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {isEditing && (
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="mb-2 block text-sm font-medium"
-                  >
-                    Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      id="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="w-full rounded-md bg-gray-700 py-2 pl-3 pr-10 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-invalid={errors.password ? "true" : "false"}
-                      aria-describedby="password-error"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3"
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                    >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <p
-                      id="password-error"
-                      className="mt-2 text-sm text-red-500"
-                    >
-                      {errors.password}
-                    </p>
-                  )}
-                </div>
-              )}
-              {isEditing && (
-                <div>
-                  <label
-                    htmlFor="confirmPassword"
-                    className="mb-2 block text-sm font-medium"
-                  >
-                    Confirm Password
-                  </label>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full rounded-md bg-gray-700 py-2 pl-3 pr-10 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    aria-invalid={errors.confirmPassword ? "true" : "false"}
-                    aria-describedby="confirm-password-error"
-                  />
-                  {errors.confirmPassword && (
-                    <p
-                      id="confirm-password-error"
-                      className="mt-2 text-sm text-red-500"
-                    >
-                      {errors.confirmPassword}
-                    </p>
-                  )}
-                </div>
-              )}
-              <div>
-                <label
-                  htmlFor="fullname"
-                  className="mb-2 block text-sm font-medium"
-                >
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="fullname"
-                  name="fullname"
-                  value={formData.fullname}
-                  onChange={handleChange}
-                  className="w-full rounded-md bg-gray-700 px-3 py-2 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={!isEditing}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-2 block text-sm font-medium"
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400" />
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full rounded-md bg-gray-700 py-2 pl-10 pr-3 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={!isEditing}
-                    aria-invalid={errors.email ? "true" : "false"}
-                    aria-describedby="email-error"
-                  />
-                </div>
-                {errors.email && (
-                  <p id="email-error" className="mt-2 text-sm text-red-500">
-                    {errors.email}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="mb-2 block text-sm font-medium"
-                >
-                  Phone
-                </label>
-                <div className="relative">
-                  <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400" />
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full rounded-md bg-gray-700 py-2 pl-10 pr-3 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={!isEditing}
-                    aria-invalid={errors.phone ? "true" : "false"}
-                    aria-describedby="phone-error"
-                  />
-                </div>
-                {errors.phone && (
-                  <p id="phone-error" className="mt-2 text-sm text-red-500">
-                    {errors.phone}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label
-                  htmlFor="address"
-                  className="mb-2 block text-sm font-medium"
-                >
-                  Address
-                </label>
-                <div className="relative">
-                  <FaMapMarkerAlt className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400" />
-                  <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className="w-full rounded-md bg-gray-700 py-2 pl-10 pr-3 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={!isEditing}
-                    aria-invalid={errors.address ? "true" : "false"}
-                    aria-describedby="address-error"
-                  />
-                </div>
-                {errors.address && (
-                  <p id="address-error" className="mt-2 text-sm text-red-500">
-                    {errors.address}
-                  </p>
-                )}
-              </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-medium text-gray-500">Username</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData?.username || "N/A"}
+              </p>
             </div>
-            <div className="flex justify-center space-x-4">
-              {!isEditing ? (
-                <button
-                  type="button"
-                  onClick={toggleEdit}
-                  className="btn-edit_3 rounded-md bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600"
-                >
-                  Edit Profile
-                </button>
-              ) : (
-                <div className="flex justify-between space-x-4">
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    className="btn-cancel_3 rounded-md px-4 py-2 transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    onClick={handleSubmit}
-                    className="btn-save_3 rounded-md px-4 py-2 transition"
-                    disabled={loading}
-                  >
-                    {loading ? <FaSpinner className="animate-spin" /> : "Save"}
-                  </button>
-                </div>
-              )}
+
+            <div className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-medium text-gray-500">Full Name</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData?.fullname || "N/A"}
+              </p>
             </div>
-          </form>
+
+            <div className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-medium text-gray-500">Email</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData?.email || "N/A"}
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-medium text-gray-500">Phone Number</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData?.phone || "N/A"}
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-gray-50 p-4 md:col-span-2">
+              <p className="text-sm font-medium text-gray-500">Address</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData?.address || "N/A"}
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-medium text-gray-500">
+                Loyalty Points
+              </p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData?.loyaltyPoint || 0} pts
+              </p>
+            </div>
+          </div>
+          <div className="mt-8 text-center">
+            <Button type="primary" onClick={openModal}>
+              Update Profile
+            </Button>
+          </div>
+
+          <Modal
+            title="Update Profile"
+            open={isModalOpen}
+            onCancel={closeModal}
+            onOk={() => form.submit()}
+          >
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleUpdateProfile}
+              initialValues={profileData || {}}
+            >
+              {/* Add form items as before */}
+            </Form>
+          </Modal>
         </div>
       </div>
+      {previewImage && (
+        <Image
+          preview={{
+            visible: previewOpen,
+            onVisibleChange: (visible) => setPreviewOpen(visible),
+          }}
+          src={previewImage}
+        />
+      )}
     </div>
   );
 };
 
-export default ProfileUser;
+export default UserProfile;
