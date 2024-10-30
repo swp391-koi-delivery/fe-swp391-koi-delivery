@@ -14,7 +14,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
-import { useForm } from "antd/es/form/Form";
 import { toast } from "react-toastify";
 import {
   CheckCircleOutlined,
@@ -22,22 +21,19 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
+import { useForm } from "antd/es/form/Form";
 
 function OrderHistoryPage() {
+  const [form] = useForm();
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form] = useForm();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
-
-  useEffect(() => {
-    handleDarkMode();
-    fetchOrder(1);
-  }, []);
+  const { Step } = Steps;
 
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
@@ -237,15 +233,112 @@ function OrderHistoryPage() {
     );
   };
 
-  const fetchOrder = async (values) => {
-    console.log(values);
+  const generateTable = (orderDetails) => {
+    return (
+      <div className="overflow-x-auto md:overflow-x-visible">
+        <table className="container w-full table-auto overflow-hidden text-nowrap rounded-xl text-center shadow-pricing">
+          <thead className="bg-gray-200 dark:bg-slate-600">
+            <tr>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Fish ID
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Farm Name
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Farm Address
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Fish Species
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Number of Fish
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Size of Fish (cm)
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Total Box
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Total Volume (L)
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Price ($)
+                </span>
+              </th>
+              <th className="px-3 py-1">
+                <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
+                  Health Status
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="text-base text-dark dark:text-white">
+            {orderDetails.map((detail, index) => (
+              <tr
+                key={index}
+                className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
+              >
+                <td className="font-small whitespace-nowrap px-2 py-1">
+                  {detail.id}
+                </td>
+                <td className="text-wrap px-2 py-1">{detail.nameFarm}</td>
+                <td className="text-wrap px-2 py-1">{detail.farmAddress}</td>
+                <td className="px-2 py-1">{detail.fishSpecies}</td>
+                <td className="px-2 py-1">{detail.numberOfFish}</td>
+                <td className="px-2 py-1">{detail.sizeOfFish}</td>
+                <td className="px-2 py-1">{detail.totalBox}</td>
+                <td className="px-2 py-1">{detail.totalVolume}</td>
+                <td className="px-6 py-1">{detail.priceOfFish}</td>
+                <td className="px-2 py-1">{detail.healthFishStatus}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  const handleFeedback = async (values) => {
+    try {
+      setLoading(true);
+      const response = await api.post("feedBack", values);
+      toast.success("Successfully send feedback");
+      setOpenModal(false);
+    } catch (err) {
+      toast.error(err.response.data || "Failed to send feedback");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchOrder = async (page) => {
+    console.log(page);
     setLoading(true);
     try {
       const response = await api.get(
-        `/customer/order/orderHistory?page=${values}&size=5`,
+        `/customer/order/orderHistory?page=${page}&size=5`,
       );
       console.log(response);
-      setTotalPages(response.data.totalPages);
+      setTotalPages(response.data.totalElements);
       setOrders(response.data.content);
     } catch (err) {
       console.log("Failed to fetch order", err);
@@ -254,103 +347,17 @@ function OrderHistoryPage() {
     }
   };
 
-const generateTables = (orderDetails) => {
-  return (
-    <div className="overflow-x-auto md:overflow-x-visible">
-      <table className="container w-full table-auto overflow-hidden text-nowrap rounded-xl text-center shadow-pricing">
-        <thead className="bg-gray-200 dark:bg-slate-600">
-          <tr>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Fish ID
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Farm Name
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Farm Address
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Fish Species
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Number of Fish
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Size of Fish (cm)
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Total Box
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Total Volume (L)
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Price ($)
-              </span>
-            </th>
-            <th className="px-3 py-1">
-              <span className="block text-wrap py-1 text-base font-medium text-dark dark:text-white">
-                Health Status
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody className="text-base text-dark dark:text-white">
-          {orderDetails.map((detail, index) => (
-            <tr
-              key={index}
-              className="text-center hover:table-row hover:scale-105 dark:hover:table-row"
-            >
-              <td className="font-small whitespace-nowrap px-2 py-1">
-                {detail.id}
-              </td>
-              <td className="text-wrap px-2 py-1">{detail.nameFarm}</td>
-              <td className="text-wrap px-2 py-1">{detail.farmAddress}</td>
-              <td className="px-2 py-1">{detail.fishSpecies}</td>
-              <td className="px-2 py-1">{detail.numberOfFish}</td>
-              <td className="px-2 py-1">{detail.sizeOfFish}</td>
-              <td className="px-2 py-1">{detail.totalBox}</td>
-              <td className="px-2 py-1">{detail.totalVolume}</td>
-              <td className="px-6 py-1">{detail.priceOfFish}</td>
-              <td className="px-2 py-1">{detail.healthFishStatus}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-  const handleFeedback = async (values) => {
-    try {
-      setLoading(true);
-      const response = await api.post("feedBack", values);
-      toast.success("Successfully send feedback");
-    } catch (err) {
-      toast.error(err.response.data || "Failed to send feedback");
-    } finally {
-      setLoading(false);
-    }
+  const handlePageChange = (page) => {
+    localStorage.setItem("currentPage", page);
+    fetchOrder(page);
   };
 
-  const { Step } = Steps;
+  useEffect(() => {
+    handleDarkMode();
+
+    const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
+    fetchOrder(savedPage);
+  }, []);
 
   const Order = ({ order }) => {
     return (
@@ -372,8 +379,24 @@ const generateTables = (orderDetails) => {
                     </span>
                   </div>
                   <div className="flex w-full flex-col items-end justify-between md:w-1/2">
-                    {order?.orderStatus === "DELIVERED" && (
+                    {(order?.orderStatus === "PAID" ||
+                      order?.orderStatus === "DELIVERED") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-0.5 text-sm font-medium leading-6 text-emerald-600 lg:mt-3">
+                        {order?.orderStatus}
+                      </p>
+                    )}
+                    {order?.orderStatus === "PENDING" && (
+                      <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
+                        {order?.orderStatus}
+                      </p>
+                    )}
+                    {order?.orderStatus === "REJECTED" && (
+                      <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
+                        {order.orderStatus}
+                      </p>
+                    )}
+                    {order?.orderStatus === "AWAITING_PAYMENT" && (
+                      <p className="mb-3 whitespace-nowrap rounded-full bg-yellow-50 px-3 py-0.5 text-sm font-medium leading-6 text-yellow-600 lg:mt-3">
                         {order?.orderStatus}
                       </p>
                     )}
@@ -608,7 +631,7 @@ const generateTables = (orderDetails) => {
                         Order Details
                       </h2>
                       <div className="table-list flex w-full flex-wrap items-center justify-center">
-                        {generateTables(order?.orderDetails)}
+                        {generateTable(order?.orderDetails)}
                       </div>
                       <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
                         Order Price
@@ -748,7 +771,7 @@ const generateTables = (orderDetails) => {
                       </div>
                     </div>
                     <div className="flex w-full flex-row items-end justify-end gap-1.5">
-                      {order.orderStatus === "AWAITING_PAYMENT" && (
+                      {order?.orderStatus === "DELIVERED" && (
                         <div className="">
                           <Modal
                             title="Feedback"
@@ -767,6 +790,7 @@ const generateTables = (orderDetails) => {
                                 type="info"
                               />
                               <Form.Item
+                                hidden
                                 label="Order Id"
                                 name="orderId"
                                 initialValue={selectedOrder?.id}
@@ -777,7 +801,7 @@ const generateTables = (orderDetails) => {
                                 label="Rating Score"
                                 name="ratingScore"
                               >
-                                <Rate />
+                                <Rate></Rate>
                               </Form.Item>
                               <Form.Item label="Comment" name="comment">
                                 <Input.TextArea />
@@ -1064,7 +1088,7 @@ const generateTables = (orderDetails) => {
                         <a className="submenu-item group relative">
                           <div className="pl-6">
                             <img
-                              className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
+                              className="relative inline-block h-11 w-11 rounded-full"
                               src={
                                 user?.image ||
                                 "assets/images/navbar/default-avatar.jpg"
@@ -1107,7 +1131,7 @@ const generateTables = (orderDetails) => {
             <div className="w-full px-4">
               <div className="text-center">
                 <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Order List Page
+                  Order History Page
                 </h1>
                 <p className="mb-5 text-base text-body-color dark:text-dark-6">
                   All of your order information are here.
@@ -1124,7 +1148,7 @@ const generateTables = (orderDetails) => {
                   </Link>
                   <li>
                     <Link
-                      to="/order-list"
+                      to="/order-history"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -1132,7 +1156,7 @@ const generateTables = (orderDetails) => {
                         {" "}
                         /{" "}
                       </span>
-                      Order List Page
+                      Order History Page
                     </Link>
                   </li>
                 </ul>
@@ -1167,10 +1191,15 @@ const generateTables = (orderDetails) => {
               {/*  */}
               <div className="flex justify-end">
                 <Pagination
-                  initialValue={1}
-                  defaultCurrent={1}
-                  total={totalPages * 5}
-                  onChange={fetchOrder}
+                  initialValue={
+                    parseInt(localStorage.getItem("currentPage")) || 1
+                  }
+                  defaultCurrent={
+                    parseInt(localStorage.getItem("currentPage")) || 1
+                  }
+                  total={totalPages}
+                  defaultPageSize={5}
+                  onChange={handlePageChange}
                 />
               </div>
             </div>

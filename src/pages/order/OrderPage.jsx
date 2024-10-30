@@ -542,7 +542,7 @@ function OrderPage() {
                         <a className="submenu-item group relative">
                           <div className="pl-6">
                             <img
-                              className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
+                              className="relative inline-block h-11 w-11 rounded-full"
                               src={
                                 user?.image ||
                                 "assets/images/navbar/default-avatar.jpg"

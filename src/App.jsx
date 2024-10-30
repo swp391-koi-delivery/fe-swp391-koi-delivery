@@ -19,7 +19,7 @@ import OrderPage from "./pages/order/OrderPage";
 import OrderListPage from "./pages/order-list/OrderListPage";
 import OrderSearchPage from "./pages/order-search/OrderSearch";
 import OrderHistoryPage from "./pages/order-history/OrderHistory";
-import SuccessPage from "./pages/success/Success";
+import SuccessPage from "./pages/success/SuccessPage";
 import ErrorPage from "./pages/error/ErrorPage";
 
 // Manager & Sales Staff
