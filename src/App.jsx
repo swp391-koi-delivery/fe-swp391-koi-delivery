@@ -28,9 +28,12 @@ import OrderDetailStaff from "./pages/sales-staff/orderDetails-staff";
 import OrderDetailsInfoStaff from "./pages/sales-staff/orderDetailInfo";
 import ManageBox from "./pages/manager/manage-box";
 import ManageWarehouse from "./pages/manager/manage-warehouse";
+
+import ManageProfile from "./pages/manager/ManagerProfile";
 import ManageUser from "./pages/manager/manage-user";
 import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
+
 
 import ProfileUser from "./pages/ProfileUser/ProfileUser";
 // Delivery Staff
@@ -176,6 +179,10 @@ function App() {
         </ProtectRouteManagerAuth>
       ),
       children: [
+        {
+          path: "profile",
+          element: <ManageProfile />,
+        },
         {
           path: "user",
           element: <ManageUser />,

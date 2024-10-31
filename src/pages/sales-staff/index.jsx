@@ -28,6 +28,7 @@ const OrderList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [newOrderStatus, setNewOrderStatus] = useState("");
+  const [totalElements, setTotalElement] = useState(0);
   const [deletingOrderId, setDeletingOrderId] = useState(null);
   const [expandedOrderId, setExpandedOrderId] = useState(null); //Tạo state để lưu ID của order đang được mở
 
@@ -35,13 +36,24 @@ const OrderList = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await api.get("order/allOrder?page=1&size=1000000000");
+      const response = await api.get(
+        `order/allOrder?page=${currentPage}&size=${ordersPerPage}`,
+      );
       const fetchedOrders = response.data;
-      setOrders(fetchedOrders);
-      setFilteredOrders(fetchedOrders);
+      console.log(response.data);
+      // console.log(fetchedOrders.totalElements);
+        
+      setOrders(response.data.content);
+      setFilteredOrders(response.data.content);
+      setTotalElement(response.data.totalElements)
+      // console.log(filteredOrders.totalElements);
       setPriceRange([
         0,
-        Math.max(...fetchedOrders.map((order) => order.totalPrice)),
+        // Math.max(...fetchedOrders.map((order) => order.totalPrice)),
+        Math.max(
+          Array.isArray(filteredOrders) &&
+            filteredOrders.map((order) => order.totalPrice),
+        ),
       ]);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -52,9 +64,7 @@ const OrderList = () => {
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+
 
   useEffect(() => {
     const filtered = orders.filter((order) => {
@@ -66,9 +76,8 @@ const OrderList = () => {
       );
     });
     setFilteredOrders(filtered);
-    setCurrentPage(1);
-  }, [searchTerm, priceRange, orders]);
-
+    fetchOrders();
+  }, [searchTerm, priceRange, orders,currentPage, ordersPerPage]);
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
@@ -128,12 +137,18 @@ const OrderList = () => {
     setDeletingOrderId(null); // Reset delete state after action
   };
 
+  // const formatPrice = (price) => {
+  //   return new Intl.NumberFormat("en-US", {
+  //     style: "currency",
+  //     currency: "USD",
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   }).format(price);
+  // };
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-VN", {
       style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      currency: "VND",
     }).format(price);
   };
   const getPaymentMethodIcon = (method) => {
@@ -175,9 +190,9 @@ const OrderList = () => {
     }
   };
 
-  const startIndex = (currentPage - 1) * ordersPerPage;
-  const endIndex = startIndex + ordersPerPage;
-  const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * ordersPerPage;
+  // const endIndex = startIndex + ordersPerPage;
+  // const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-4">
@@ -206,20 +221,21 @@ const OrderList = () => {
               style={{ height: "4px" }}
             />
             <div className="mt-1 text-xs text-gray-600">
-              Price Range: ${priceRange[0]} - ${priceRange[1]}
+              Price Range: {priceRange[0]} - {priceRange[1]}
             </div>
           </div>
         </div>
 
-        {paginatedOrders.length === 0 ? (
+        {totalElements === 0 ? (
           <div className="mt-4 text-center text-sm text-gray-500">
             No orders found matching your criteria.
           </div>
         ) : (
           <div className="space-y-3">
-            {paginatedOrders.map((order) => (
+            {Array.isArray(orders) &&
+              orders.map((order) => (
               <div
-                key={order.id}
+              key={`${order.id}-${order.orderDate}`}
                 className="hover:scale-102 rounded-md bg-gray-100 p-3 shadow-md transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 hover:shadow-xl"
               >
                 <div className="flex flex-col items-start justify-between space-y-1 md:flex-row md:items-center md:space-y-0">
@@ -266,15 +282,15 @@ const OrderList = () => {
                           onChange={handleOrderStatusChange}
                           className="w-32"
                         >
-                          <Option value="PENDING">PENDING</Option>
+                          {/* <Option value="PENDING">PENDING</Option> */}
                           <Option value="ACCEPTED">ACCEPTED</Option>
                           <Option value="REJECTED">REJECTED</Option>
-                          <Option value=" CANCELED"> CANCELED</Option>
+                          {/* <Option value=" CANCELED"> CANCELED</Option> */}
                           {/* <Option value="AWAITING_RESPONSE">AWAITING_RESPONSE</Option> */}
                           {/* <Option value="AWAITING_PAYMENT">AWAITING PAYMENT</Option> */}
-                          <Option value="PAID">PAID</Option>
-                          <Option value="SHIPPING">SHIPPING</Option>
-                          <Option value="DELIVERED">DELIVERED</Option>
+                          {/* <Option value="PAID">PAID</Option> */}
+                          {/* <Option value="SHIPPING">SHIPPING</Option> */}
+                          {/* <Option value="DELIVERED">DELIVERED</Option>  */}
                         </Select>
                       ) : (
                         <>
@@ -339,7 +355,7 @@ const OrderList = () => {
         <div className="mt-8 flex justify-center">
           <Pagination
             current={currentPage}
-            total={filteredOrders.length}
+            total={totalElements}
             pageSize={ordersPerPage}
             onChange={(page) => setCurrentPage(page)}
             showSizeChanger={false}

@@ -22,7 +22,7 @@ import { DeleteOutlined, EditTwoTone, PlusOutlined } from "@ant-design/icons";
 import Password from "antd/es/input/Password";
 import api from "../../config/axios";
 import uploadFile from "../../utils/file";
-function CRUDTemplate({ columns, formItems, path , path2}) {
+function CRUDTemplate({ columns, formItems, path, path2 }) {
   //const api = "https://66ebf57e2b6cf2b89c5c9df5.mockapi.io/User";
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -41,24 +41,29 @@ function CRUDTemplate({ columns, formItems, path , path2}) {
       dataIndex: "id",
       key: "id",
       align: "left",
-      render: (id, record) => (
-        <>
-          {/* <Button
+      render: (id, record) => {
+        if (record.available === false) {
+          return null; // Không hiển thị nút khi trạng thái là 'Inactive'
+        }
+        return (
+          <>
+            {/* <Button
             icon={<EditTwoTone/>}
             onClick={() => {
               setOpenModal(true);
               form.setFieldsValue(record);
             }}
           />{" "} */}
-          <Popconfirm
-            title="Delete"
-            description="Are you sure want to delete?"
-            onConfirm={() => handleDelete(id)}
-          >
-            <Button icon={<DeleteOutlined/>} danger/>
-          </Popconfirm>
-        </>
-      ),
+            <Popconfirm
+              title="Delete"
+              description="Are you sure want to delete?"
+              onConfirm={() => handleDelete(id)}
+            >
+              <Button icon={<DeleteOutlined />} danger />
+            </Popconfirm>
+          </>
+        );
+      },
     },
   ];
   const fetchData = async () => {
@@ -66,8 +71,8 @@ function CRUDTemplate({ columns, formItems, path , path2}) {
     try {
       const response = await api.get(`manager/${path2}`);
       //lấy dữ liệu từ BE và set nó
-      setUsers(response.data);
-      setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
+      setUsers(Array.isArray(response.data) ? response.data : []);
+      setFilteredUsers(Array.isArray(response.data) ? response.data : []); // khởi tạo filteredUsers bằng tất cả user
     } catch (error) {
       toast.error(error.response.data);
     }
@@ -81,7 +86,7 @@ function CRUDTemplate({ columns, formItems, path , path2}) {
   const handleSearch = (value) => {
     setSearchText(value); // Cập nhật giá trị search text
     const filteredData = users.filter(
-      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()) // Lọc theo tên người dùng
+      (user) => user.fullname.toLowerCase().includes(value.toLowerCase()), // Lọc theo tên người dùng
     );
     setFilteredUsers(filteredData); // Cập nhật danh sách đã lọc
   };
@@ -283,7 +288,14 @@ function CRUDTemplate({ columns, formItems, path , path2}) {
         style={{ marginBottom: 20, width: 300 }} // Thêm style cho input search
         />
         </div> */}
-      <Button icon={<PlusOutlined/>} onClick={() => setOpenModal(true)} className="mb-4" style={{marginLeft:"20px"}}>Add</Button>
+      <Button
+        icon={<PlusOutlined />}
+        onClick={() => setOpenModal(true)}
+        className="mb-4"
+        style={{ marginLeft: "20px" }}
+      >
+        Add
+      </Button>
       <Table columns={tableColumn} dataSource={users} rowKey="userId" />
       <Modal
         confirmLoading={submitting}

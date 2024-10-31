@@ -1,15 +1,28 @@
 import React from "react";
 import CRUDTemplate from "../../../components/crud-template";
-import { Form, Input, InputNumber } from "antd";
+import { Form, Input, InputNumber, Tag } from "antd";
 import "./index.css";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 function ManageBox() {
   const columns = [
     { title: "ID", dataIndex: "id", key: "id",align: "left", },
     { title: "Type", dataIndex: "type", key: "type",align: "left", },
     { title: "Volume", dataIndex: "volume", key: "volume",align: "left", },
-    { title: "Price", dataIndex: "price", key: "price",align: "left", },
+    { title: "Price", dataIndex: "price", key: "price",align: "left", render: (price) => formatPrice(price), },
+    { title: "Available", dataIndex: "available", key: "available",align: "left", render: (available) => (<Tag style={{fontSize:"22px"}}
+      icon={available ? <CloseCircleOutlined /> : <CheckCircleOutlined />} 
+      color={available ? 'success' : 'error'} // Màu đỏ cho Inactive, xanh cho Active
+    >
+      {available ? 'Available' : 'Unavailable'}
+    </Tag>),},
   ];
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  };
   const formItems = [
     <>
       <Form.Item name="id" hidden>

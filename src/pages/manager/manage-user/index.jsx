@@ -12,6 +12,7 @@ import {
   Upload,
   Image,
   Tag,
+  Input,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import Search from "antd/es/transfer/search";
@@ -207,11 +208,11 @@ function ManageUser() {
       align: "left",
     },
     {
-      title: <span className="custom-table-header">Image</span>,
+      title: <span className="custom-table-header w-20 h-20">Image</span>,
       dataIndex: "image",
       key: "image",
       render: (image) => {
-        return <img src={image} alt="" width={130} height={150} />;
+        return <img src={image || "../public/assets/images/vodanh.jpg"} alt="" width={100} height={140} />;
       },
     },
     {
@@ -510,11 +511,11 @@ function ManageUser() {
             rules={[
               {
                 required: true,
-                message: "Please imput username!",
+                message: "Please imput password!",
               },
             ]}
           >
-            <AntInput />
+            <Input.Password />
           </Form.Item>
           <Form.Item
             name="fullname"

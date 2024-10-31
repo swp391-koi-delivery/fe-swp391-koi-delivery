@@ -229,7 +229,7 @@ function HeaderComponent() {
                               {user?.username}
                             </span>
                             <Link
-                              to=""
+                              to="/profileUser"
                               className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                             >
                               Profile
@@ -449,7 +449,7 @@ function HeaderComponent() {
                             {user?.username}
                           </span>
                           <Link
-                            to=""
+                            to="/profileUser"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Profile

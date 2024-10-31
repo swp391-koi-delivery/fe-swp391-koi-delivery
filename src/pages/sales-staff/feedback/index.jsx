@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUser, FaStar, FaCalendar, FaReply, FaBriefcase } from "react-icons/fa";
+import { FaUser, FaStar, FaCalendar, FaReply, FaBriefcase, FaArrowDown } from "react-icons/fa";
 //import axios from 'axios'; // or use fetch
 import api from "../../../config/axios";
 import { Rate } from "antd";
@@ -24,7 +24,7 @@ const FeedbackForm = ({id}) => {
         replies: feedback.replies.map(reply => ({
           id: reply.id,
           staffName: reply.repliedBy,
-          // date: reply.replyDate.split("T")[0], // Extract date
+          date: reply.replyDate.split("T")[0], // Extract date
           content: reply.replyContent,
         })),
       }));
@@ -161,6 +161,11 @@ const FeedbackForm = ({id}) => {
                     Submit Reply
                   </button>
                 </div>
+              </div>
+            )}
+            {feedback.type === "customer" && (
+              <div className="flex justify-center py-4">
+                <FaArrowDown className="text-gray-500" />
               </div>
             )}
           </div>

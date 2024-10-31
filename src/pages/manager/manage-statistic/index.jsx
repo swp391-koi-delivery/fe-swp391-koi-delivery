@@ -6,6 +6,7 @@ import {
   FaUsers,
   FaShoppingCart,
   FaStar,
+  FaMoneyBill
 } from "react-icons/fa";
 import {
   LineChart,
@@ -41,6 +42,13 @@ const ManageStatistic = () => {
   //   (user) => user.role === "CUSTOMER" && user.deleted === false,
   // );
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  };
+
   const activeCustomers = Array.isArray(user)
   ? user.filter((user) => user.role === "CUSTOMER" && user.deleted === false)
   : [];
@@ -50,14 +58,16 @@ const ManageStatistic = () => {
 
   // Đếm số lượng khách hàng
   const customerCount = activeCustomers.length;
-  const calculateTotalOrders = () => {
-    return orderData.length;
-  };
+
+
+  // const calculateTotalOrders = () => {
+  //   return orderData.length;
+  // };
 
   //PAID
-  // const calculateTotalOrders = () => {
-  //   return orderData.filter(order => order.orderStatus === "PAID").length;
-  // };
+  const calculateTotalOrders = () => {
+    return orderData.filter(order => order.orderStatus === "PAID").length;
+  };
 
   const handleStatClick = (statType) => {
     let content = {};
@@ -65,7 +75,7 @@ const ManageStatistic = () => {
       case "sales":
         content = {
           title: "Total Sales",
-          value: `$${calculateTotalRevenue()}`,
+          value: `${formatPrice(calculateTotalRevenue())}`,
           description: "Revenue generated from all sales this month.",
         };
         break;
@@ -136,12 +146,13 @@ const ManageStatistic = () => {
     const fetchData = async () => {
       try {
         //const response = await axios.get("http://14.225.220.122:8080/api/order");
-        const response1 = await api.get(
-          "order/allOrder?page=1&size=1000000000",
-        );
+        // const response1 = await api.get(
+        //   "order/allOrder?page=1&size=1000000000",
+        // );
         const response2 = await api.get(
           "manager/allUser?page=1&size=1000000000",
         );
+        const response1 = await api.get("manager/dashboard/orderStatistics?filter=month")
         setOrderData(response1.data);
         setUser(response2.data);
         calculateMonthlyRevenue();
@@ -194,83 +205,104 @@ const ManageStatistic = () => {
 
   // Calculate revenue growth percentage
   const calculateRevenueGrowth = () => {
-    if (previousMonthRevenue === 0) return "N/A"; // Avoid division by zero
+    if (previousMonthRevenue === 0) return "Calculating..."; // Avoid division by zero
     const growth =
       ((currentMonthRevenue - previousMonthRevenue) / previousMonthRevenue) *
       100;
     return growth.toFixed(2);
   };
 
+  // const processChartData = () => {
+  //   const chartData = orderData.map((order) => ({
+  //     orderDate: formatDate(convertToDate(order.orderDate)), // Use convertToDate to parse DD/MM/YYYY format
+  //     totalPrice: order.totalPrice,
+  //   }));
+  //   console.log(chartData.sort(
+  //     (a, b) => new Date(a.orderDate) - new Date(b.orderDate),
+  //   ))
+  //   return chartData.sort(
+  //     (a, b) => new Date(a.orderDate) - new Date(b.orderDate),
+  //   ); // Sort by the parsed date
+  // };
+
+  //PAID
   const processChartData = () => {
-    const chartData = orderData.map((order) => ({
-      orderDate: formatDate(convertToDate(order.orderDate)), // Use convertToDate to parse DD/MM/YYYY format
+    const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
+    const chartData = paidOrders.map(order => ({
+      orderDate: formatDate(convertToDate(order.orderDate)), // Parse DD/MM/YYYY format
       totalPrice: order.totalPrice,
     }));
-    console.log(chartData.sort(
-      (a, b) => new Date(a.orderDate) - new Date(b.orderDate),
-    ))
-    return chartData.sort(
-      (a, b) => new Date(a.orderDate) - new Date(b.orderDate),
-    ); // Sort by the parsed date
+    
+    return chartData.sort((a, b) => new Date(a.orderDate) - new Date(b.orderDate)); // Sort by parsed date
   };
+  
+  //PAID
+  const processChartDataDate = () => {
+    const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
+    const combinedData = paidOrders.map(order => ({
+      orderDate: formatDate(convertToDate(order.orderDate)), // Convert date format
+      totalPrice: order.totalPrice, // Order price
+    }));
+  
+    const aggregatedData = combinedData.reduce((acc, curr) => {
+      const date = new Date(curr.orderDate);
+      let key;
+  
+      if (filterType === "detail") {
+        return processChartData(); // Call the original process function
+      } else if (filterType === "month") {
+        key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Format as "YYYY-MM"
+      } else if (filterType === "year") {
+        key = `${date.getFullYear()}`; // Only year
+      } else {
+        key = curr.orderDate; // By date
+      }
+  
+      const existing = acc.find(item => item.key === key);
+  
+      if (existing) {
+        existing.totalPrice += curr.totalPrice; // Sum total price if key exists
+      } else {
+        acc.push({ key, totalPrice: curr.totalPrice }); // Add if key doesn't exist
+      }
+  
+      return acc;
+    }, []);
+  
+    return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sort by key
+  };
+
   // const processChartDataDate = () => {
   //   const combinedData = orderData.map((order) => ({
   //     orderDate: formatDate(convertToDate(order.orderDate)), // Chuyển đổi định dạng ngày
   //     totalPrice: order.totalPrice, // Giá của đơn hàng
   //   }));
-  //   //console.log(orderData);
-  //   // Tính tổng giá cho mỗi ngày
-  //   if (filterType === "detail") {
-  //     return processChartData();
-  //   }
   //   const aggregatedData = combinedData.reduce((acc, curr) => {
-  //     const existing = acc.find((item) => item.orderDate === curr.orderDate);
-
-  //     if (existing) {
-  //       existing.totalPrice += curr.totalPrice; // Cộng dồn giá nếu ngày đã tồn tại
+  //     const date = new Date(curr.orderDate);
+  //     let key;
+  //     if (filterType === "detail") {
+  //       return processChartData();
+  //     } else if (filterType === "month") {
+  //       key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Chuỗi định dạng "YYYY-MM"
+  //     } else if (filterType === "year") {
+  //       key = `${date.getFullYear()}`; // Chỉ năm
   //     } else {
-  //       acc.push({ ...curr }); // Nếu ngày chưa tồn tại, thêm vào mảng
+  //       key = curr.orderDate; // Theo ngày
   //     }
-  //     //console.log(acc);
+  
+  //     const existing = acc.find((item) => item.key === key);
+  
+  //     if (existing) {
+  //       existing.totalPrice += curr.totalPrice; // Cộng dồn giá nếu key đã tồn tại
+  //     } else {
+  //       acc.push({ key, totalPrice: curr.totalPrice }); // Nếu chưa tồn tại, thêm vào mảng
+  //     }
+  //     console.log(acc)
   //     return acc;
   //   }, []);
-
-  //   return aggregatedData.sort(
-  //     (a, b) => new Date(a.orderDate) - new Date(b.orderDate),
-  //   ); // Sắp xếp theo orderDate
+  
+  //   return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sắp xếp theo key
   // };
-
-  const processChartDataDate = () => {
-    const combinedData = orderData.map((order) => ({
-      orderDate: formatDate(convertToDate(order.orderDate)), // Chuyển đổi định dạng ngày
-      totalPrice: order.totalPrice, // Giá của đơn hàng
-    }));
-    const aggregatedData = combinedData.reduce((acc, curr) => {
-      const date = new Date(curr.orderDate);
-      let key;
-      if (filterType === "detail") {
-        return processChartData();
-      } else if (filterType === "month") {
-        key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Chuỗi định dạng "YYYY-MM"
-      } else if (filterType === "year") {
-        key = `${date.getFullYear()}`; // Chỉ năm
-      } else {
-        key = curr.orderDate; // Theo ngày
-      }
-  
-      const existing = acc.find((item) => item.key === key);
-  
-      if (existing) {
-        existing.totalPrice += curr.totalPrice; // Cộng dồn giá nếu key đã tồn tại
-      } else {
-        acc.push({ key, totalPrice: curr.totalPrice }); // Nếu chưa tồn tại, thêm vào mảng
-      }
-      console.log(acc)
-      return acc;
-    }, []);
-  
-    return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sắp xếp theo key
-  };
 
   //PAID
   // const processChartData = () => {
@@ -281,28 +313,29 @@ const ManageStatistic = () => {
   //   }));
   //   return chartData.sort((a, b) => new Date(a.orderDate) - new Date(b.orderDate));
   // };
-  const calculateTotalRevenue = () => {
-    return orderData
-      .reduce((sum, order) => sum + order.totalPrice, 0)
-      .toFixed(2);
-  };
-
-  //PAID
+  
   // const calculateTotalRevenue = () => {
-  //   const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
-  //   return paidOrders.reduce((sum, order) => sum + order.totalPrice, 0).toFixed(2);
+  //   return orderData
+  //     .reduce((sum, order) => sum + order.totalPrice, 0)
+  //     .toFixed(2);
   // };
-
-  const calculateAverageOrderValue = () => {
-    return (calculateTotalRevenue() / orderData.length).toFixed(2);
-  };
 
   //PAID
+  const calculateTotalRevenue = () => {
+    const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
+    return paidOrders.reduce((sum, order) => sum + order.totalPrice, 0).toFixed(2);
+  };
+
   // const calculateAverageOrderValue = () => {
-  //   const totalOrders = calculateTotalOrders();
-  //   if (totalOrders === 0) return "0.00";
-  //   return (calculateTotalRevenue() / totalOrders).toFixed(2);
+  //   return (calculateTotalRevenue() / orderData.length).toFixed(2);
   // };
+
+  //PAID
+  const calculateAverageOrderValue = () => {
+    const totalOrders = calculateTotalOrders();
+    if (totalOrders === 0) return "0.00";
+    return (calculateTotalRevenue() / totalOrders).toFixed(2);
+  };
 
   // Helper function to convert DD/MM/YYYY to YYYY-MM-DD
 
@@ -420,30 +453,29 @@ const ManageStatistic = () => {
   const RevenueDetailsCard = () => (
     <div className="flex h-full flex-col rounded-lg bg-white p-6 shadow-lg">
       <h2 className="mb-4 flex items-center text-2xl font-bold">
-        <FaDollarSign className="mr-2 text-green-500" /> Revenue Details
+        <FaMoneyBill className="mr-2 text-green-500" /> Revenue Details
       </h2>
       <div className="flex-grow space-y-4">
         <div className="flex items-center justify-between">
           <span>Total Revenue:</span>
-          <span className="font-bold">${calculateTotalRevenue()}</span>
+          <span className="font-bold">{formatPrice(calculateTotalRevenue())}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Average Order Value:</span>
-          <span className="font-bold">${calculateAverageOrderValue()}</span>
+          <span className="font-bold">{formatPrice(calculateAverageOrderValue())}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Highest Order Value:</span>
           <span className="font-bold">
-            $
-            {Math.max(...orderData.map((order) => order.totalPrice)).toFixed(2)}
+          {formatPrice(Math.max(...orderData.filter((order) => order.orderStatus === 'SHIPPING').map((order) => order.totalPrice)).toFixed(2))}
           </span>
         </div>
       </div>
       <div className="mt-4 flex items-center justify-between">
         <span className="mr-2 rounded bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
           Revenue Growth:
-          {/* <span className="font-bold">{calculateRevenueGrowth()}%</span> */}
-          Calculate
+          <span className="font-bold">{calculateRevenueGrowth()}%</span>
+          {/* Calculate */}
         </span>
         <button
           onClick={() => setShowRevenueSummary(!showRevenueSummary)}
@@ -571,12 +603,12 @@ const ManageStatistic = () => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <StatItem
               icon={
-                <FaDollarSign
+                <FaMoneyBill
                   className="text-4xl text-green-500"
                   aria-hidden="true"
                 />
               }
-              value={`$${calculateTotalRevenue()}`}
+              value={`${formatPrice(calculateTotalRevenue())}`}
               label="Total Sales"
               onClick={() => handleStatClick("sales")}
             />

@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import { toast } from "react-toastify";
 const { Header, Content, Footer, Sider } = Layout;
-import { FaWarehouse } from "react-icons/fa";
+import { FaWarehouse, FaIdCard } from "react-icons/fa";
 function getItem(label, key, icon, children, onClick = null) {
   return {
     key,
@@ -83,6 +83,7 @@ const Dashboard = () => {
 
   if (role === "MANAGER") {
     items = [
+      getItem("My Profile", "profile", <FaIdCard />),
       getItem("Analytics", "statistic", <BarChartOutlined />),
       getItem("Manage User", "user", <UserOutlined />),
       getItem("Manage Order", "order", <ProductOutlined />),
