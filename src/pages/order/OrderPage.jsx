@@ -27,23 +27,6 @@ function OrderPage() {
          ud_header.classList.remove("sticky");
        }
 
-       // Logo Change on Sticky Header
-       if (logo.length) {
-         const logoSrc = ud_header.classList.contains("sticky")
-           ? "assets/images/logo/logo.svg"
-           : "assets/images/logo/logo-white.svg";
-
-         document.querySelector(".header-logo").src = logoSrc;
-       }
-
-       // Handle logo change for dark mode
-       if (document.documentElement.classList.contains("dark")) {
-         if (logo.length && ud_header.classList.contains("sticky")) {
-           document.querySelector(".header-logo").src =
-             "assets/images/logo/logo-white.svg";
-         }
-       }
-
        // Show or hide the back-to-top button
        const backToTop = document.querySelector(".back-to-top");
        if (backToTop) {
@@ -218,9 +201,15 @@ function OrderPage() {
       );
     } else if (value === "WHOLESALE_ORDER") {
       toast.info(
-        "If total number of fish more than 10, wholesale order price will be cheaper with 10% disconut",
+        "If total number of fish more than 10, wholesale order price will be cheaper with 5% disconut",
       );
     }
+  };
+
+  const handleLocationChange = () => {
+      toast.info(
+        "The more specific the location, the more accurate the shipping price.",
+      );
   };
 
   const handleOrderDetailChange = (index, field, value) => {
@@ -237,7 +226,6 @@ function OrderPage() {
       recipientInfo: values.recipientInfo,
       methodTransPort: values.methodTransPort,
       customerNotes: values.customerNotes,
-      paymentMethod: values.paymentMethod,
       orderDetailRequestList: orderDetails.map((detail) => ({
         priceOfFish: parseInt(detail.priceOfFish),
         nameFarm: detail.nameFarm,
@@ -298,14 +286,9 @@ function OrderPage() {
             <div className="w-60 max-w-full px-4">
               <Link to="/" className="navbar-logo block w-full py-5">
                 <img
-                  src="assets/images/logo/logo.svg"
+                  src="assets/images/logo/logo-v2.svg"
                   alt="logo"
-                  className="w-full dark:hidden"
-                />
-                <img
-                  src="assets/images/logo/logo-white.svg"
-                  alt="logo"
-                  className="hidden w-full dark:block"
+                  className="header-logo h-2/5 w-2/5 rounded-full"
                 />
               </Link>
             </div>
@@ -462,6 +445,18 @@ function OrderPage() {
                           >
                             Order List Page
                           </Link>
+                          <Link
+                            to="/order-history"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order History Page
+                          </Link>
+                          <Link
+                            to="/order-search"
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Order Search Page
+                          </Link>
                         </div>
                       )}
                     </li>
@@ -547,7 +542,7 @@ function OrderPage() {
                         <a className="submenu-item group relative">
                           <div className="pl-6">
                             <img
-                              className="relative inline-block h-11 w-11 rounded-full ring-1 ring-white"
+                              className="relative inline-block h-11 w-11 rounded-full"
                               src={
                                 user?.image ||
                                 "assets/images/navbar/default-avatar.jpg"
@@ -637,17 +632,12 @@ function OrderPage() {
                 <div className="mb-10 text-center">
                   <a
                     href="javascript:void(0)"
-                    className="mx-auto inline-block max-w-[160px]"
+                    className="mx-auto flex max-w-[160px] justify-center"
                   >
                     <img
-                      src="assets/images/logo/logo.svg"
+                      src="assets/images/logo/logo-v2.svg"
                       alt="logo"
-                      className="dark:hidden"
-                    />
-                    <img
-                      src="assets/images/logo/logo-white.svg"
-                      alt="logo"
-                      className="hidden dark:block"
+                      className="header-logo h-2/5 w-2/5 rounded-full"
                     />
                   </a>
                 </div>
@@ -662,6 +652,7 @@ function OrderPage() {
                       label="Origin Location"
                       name="originLocation"
                       className="mb-4 w-full px-2 md:w-1/2"
+                      onChange={handleLocationChange}
                       rules={[
                         {
                           required: true,
@@ -679,6 +670,7 @@ function OrderPage() {
                       label="Destination Location"
                       name="destinationLocation"
                       className="mb-4 w-full px-2 md:w-1/2"
+                      onChange={handleLocationChange}
                       rules={[
                         {
                           required: true,
@@ -771,35 +763,6 @@ function OrderPage() {
                             value: "NORMAL_DELIVERY",
                             label: "Normal Delivery",
                           },
-                        ]}
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label="Payment Method"
-                      name="paymentMethod"
-                      className="mb-4 w-full px-2 md:w-1/2"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please choose payment method",
-                        },
-                      ]}
-                      style={{ textAlign: "left" }}
-                    >
-                      <Select
-                        showSearch
-                        style={{
-                          width: "100%",
-                        }}
-                        placeholder="Select payment method"
-                        optionFilterProp="label"
-                        filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? "")
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? "").toLowerCase())
-                        }
-                        options={[
-                          { value: "BANK_TRANSFER", label: "Bank Transfer" },
                         ]}
                       />
                     </Form.Item>

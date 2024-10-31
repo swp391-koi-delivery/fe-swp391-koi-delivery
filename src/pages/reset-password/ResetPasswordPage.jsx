@@ -86,17 +86,12 @@ function ResetPasswordPage() {
                 <div className="mb-10 text-center">
                   <a
                     href="javascript:void(0)"
-                    className="mx-auto inline-block max-w-[160px]"
+                    className="mx-auto flex max-w-[160px] justify-center"
                   >
                     <img
-                      src="assets/images/logo/logo.svg"
+                      src="assets/images/logo/logo-v2.svg"
                       alt="logo"
-                      className="dark:hidden"
-                    />
-                    <img
-                      src="assets/images/logo/logo-white.svg"
-                      alt="logo"
-                      className="hidden dark:block"
+                      className="header-logo h-2/5 w-2/5 rounded-full"
                     />
                   </a>
                 </div>
