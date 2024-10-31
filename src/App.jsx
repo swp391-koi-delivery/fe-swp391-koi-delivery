@@ -35,14 +35,14 @@ import ManageUser from "./pages/manager/manage-user";
 import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
 
-
 import ProfileUser from "./pages/ProfileUser/ProfileUser";
 // Delivery Staff
 import DeliveryStaff from "./pages/DeliveryStaff/Dashboard_DS/DeliveryStaff";
+import DeliStaffProfile from "./pages/DeliveryStaff/DeliStaffProfile/DeliStaffProfile";
 import ListOrders from "./pages/DeliveryStaff/ListOrders/ListOrders";
 import OrderDetails from "./pages/DeliveryStaff/ListOrders/OrderDetails/OrderDetails";
 import Chat from "./pages/DeliveryStaff/Chat/Chat";
-import OrderTracking from "./pages/OrderTracking/OrderTracking";
+import OrderProgress from "./pages/DeliveryStaff/ListOrders/OrderProgress/OrderProgress";
 import OrderDetailsInfo from "./pages/DeliveryStaff/ListOrders/OrderDetails/OrderDetailsInfo/OrderDetailsInfo";
 import BoxDetails from "./pages/DeliveryStaff/ListOrders/OrderDetails/BoxDetails/BoxDetails";
 // Map & Routing
@@ -225,10 +225,6 @@ function App() {
       ],
     },
     {
-      path: "OrderTracking",
-      element: <OrderTracking />,
-    },
-    {
       path: "profileUser",
       element: <ProfileUser />,
     },
@@ -249,6 +245,10 @@ function App() {
           element: <Chat />,
         },
         {
+          path: "deliStaffProfile",
+          element: <DeliStaffProfile />,
+        },
+        {
           path: "orderDetails_Deli/:id",
           element: <OrderDetails />,
         },
@@ -259,6 +259,10 @@ function App() {
         {
           path: "boxDetails_Deli/:id",
           element: <BoxDetails />,
+        },
+        {
+          path: "orderProgress/:id",
+          element: <OrderProgress />,
         },
         {
           path: "MapComponent",

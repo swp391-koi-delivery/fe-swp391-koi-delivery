@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Button, Upload, Image } from "antd";
-import { FaLock } from "react-icons/fa";
+import axios from "axios";
+import { Modal, Form, Input, Button, message, Upload } from "antd";
+import { FaCheck, FaLock } from "react-icons/fa";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { PlusOutlined } from "@ant-design/icons";
 import uploadFile from "../../utils/file";
 
 const UserProfile = ({ token }) => {
-  const [user, setUser] = useState({});
   const [profileData, setProfileData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -18,14 +18,12 @@ const UserProfile = ({ token }) => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await api.get(`user`);
-        if (response.data) {
-          setUser(response.data);
-          setProfileData(response.data);
-          console.log("Profile Data:", response.data);
-        } else {
-          console.warn("No data found in response");
-        }
+        const response = await api.get(`customer/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setProfileData(response.data);
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }
@@ -36,8 +34,9 @@ const UserProfile = ({ token }) => {
   const handleUpdateProfile = async (values) => {
     if (fileList.length > 0) {
       const file = fileList[0];
-      const url = await uploadFile(file.originFileObj);
-      values.image = url;
+      const url = await uploadFile(file.originFileObj); // Gọi hàm upload file
+      //console.log(url);
+      values.image = url; // Cập nhật URL ảnh vào đối tượng người dùng
     }
     try {
       await api.put(`user/${profileData.id}`, values);
@@ -57,7 +56,6 @@ const UserProfile = ({ token }) => {
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
-
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
@@ -65,9 +63,7 @@ const UserProfile = ({ token }) => {
     setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
   };
-
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
-
   const uploadButton = (
     <button
       style={{
@@ -88,10 +84,10 @@ const UserProfile = ({ token }) => {
   );
 
   const openModal = () => {
-    form.setFieldsValue(profileData); // Set default values
+    form.setFieldsValue(profileData);
     setIsModalOpen(true);
   };
-  console.log(profileData);
+
   const closeModal = () => {
     setIsModalOpen(false);
   };
@@ -99,6 +95,12 @@ const UserProfile = ({ token }) => {
   if (!profileData) {
     return <div>Loading...</div>;
   }
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-8">
@@ -113,7 +115,7 @@ const UserProfile = ({ token }) => {
           <div className="mb-6 text-center">
             <div className="relative inline-block">
               <img
-                src={profileData?.image || "https://via.placeholder.com/150"}
+                src={profileData.image || "https://via.placeholder.com/150"}
                 alt="Profile"
                 className="h-32 w-32 rounded-full border-4 border-blue-100 object-cover"
               />
@@ -124,49 +126,69 @@ const UserProfile = ({ token }) => {
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="rounded-lg bg-gray-50 p-4">
+            <div className="rounded-lg bg-gray-100 p-4">
               <p className="text-sm font-medium text-gray-500">Username</p>
               <p className="text-lg font-semibold text-gray-900">
-                {profileData?.username || "N/A"}
+                {profileData.username}
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-50 p-4">
+            <div className="rounded-lg bg-gray-100 p-4">
               <p className="text-sm font-medium text-gray-500">Full Name</p>
               <p className="text-lg font-semibold text-gray-900">
-                {profileData?.fullname || "N/A"}
+                {profileData.fullname}
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-50 p-4">
+            <div className="rounded-lg bg-gray-100 p-4">
               <p className="text-sm font-medium text-gray-500">Email</p>
               <p className="text-lg font-semibold text-gray-900">
-                {profileData?.email || "N/A"}
+                {profileData.email}
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-50 p-4">
+            <div className="rounded-lg bg-gray-100 p-4">
               <p className="text-sm font-medium text-gray-500">Phone Number</p>
               <p className="text-lg font-semibold text-gray-900">
-                {profileData?.phone || "N/A"}
+                {profileData.phone}
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-50 p-4 md:col-span-2">
+            <div className="rounded-lg bg-gray-100 p-4 md:col-span-2">
               <p className="text-sm font-medium text-gray-500">Address</p>
               <p className="text-lg font-semibold text-gray-900">
-                {profileData?.address || "N/A"}
+                {profileData.address}
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-50 p-4">
-              <p className="text-sm font-medium text-gray-500">
-                Loyalty Points
-              </p>
+            <div className="rounded-lg bg-gray-100 p-4">
+              <p className="text-sm font-medium text-gray-500">Balance</p>
               <p className="text-lg font-semibold text-gray-900">
-                {profileData?.loyaltyPoint || 0} pts
+                {formatPrice(profileData.balance || 0)}
               </p>
             </div>
+
+            {/* <div className="p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm font-medium text-gray-500">Email Status</p>
+              <div className="flex items-center">
+                <FaCheck className="text-green-500 mr-2" />
+                <p className="text-lg font-semibold text-gray-900">{profileData.emailStatus}</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm font-medium text-gray-500">Loyalty Points</p>
+              <p className="text-lg font-semibold text-gray-900">{profileData.loyaltyPoint} pts</p>
+            </div> */}
+            {/* 
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm font-medium text-gray-500">
+                Account Status
+              </p>
+              <p className="text-lg font-semibold text-gray-900">
+                {profileData.deleted ? "Inactive" : "Active"}
+              </p>
+            </div> */}
           </div>
           <div className="mt-8 text-center">
             <Button type="primary" onClick={openModal}>
@@ -176,7 +198,7 @@ const UserProfile = ({ token }) => {
 
           <Modal
             title="Update Profile"
-            open={isModalOpen}
+            visible={isModalOpen}
             onCancel={closeModal}
             onOk={() => form.submit()}
           >
@@ -184,18 +206,116 @@ const UserProfile = ({ token }) => {
               form={form}
               layout="vertical"
               onFinish={handleUpdateProfile}
-              initialValues={profileData || {}}
+              initialValues={profileData}
             >
-              {/* Add form items as before */}
+              <Form.Item
+                label="Username"
+                name="username"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please imput username!",
+                  },
+                  {
+                    min: 6,
+                    message: "Username must be at least 6 characters",
+                  },
+                ]}
+              >
+                <Input disabled />
+              </Form.Item>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please imput password!",
+                  },
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
+              <Form.Item
+                label="Full Name"
+                name="fullname"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please imput fullname!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input email!",
+                  },
+                  {
+                    type: "email",
+                    message: "Invalid email's format!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Phone"
+                name="phone"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input phone number!",
+                  },
+                  {
+                    pattern: "^0[0-9]{9}$",
+                    message: "Invalid format!(0*********)",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Address"
+                name="address"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input address!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item label="image" name="image">
+                <Upload
+                  action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                  listType="picture-card"
+                  fileList={fileList}
+                  onPreview={handlePreview}
+                  onChange={handleChange}
+                >
+                  {fileList.length >= 8 ? null : uploadButton}
+                </Upload>
+              </Form.Item>
             </Form>
           </Modal>
         </div>
       </div>
       {previewImage && (
         <Image
+          wrapperStyle={{
+            display: "none",
+          }}
           preview={{
             visible: previewOpen,
             onVisibleChange: (visible) => setPreviewOpen(visible),
+            afterOpenChange: (visible) => !visible && setPreviewImage(""),
           }}
           src={previewImage}
         />
