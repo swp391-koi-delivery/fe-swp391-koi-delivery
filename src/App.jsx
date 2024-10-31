@@ -30,6 +30,7 @@ import ManageBox from "./pages/manager/manage-box";
 import ManageWarehouse from "./pages/manager/manage-warehouse";
 
 import ManageProfile from "./pages/manager/ManagerProfile";
+import BoxDetailsStaff from "./pages/sales-staff/BoxDetails-staff";
 import ManageUser from "./pages/manager/manage-user";
 import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
@@ -48,6 +49,7 @@ import BoxDetails from "./pages/DeliveryStaff/ListOrders/OrderDetails/BoxDetails
 import MapComponent from "./pages/DeliveryStaff/MapComponent/MapComponent";
 import MapPlatform from "./pages/DeliveryStaff/MapComponent/MapPlatform/MapPlatform";
 import OrderRouting from "./pages/DeliveryStaff/MapComponent/OrderRouting/OrderRouting";
+
 
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
@@ -169,6 +171,10 @@ function App() {
           path: "orderDetailsInfo/:id",
           element: <OrderDetailsInfoStaff />,
         },
+        {
+          path: "boxDetails/:id",
+          element: <BoxDetailsStaff />,
+        },
       ],
     },
     {
@@ -200,8 +206,13 @@ function App() {
           element: <OrderDetailsInfoStaff />,
         },
         {
-          path: "box",
-          element: <ManageBox />,
+          path: "boxDetails/:id",
+          element: <BoxDetailsStaff />,
+        },
+        {
+          path:"box",
+          element:<ManageBox/>
+
         },
         {
           path: "warehouse",

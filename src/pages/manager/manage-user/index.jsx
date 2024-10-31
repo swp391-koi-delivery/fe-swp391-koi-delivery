@@ -70,8 +70,8 @@ function ManageUser() {
       //lấy dữ liệu từ BE và set nó
       // setUsers(response.data);
       // setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
-      setUsers(Array.isArray(response.data.content) ? response.data.content : []);
-      setFilteredUsers(Array.isArray(response.data.content) ? response.data.content : []);
+      setUsers(Array.isArray(response.data.content) ? response.data.content.filter(user => user.role !== "MANAGER") : []);
+      setFilteredUsers(Array.isArray(response.data.content) ?response.data.content.filter(user => user.role !== "MANAGER") : []);
       console.log(response.data.content);
     } catch (error) {
       toast.error(error.response.data);

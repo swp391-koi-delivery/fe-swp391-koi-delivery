@@ -75,14 +75,14 @@ const ManageStatistic = () => {
       case "sales":
         content = {
           title: "Total Sales",
-          value: `${formatPrice(calculateTotalRevenue())}`,
+          value: `${formatPrice(user.totalRevenue)}`,
           description: "Revenue generated from all sales this month.",
         };
         break;
       case "customers":
         content = {
           title: "Total Customers",
-          value: customerCount.toLocaleString(),
+          value: user.customersCount.toLocaleString(),
           description:
             "Number of unique customers who made a purchase this month.",
         };
@@ -90,7 +90,7 @@ const ManageStatistic = () => {
       case "orders":
         content = {
           title: "Total Orders",
-          value: calculateTotalOrders().toLocaleString(),
+          value: user.orders.toLocaleString(),
           description: "Number of orders processed this month.",
         };
         break;
@@ -149,10 +149,10 @@ const ManageStatistic = () => {
         // const response1 = await api.get(
         //   "order/allOrder?page=1&size=1000000000",
         // );
-        const response2 = await api.get(
-          "manager/allUser?page=1&size=1000000000",
-        );
-        const response1 = await api.get("manager/dashboard/orderStatistics?filter=month")
+        // const response1 = await api.get("manager/dashboard/orderStatistics?filter=month")
+        // const response2 = await api.get("manager/allUser?page=1&size=1000000000");
+        const response1 = await api.get(`manager/dashboard/orderStatistics?filter=${filterType}`);
+        const response2 = await api.get("manager/dashboard/dashboardStats");
         setOrderData(response1.data);
         setUser(response2.data);
         calculateMonthlyRevenue();
@@ -212,97 +212,97 @@ const ManageStatistic = () => {
     return growth.toFixed(2);
   };
 
-  // const processChartData = () => {
-  //   const chartData = orderData.map((order) => ({
-  //     orderDate: formatDate(convertToDate(order.orderDate)), // Use convertToDate to parse DD/MM/YYYY format
-  //     totalPrice: order.totalPrice,
-  //   }));
-  //   console.log(chartData.sort(
-  //     (a, b) => new Date(a.orderDate) - new Date(b.orderDate),
-  //   ))
-  //   return chartData.sort(
-  //     (a, b) => new Date(a.orderDate) - new Date(b.orderDate),
-  //   ); // Sort by the parsed date
-  // };
-
-  //PAID
   const processChartData = () => {
-    const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
-    const chartData = paidOrders.map(order => ({
-      orderDate: formatDate(convertToDate(order.orderDate)), // Parse DD/MM/YYYY format
+    const chartData = orderData.map((order) => ({
+      orderDate: formatDate(convertToDate(order.date)), // Use convertToDate to parse DD/MM/YYYY format
       totalPrice: order.totalPrice,
     }));
-    
-    return chartData.sort((a, b) => new Date(a.orderDate) - new Date(b.orderDate)); // Sort by parsed date
-  };
-  
-  //PAID
-  const processChartDataDate = () => {
-    const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
-    const combinedData = paidOrders.map(order => ({
-      orderDate: formatDate(convertToDate(order.orderDate)), // Convert date format
-      totalPrice: order.totalPrice, // Order price
-    }));
-  
-    const aggregatedData = combinedData.reduce((acc, curr) => {
-      const date = new Date(curr.orderDate);
-      let key;
-  
-      if (filterType === "detail") {
-        return processChartData(); // Call the original process function
-      } else if (filterType === "month") {
-        key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Format as "YYYY-MM"
-      } else if (filterType === "year") {
-        key = `${date.getFullYear()}`; // Only year
-      } else {
-        key = curr.orderDate; // By date
-      }
-  
-      const existing = acc.find(item => item.key === key);
-  
-      if (existing) {
-        existing.totalPrice += curr.totalPrice; // Sum total price if key exists
-      } else {
-        acc.push({ key, totalPrice: curr.totalPrice }); // Add if key doesn't exist
-      }
-  
-      return acc;
-    }, []);
-  
-    return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sort by key
+    console.log(chartData.sort(
+      (a, b) => new Date(a.date) - new Date(b.date),
+    ))
+    return chartData.sort(
+      (a, b) => new Date(a.date) - new Date(b.date),
+    ); // Sort by the parsed date
   };
 
-  // const processChartDataDate = () => {
-  //   const combinedData = orderData.map((order) => ({
-  //     orderDate: formatDate(convertToDate(order.orderDate)), // Chuyển đổi định dạng ngày
-  //     totalPrice: order.totalPrice, // Giá của đơn hàng
+  //PAID
+  // const processChartData = () => {
+  //   const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
+  //   const chartData = paidOrders.map(order => ({
+  //     orderDate: formatDate(convertToDate(order.orderDate)), // Parse DD/MM/YYYY format
+  //     totalPrice: order.totalPrice,
   //   }));
+    
+  //   return chartData.sort((a, b) => new Date(a.orderDate) - new Date(b.orderDate)); // Sort by parsed date
+  // };
+  
+  // //PAID
+  // const processChartDataDate = () => {
+  //   const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
+  //   const combinedData = paidOrders.map(order => ({
+  //     orderDate: formatDate(convertToDate(order.orderDate)), // Convert date format
+  //     totalPrice: order.totalPrice, // Order price
+  //   }));
+  
   //   const aggregatedData = combinedData.reduce((acc, curr) => {
   //     const date = new Date(curr.orderDate);
   //     let key;
+  
   //     if (filterType === "detail") {
-  //       return processChartData();
+  //       return processChartData(); // Call the original process function
   //     } else if (filterType === "month") {
-  //       key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Chuỗi định dạng "YYYY-MM"
+  //       key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Format as "YYYY-MM"
   //     } else if (filterType === "year") {
-  //       key = `${date.getFullYear()}`; // Chỉ năm
+  //       key = `${date.getFullYear()}`; // Only year
   //     } else {
-  //       key = curr.orderDate; // Theo ngày
+  //       key = curr.orderDate; // By date
   //     }
   
-  //     const existing = acc.find((item) => item.key === key);
+  //     const existing = acc.find(item => item.key === key);
   
   //     if (existing) {
-  //       existing.totalPrice += curr.totalPrice; // Cộng dồn giá nếu key đã tồn tại
+  //       existing.totalPrice += curr.totalPrice; // Sum total price if key exists
   //     } else {
-  //       acc.push({ key, totalPrice: curr.totalPrice }); // Nếu chưa tồn tại, thêm vào mảng
+  //       acc.push({ key, totalPrice: curr.totalPrice }); // Add if key doesn't exist
   //     }
-  //     console.log(acc)
+  
   //     return acc;
   //   }, []);
   
-  //   return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sắp xếp theo key
+  //   return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sort by key
   // };
+
+  const processChartDataDate = () => {
+    const combinedData = orderData.map((order) => ({
+      orderDate: formatDate(convertToDate(order.date)), // Chuyển đổi định dạng ngày
+      totalPrice: order.totalPrice, // Giá của đơn hàng
+    }));
+    const aggregatedData = combinedData.reduce((acc, curr) => {
+      const date = new Date(curr.date);
+      let key;
+      if (filterType === "detail") {
+        return processChartData();
+      } else if (filterType === "month") {
+        key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Chuỗi định dạng "YYYY-MM"
+      } else if (filterType === "year") {
+        key = `${date.getFullYear()}`; // Chỉ năm
+      } else {
+        key = curr.date; // Theo ngày
+      }
+  
+      const existing = acc.find((item) => item.key === key);
+  
+      if (existing) {
+        existing.totalPrice += curr.totalPrice; // Cộng dồn giá nếu key đã tồn tại
+      } else {
+        acc.push({ key, totalPrice: curr.totalPrice }); // Nếu chưa tồn tại, thêm vào mảng
+      }
+      console.log(acc)
+      return acc;
+    }, []);
+  
+    return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sắp xếp theo key
+  };
 
   //PAID
   // const processChartData = () => {
@@ -365,14 +365,16 @@ const ManageStatistic = () => {
 
 
   const convertToDate = (dateString) => {
+    if (!dateString) return null;
     const [day, month, year] = dateString.split("/");
     return new Date(`${year}-${month}-${day}`);
   };
 
   const formatDate = (date) => {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-    const dd = String(date.getDate()).padStart(2, "0");
+    //if (!date) return ""; // Trả về chuỗi rỗng nếu date không hợp lệ
+    const yyyy = date?.getFullYear();
+    const mm = String(date?.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const dd = String(date?.getDate()).padStart(2, "0");
     return `${dd}/${mm}/${yyyy}`;
   };
   const { mostActiveDay, highestRevenue } = getMostActiveDay();
@@ -432,7 +434,7 @@ const ManageStatistic = () => {
       </p>
       <div className="mt-4 flex items-center justify-between">
         <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-          Total Orders: {orderData.length}
+          Total Orders: {user.countOrderDelivered}
         </span>
         <button
           onClick={() => setShowOrderSummary(!showOrderSummary)}
@@ -458,23 +460,23 @@ const ManageStatistic = () => {
       <div className="flex-grow space-y-4">
         <div className="flex items-center justify-between">
           <span>Total Revenue:</span>
-          <span className="font-bold">{formatPrice(calculateTotalRevenue())}</span>
+          <span className="font-bold">{formatPrice(user.totalRevenue)}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Average Order Value:</span>
-          <span className="font-bold">{formatPrice(calculateAverageOrderValue())}</span>
+          <span className="font-bold">{formatPrice(user.averageOrderValue)}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Highest Order Value:</span>
           <span className="font-bold">
-          {formatPrice(Math.max(...orderData.filter((order) => order.orderStatus === 'SHIPPING').map((order) => order.totalPrice)).toFixed(2))}
+          {formatPrice(user.highestOrderValue)}
           </span>
         </div>
       </div>
       <div className="mt-4 flex items-center justify-between">
         <span className="mr-2 rounded bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
           Revenue Growth:
-          <span className="font-bold">{calculateRevenueGrowth()}%</span>
+          <span className="font-bold">{user.revenueGrowth|| "Calculating..."}%</span>
           {/* Calculate */}
         </span>
         <button
@@ -502,30 +504,18 @@ const ManageStatistic = () => {
         <div className="flex items-center justify-between">
           <span>First Order Date:</span>
           <span className="font-bold">
-            {formatDate(
-              new Date(
-                Math.min(
-                  ...orderData.map((order) => convertToDate(order.orderDate)),
-                ),
-              ),
-            )}
+            {formatDate(new Date(convertToDate(user.firstOrderDate)))}
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span>Last Order Date:</span>
+          <span>Most Active Date:</span>
           <span className="font-bold">
-            {formatDate(
-              new Date(
-                Math.max(
-                  ...orderData.map((order) => convertToDate(order.orderDate)),
-                ),
-              ),
-            )}
+          {formatDate(new Date(convertToDate(user.mostActiveDay)))}
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span>Most Active Day:</span>
-         <span className="font-bold">{mostActiveDay ? `${mostActiveDay}` : "N/A"}</span>
+          <span>Order(s):</span>
+         <span className="font-bold">{user.mostActiveDayOrderCount}</span>
         </div>
       </div>
       <div className="mt-4 flex items-center justify-between">
@@ -558,19 +548,13 @@ const ManageStatistic = () => {
         <div className="flex items-center justify-between">
           <span>First Order Date:</span>
           <span className="font-bold">
-            <Rate disabled defaultValue={4.5} />
+          <Rate disabled defaultValue={user.averageRatingScore} />
           </span>
         </div>
         <div className="flex items-center justify-between">
           <span>Now: </span>
           <span className="font-bold">
-            {formatDate(
-              new Date(
-                Math.max(
-                  ...orderData.map((order) => convertToDate(order.orderDate)),
-                ),
-              ),
-            )}
+            {formatDate(new Date())}
           </span>
         </div>
       </div>
@@ -608,7 +592,7 @@ const ManageStatistic = () => {
                   aria-hidden="true"
                 />
               }
-              value={`${formatPrice(calculateTotalRevenue())}`}
+              value={`${formatPrice(user.totalRevenue)}`}
               label="Total Sales"
               onClick={() => handleStatClick("sales")}
             />
@@ -619,7 +603,7 @@ const ManageStatistic = () => {
                   aria-hidden="true"
                 />
               }
-              value={customerCount.toLocaleString()}
+              value={user.customersCount}
               label="Customers"
               onClick={() => handleStatClick("customers")}
             />
@@ -630,7 +614,7 @@ const ManageStatistic = () => {
                   aria-hidden="true"
                 />
               }
-              value={calculateTotalOrders().toLocaleString()}
+              value={user.orders}
               label="Orders"
               onClick={() => handleStatClick("orders")}
             />
