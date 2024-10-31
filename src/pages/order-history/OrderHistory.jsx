@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import { Button, Form, Input, Pagination, Steps } from "antd";
+import {
+  Alert,
+  Button,
+  Form,
+  Input,
+  Modal,
+  Pagination,
+  Rate,
+  Steps,
+} from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
@@ -12,13 +21,17 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
+import { useForm } from "antd/es/form/Form";
 
-function OrderListPage() {
+function OrderHistoryPage() {
+  const [form] = useForm();
+  const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const { Step } = Steps;
 
@@ -172,6 +185,15 @@ function OrderListPage() {
     navigate("/login");
   };
 
+  const handleOpenModal = (values) => {
+    setSelectedOrder(values);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
   const formatVND = (amount) => {
     // Ensure amount is a valid number
     if (typeof amount !== "number" || isNaN(amount)) {
@@ -209,20 +231,6 @@ function OrderListPage() {
         maximumFractionDigits: 2,
       }).format(distance) + " km"
     );
-  };
-
-  const handlePayment = async (values) => {
-    try {
-      setLoading(true);
-      const response = await api.post(`customer/orderPaymentUrl/${values}`);
-      console.log(response);
-      window.open(response.data);
-      toast.success("Successfully pay for order");
-    } catch (err) {
-      toast.error(err.response.data || "Failed to pay for order");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const generateTable = (orderDetails) => {
@@ -309,12 +317,25 @@ function OrderListPage() {
     );
   };
 
+  const handleFeedback = async (values) => {
+    try {
+      setLoading(true);
+      const response = await api.post("feedBack", values);
+      toast.success("Successfully send feedback");
+      setOpenModal(false);
+    } catch (err) {
+      toast.error(err.response.data || "Failed to send feedback");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchOrder = async (page) => {
     console.log(page);
     setLoading(true);
     try {
       const response = await api.get(
-        `/customer/order/each-user?page=${page}&size=5`,
+        `/customer/order/orderHistory?page=${page}&size=5`,
       );
       console.log(response);
       setTotalPages(response.data.totalElements);
@@ -750,13 +771,47 @@ function OrderListPage() {
                       </div>
                     </div>
                     <div className="flex w-full flex-row items-end justify-end gap-1.5">
-                      {order.orderStatus === "AWAITING_PAYMENT" && (
-                        <Button
-                          onClick={() => handlePayment(order.id)}
-                          loading={loading}
-                        >
-                          Payment
-                        </Button>
+                      {order?.orderStatus === "DELIVERED" && (
+                        <div className="">
+                          <Modal
+                            title="Feedback"
+                            loading={loading}
+                            onOk={() => form.submit()}
+                            open={openModal}
+                            onCancel={handleCloseModal}
+                          >
+                            <Form
+                              form={form}
+                              labelCol={{ span: 24 }}
+                              onFinish={handleFeedback}
+                            >
+                              <Alert
+                                message={`Feedback for ${selectedOrder?.id}`}
+                                type="info"
+                              />
+                              <Form.Item
+                                hidden
+                                label="Order Id"
+                                name="orderId"
+                                initialValue={selectedOrder?.id}
+                              >
+                                <Input hidden />
+                              </Form.Item>
+                              <Form.Item
+                                label="Rating Score"
+                                name="ratingScore"
+                              >
+                                <Rate></Rate>
+                              </Form.Item>
+                              <Form.Item label="Comment" name="comment">
+                                <Input.TextArea />
+                              </Form.Item>
+                            </Form>
+                          </Modal>
+                          <Button onClick={() => handleOpenModal(order)}>
+                            Feedback
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -1076,7 +1131,7 @@ function OrderListPage() {
             <div className="w-full px-4">
               <div className="text-center">
                 <h1 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
-                  Order List Page
+                  Order History Page
                 </h1>
                 <p className="mb-5 text-base text-body-color dark:text-dark-6">
                   All of your order information are here.
@@ -1093,7 +1148,7 @@ function OrderListPage() {
                   </Link>
                   <li>
                     <Link
-                      to="/order-list"
+                      to="/order-history"
                       href="javascript:void(0)"
                       className="flex items-center gap-[10px] text-base font-medium text-body-color"
                     >
@@ -1101,7 +1156,7 @@ function OrderListPage() {
                         {" "}
                         /{" "}
                       </span>
-                      Order List Page
+                      Order History Page
                     </Link>
                   </li>
                 </ul>
@@ -1156,4 +1211,4 @@ function OrderListPage() {
   );
 }
 
-export default OrderListPage;
+export default OrderHistoryPage;

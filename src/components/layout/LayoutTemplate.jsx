@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import FooterComponent from "../FooterComponent";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/features/userSlice";
 
 function LayoutTemplate() {
   const handleDarkMode = () => {
@@ -14,23 +16,6 @@ function LayoutTemplate() {
         ud_header.classList.add("sticky");
       } else {
         ud_header.classList.remove("sticky");
-      }
-
-      // Logo Change on Sticky Header
-      if (logo.length) {
-        const logoSrc = ud_header.classList.contains("sticky")
-          ? "assets/images/logo/logo.svg"
-          : "assets/images/logo/logo-white.svg";
-
-        document.querySelector(".header-logo").src = logoSrc;
-      }
-
-      // Handle logo change for dark mode
-      if (document.documentElement.classList.contains("dark")) {
-        if (logo.length && ud_header.classList.contains("sticky")) {
-          document.querySelector(".header-logo").src =
-            "assets/images/logo/logo-white.svg";
-        }
       }
 
       // Show or hide the back-to-top button
@@ -168,6 +153,14 @@ function LayoutTemplate() {
   useEffect(() => {
     handleDarkMode();
   }, []);
+
+  const user = useSelector((store) => store.user);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    Navigate("/login");
+  };
   return (
     <>
       <div className="ud-header absolute left-0 top-0 z-40 flex w-full items-center bg-transparent">
@@ -176,14 +169,9 @@ function LayoutTemplate() {
             <div className="w-60 max-w-full px-4">
               <Link to="/" className="navbar-logo block w-full py-5">
                 <img
-                  src="assets/images/logo/logo.svg"
+                  src="assets/images/logo/logo-v2.svg"
                   alt="logo"
-                  className="w-full dark:hidden"
-                />
-                <img
-                  src="assets/images/logo/logo-white.svg"
-                  alt="logo"
-                  className="hidden w-full dark:block"
+                  className="header-logo h-2/5 w-2/5 rounded-full"
                 />
               </Link>
             </div>
@@ -202,6 +190,60 @@ function LayoutTemplate() {
                   className="absolute right-4 top-full hidden w-full max-w-[250px] rounded-lg bg-white py-5 shadow-lg dark:bg-dark-2 lg:static lg:block lg:w-full lg:max-w-full lg:bg-transparent lg:px-4 lg:py-0 lg:shadow-none dark:lg:bg-transparent xl:px-6"
                 >
                   <ul className="blcok lg:flex 2xl:ml-20">
+                    <li className="submenu-item group relative md:hidden">
+                      <a
+                        href="javascript:void(0)"
+                        className="relative mx-8 flex items-center justify-between py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-8 lg:mr-0 lg:inline-flex lg:py-6 lg:pl-0 lg:pr-4 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10"
+                      >
+                        Account
+                        <svg
+                          className="ml-2 fill-current"
+                          width="16"
+                          height="20"
+                          viewBox="0 0 16 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M7.99999 14.9C7.84999 14.9 7.72499 14.85 7.59999 14.75L1.84999 9.10005C1.62499 8.87505 1.62499 8.52505 1.84999 8.30005C2.07499 8.07505 2.42499 8.07505 2.64999 8.30005L7.99999 13.525L13.35 8.25005C13.575 8.02505 13.925 8.02505 14.15 8.25005C14.375 8.47505 14.375 8.82505 14.15 9.05005L8.39999 14.7C8.27499 14.825 8.14999 14.9 7.99999 14.9Z" />
+                        </svg>
+                      </a>
+                      {user == null || user?.role !== "CUSTOMER" ? (
+                        <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                          <Link
+                            to="/login"
+                            className="block rounded px-4 py-[10px] text-sm text-dark hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Login
+                          </Link>
+                          <Link
+                            to="/register"
+                            className="block rounded px-4 py-[10px] text-sm text-dark hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Register
+                          </Link>
+                        </div>
+                      ) : (
+                        user?.role === "CUSTOMER" && (
+                          <div className="submenu relative left-0 top-full hidden w-[250px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                            <span className="block rounded px-4 text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
+                              {user?.username}
+                            </span>
+                            <Link
+                              to=""
+                              className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                            >
+                              Profile
+                            </Link>
+                            <Link
+                              onClick={handleLogout}
+                              className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                            >
+                              Logout
+                            </Link>
+                          </div>
+                        )
+                      )}
+                    </li>
                     <li className="group relative">
                       <Link
                         to="/"
@@ -287,6 +329,12 @@ function LayoutTemplate() {
                         >
                           Login Page
                         </Link>
+                        <Link
+                          to="/order-search"
+                          className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                        >
+                          Order Search Page
+                        </Link>
                       </div>
                     </li>
                   </ul>
@@ -349,18 +397,55 @@ function LayoutTemplate() {
                   </span>
                 </label>
                 <div className="hidden sm:flex">
-                  <Link
-                    to="/login"
-                    className="loginBtn px-[22px] py-2 text-base font-medium text-dark hover:opacity-70 dark:text-white"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="primaryButton rounded-md px-6 py-2 text-base font-medium text-white duration-300 ease-in-out"
-                  >
-                    Register
-                  </Link>
+                  {user == null || user?.role !== "CUSTOMER" ? (
+                    <div className="">
+                      <Link
+                        to="/login"
+                        className="loginBtnLayout px-[22px] py-2 text-base font-medium text-dark hover:opacity-70 dark:text-white"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="signUpBtnLayout rounded-md bg-primary px-6 py-2 text-base font-medium text-white duration-300 ease-in-out hover:bg-opacity-100"
+                      >
+                        Register
+                      </Link>
+                    </div>
+                  ) : (
+                    user?.role === "CUSTOMER" && (
+                      <a className="submenu-item group relative">
+                        <div className="pl-6">
+                          <img
+                            className="relative inline-block h-11 w-11 rounded-full"
+                            src={
+                              user?.image ||
+                              "assets/images/navbar/default-avatar.jpg"
+                            }
+                            alt="default-avatar"
+                          />
+                        </div>
+
+                        <div className="submenu relative right-0 top-full hidden w-[220px] rounded-sm bg-white p-4 transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark-2 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full">
+                          <span className="block rounded px-4 py-[10px] text-base text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary">
+                            {user?.username}
+                          </span>
+                          <Link
+                            to=""
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Profile
+                          </Link>
+                          <Link
+                            onClick={handleLogout}
+                            className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
+                          >
+                            Logout
+                          </Link>
+                        </div>
+                      </a>
+                    )
+                  )}
                 </div>
               </div>
             </div>

@@ -190,9 +190,9 @@ const OrderList = () => {
     }
   };
 
-  const startIndex = (currentPage - 1) * ordersPerPage;
-  const endIndex = startIndex + ordersPerPage;
-  const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * ordersPerPage;
+  // const endIndex = startIndex + ordersPerPage;
+  // const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-4">

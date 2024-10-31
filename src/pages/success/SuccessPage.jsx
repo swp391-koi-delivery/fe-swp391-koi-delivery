@@ -14,7 +14,7 @@ function SuccessPage() {
 
   const postOrderID = async () => {
     try {
-      const response = await api.post(`/order/transaction?orderID=${orderID}`);
+      const response = await api.post(`/customer/transaction?orderId=${orderID}`);
       console.log(response);
     } catch (e) {
       console.log(e);

@@ -1,30 +1,41 @@
 import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
+
+// Customer
+import LayoutTemplate from "./components/layout/LayoutTemplate";
+import Dashboard from "./components/dashboard/Dashboard";
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import HomePage from "./pages/home/HomePage";
 import ResetPasswordPage from "./pages/reset-password/ResetPasswordPage";
 import ForgotPasswordPage from "./pages/forgot-password/ForgotPasswordPage";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import Dashboard from "./components/dashboard/Dashboard";
 import OrderPage from "./pages/order/OrderPage";
 import OrderListPage from "./pages/order-list/OrderListPage";
-import ManageUser from "./pages/manager/manage-user";
-import ManageOrder from "./pages/manager/manage-order";
-import ManageStatistic from "./pages/manager/manage-statistic";
-import LayoutTemplate from "./components/layout/LayoutTemplate";
+import OrderSearchPage from "./pages/order-search/OrderSearch";
+import OrderHistoryPage from "./pages/order-history/OrderHistory";
+import SuccessPage from "./pages/success/SuccessPage";
+import ErrorPage from "./pages/error/ErrorPage";
+
+// Manager & Sales Staff
 import OrderList from "./pages/sales-staff";
 import OrderDetailStaff from "./pages/sales-staff/orderDetails-staff";
 import OrderDetailsInfoStaff from "./pages/sales-staff/orderDetailInfo";
 import ManageBox from "./pages/manager/manage-box";
 import ManageWarehouse from "./pages/manager/manage-warehouse";
+
 import ManageProfile from "./pages/manager/ManagerProfile";
 import BoxDetailsStaff from "./pages/sales-staff/BoxDetails-staff";
+import ManageUser from "./pages/manager/manage-user";
+import ManageOrder from "./pages/manager/manage-order";
+import ManageStatistic from "./pages/manager/manage-statistic";
+
+
 import ProfileUser from "./pages/ProfileUser/ProfileUser";
 // Delivery Staff
 import DeliveryStaff from "./pages/DeliveryStaff/Dashboard_DS/DeliveryStaff";
@@ -39,10 +50,6 @@ import MapComponent from "./pages/DeliveryStaff/MapComponent/MapComponent";
 import MapPlatform from "./pages/DeliveryStaff/MapComponent/MapPlatform/MapPlatform";
 import OrderRouting from "./pages/DeliveryStaff/MapComponent/OrderRouting/OrderRouting";
 
-import "./index.css";
-import "./App.css";
-import SuccessPage from "./pages/success/Success";
-import ErrorPage from "./pages/error/ErrorPage";
 
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
@@ -106,6 +113,10 @@ function App() {
           path: "reset-password",
           element: <ResetPasswordPage />,
         },
+        {
+          path: "order-search",
+          element: <OrderSearchPage />,
+        },
       ],
     },
     {
@@ -121,6 +132,14 @@ function App() {
       element: (
         <ProtectRouteCustomerAuth>
           <OrderListPage />
+        </ProtectRouteCustomerAuth>
+      ),
+    },
+    {
+      path: "order-history",
+      element: (
+        <ProtectRouteCustomerAuth>
+          <OrderHistoryPage />
         </ProtectRouteCustomerAuth>
       ),
     },
@@ -193,10 +212,11 @@ function App() {
         {
           path:"box",
           element:<ManageBox/>
+
         },
         {
-          path:"warehouse",
-          element:<ManageWarehouse/>
+          path: "warehouse",
+          element: <ManageWarehouse />,
         },
         {
           path: "statistic",
@@ -256,7 +276,6 @@ function App() {
         },
       ],
     },
-   
   ]);
   return <RouterProvider router={router} />;
 }
