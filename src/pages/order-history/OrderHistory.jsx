@@ -19,7 +19,10 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
+  FileDoneOutlined,
+  HomeOutlined,
   LoadingOutlined,
+  TruckOutlined,
 } from "@ant-design/icons";
 import { useForm } from "antd/es/form/Form";
 
@@ -323,6 +326,8 @@ function OrderHistoryPage() {
       const response = await api.post("feedBack", values);
       toast.success("Successfully send feedback");
       setOpenModal(false);
+       const currentPage = localStorage.getItem("currentPage") || 1;
+       fetchOrder(currentPage);
     } catch (err) {
       toast.error(err.response.data || "Failed to send feedback");
     } finally {
@@ -352,6 +357,64 @@ function OrderHistoryPage() {
     fetchOrder(page);
   };
 
+  const renderSteps = (progresses) => {
+    return progresses.map((progress, index) => {
+      let icon;
+      let image;
+      let color = "rgb(107 114 128)";
+      let title = progress.progressStatus;
+
+      if (progress.inProgress === true) {
+        color = "rgb(59 130 246)"; // Active blue color
+      }
+
+      // Choose icon based on progressStatus
+      switch (progress.progressStatus) {
+        case "ON_SITE":
+          icon = <LoadingOutlined style={{ color }} />;
+          break;
+        case "FISH_CHECKED":
+          icon = <FileDoneOutlined style={{ color }} />;
+          break;
+        case "WAREHOUSING":
+          icon = <HomeOutlined style={{ color }} />;
+          break;
+        case "EN_ROUTE":
+          icon = <TruckOutlined style={{ color }} />;
+          break;
+        case "HANDED_OVER":
+          icon = <CheckCircleOutlined style={{ color }} />;
+          break;
+        case "CANCELED":
+          icon = <CloseCircleOutlined style={{ color: "rgb(239 68 68)" }} />;
+          break;
+        default:
+          icon = <ClockCircleOutlined style={{ color }} />;
+      }
+
+      // Dynamically load image if it exists in progress data
+      image = progress.image ? (
+        <img src={progress.image} alt={title} className="mt-2" />
+      ) : null;
+
+      return (
+        <Step
+          key={progress.id}
+          title={<span className="dark:text-white">{title}</span>}
+          description={
+            <div>
+              <span className="dark:text-white">
+                Fish status: {progress.healthFishStatus || "Unknown"}
+              </span>
+              {image}
+            </div>
+          }
+          icon={icon}
+        />
+      );
+    });
+  };
+
   useEffect(() => {
     handleDarkMode();
 
@@ -360,6 +423,9 @@ function OrderHistoryPage() {
   }, []);
 
   const Order = ({ order }) => {
+    const currentStepIndex =
+      order?.progresses.filter((progress) => progress.inProgress === true)
+        .length - 1;
     return (
       <>
         <div className="order my-8">
@@ -526,106 +592,24 @@ function OrderHistoryPage() {
                 </div>
                 <div className="inline-flex w-full items-start justify-end gap-4">
                   <div className="inline-flex w-full flex-col items-start justify-start gap-4">
-                    <div className="flex w-full flex-col items-center justify-center gap-5 rounded-xl bg-white dark:bg-dark md:items-start md:justify-start">
-                      <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-center text-2xl font-semibold leading-9 text-dark dark:text-white md:text-start">
-                        Order Tracking
-                      </h2>
-                      <div className="w-full flex-col items-center justify-center md:flex-row">
-                        <Steps current={4}>
-                          <Step
-                            title={
-                              <span className="dark:text-white">
-                                In Progress
-                              </span>
+                    {order?.progresses && order?.progresses.length > 0 && (
+                      <div className="flex w-full flex-col items-center justify-center gap-5 rounded-xl bg-white dark:bg-dark md:items-start md:justify-start">
+                        <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-center text-2xl font-semibold leading-9 text-dark dark:text-white md:text-start">
+                          Order Tracking
+                        </h2>
+                        <div className="w-full flex-col items-center justify-center md:flex-row">
+                          {/*  */}
+                          <Steps
+                            current={
+                              currentStepIndex >= 0 ? currentStepIndex : 0
                             }
-                            description={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            subTitle={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            icon={
-                              <LoadingOutlined
-                                style={{
-                                  color: " rgb(59 130 246)",
-                                }}
-                              />
-                            }
-                          />
-                          <Step
-                            title={
-                              <span className="dark:text-white">Waiting</span>
-                            }
-                            subTitle={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            description={
-                              <div>
-                                <span className="dark:text-white">hello</span>
-                                <img
-                                  src="./assets/images/blog/blog-01.jpg"
-                                  alt="Waiting"
-                                  className="mt-2"
-                                />
-                              </div>
-                            }
-                            icon={
-                              <ClockCircleOutlined
-                                style={{ color: "rgb(107 114 128)" }}
-                              />
-                            }
-                          />
-                          <Step
-                            title={
-                              <span className="dark:text-white">Waiting</span>
-                            }
-                            subTitle={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            description={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            icon={
-                              <ClockCircleOutlined
-                                style={{ color: "rgb(107 114 128)" }}
-                              />
-                            }
-                          />
-                          <Step
-                            title={
-                              <span className="dark:text-white">Rejected</span>
-                            }
-                            subTitle={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            description={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            icon={
-                              <CloseCircleOutlined
-                                style={{ color: "rgb(239 68 68)" }}
-                              />
-                            }
-                          />
-                          <Step
-                            title={
-                              <span className="dark:text-white">Done</span>
-                            }
-                            subTitle={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            description={
-                              <span className="dark:text-white">hello</span>
-                            }
-                            icon={
-                              <CheckCircleOutlined
-                                style={{ color: "rgb(16 185 129)" }}
-                              />
-                            }
-                          />
-                        </Steps>
+                          >
+                            {renderSteps(order.progresses)}
+                          </Steps>
+                          {/*  */}
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="flex w-full flex-col items-start justify-start gap-5 rounded-xl bg-white dark:bg-dark">
                       <h2 className="font-manrope w-full border-b border-gray-200 pb-5 text-2xl font-semibold leading-9 text-dark dark:text-white">
                         Order Details
