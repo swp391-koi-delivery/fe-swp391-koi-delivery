@@ -19,8 +19,16 @@ const OrderDetails = () => {
 
   const fetchOrder = async () => {
     try {
-      const response = await api.get(`order/listOrderPaid`);
-      const foundOrder = response.data.find(
+      const responses = await Promise.all([
+        api.get("order/listOrderShipping"),
+        api.get("order/listOrderPaid"),
+        api.get("order/listOrderDelivered"),
+      ]);
+
+      const fetchedOrders = responses
+        .map((response) => response?.data.content || []) // Use an empty array if data is undefined
+        .flat(); // Flatten the resulting array of arrays
+      const foundOrder = fetchedOrders.find(
         (order) => order.id === parseInt(id),
       ); // Find order that matches id
 
@@ -41,20 +49,20 @@ const OrderDetails = () => {
   }, [id]);
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-VN", {
       style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      currency: "VND",
     }).format(price);
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
       case "SHIPPING":
-        return <FaTruck className="text-blue-500" />;
-      case ("DELIVERED", "PAID"):
+        return <FaTruck className="text-yellow-500" />;
+      case "DELIVERED":
         return <FaCheckCircle className="text-green-500" />;
+      case "PAID":
+        return <FaCheckCircle className="text-purple-500" />;
       default:
         return null;
     }
@@ -69,7 +77,7 @@ const OrderDetails = () => {
   }
 
   return (
-    <div className="mx-auto max-w-7xl bg-gradient-to-br from-blue-200 to-purple-200 p-6">
+    <div className="mx-auto max-w-7xl bg-gradient-to-br from-blue-100 to-purple-100 p-6">
       <div className="mx-auto max-w-2xl space-y-5 rounded-lg bg-white p-8 shadow-md">
         <h2 className="mb-6 text-center text-3xl font-bold text-indigo-800">
           Order: {order.id}

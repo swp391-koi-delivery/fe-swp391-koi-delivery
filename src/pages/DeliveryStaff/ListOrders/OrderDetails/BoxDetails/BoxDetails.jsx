@@ -1,85 +1,185 @@
-import { useState } from "react";
-import { FaBox, FaArrowRight, FaDollarSign, FaVolumeUp } from "react-icons/fa";
-import { MdOutlineCategory } from "react-icons/md";
-import { BsBoxSeam } from "react-icons/bs";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { FaBox, FaArrowRight, FaMoneyBillWave, FaCube } from "react-icons/fa";
+import api from "../../../../../config/axios";
+import { useParams, useNavigate } from "react-router-dom";
 
 const BoxDetails = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [boxData, setBoxData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams(); // Assuming the box ID is passed via route parameters
+  const navigate = useNavigate(); // To handle navigation
 
-  const boxData = {
-    contributeID: "BOX123456",
-    type: "Standard Package",
-    volume: "2.5 cubic feet",
-    price: "149.99",
-    quantity: 5
+  const fetchBoxData = async () => {
+    try {
+      const responses = await Promise.all([
+        api.get("order/listOrderShipping"),
+        api.get("order/listOrderPaid"),
+        api.get("order/listOrderDelivered"),
+      ]);
+
+      const fetchedOrders = responses
+        .map((response) => response?.data.content || []) // Use an empty array if data is undefined
+        .flat(); // Flatten the resulting array of arrays
+
+      const data = fetchedOrders;
+      console.log(data);
+      // Find the order containing the desired box
+      const foundOrder = data.find((item) =>
+        item.orderDetails.some((detail) =>
+          detail.boxDetails.some(
+            (boxDetail) => boxDetail.boxes.id === parseInt(id),
+          ),
+        ),
+      );
+
+      // Find box based on ID
+      if (foundOrder) {
+        const foundBox = foundOrder.orderDetails
+          .flatMap((detail) => detail.boxDetails)
+          .find((boxDetail) => boxDetail.boxes.id === parseInt(id));
+
+        if (foundBox) {
+          setBoxData({
+            id: foundBox.id,
+            type: foundBox.boxes.type,
+            volume: foundBox.boxes.volume,
+            price: foundBox.boxes.price,
+            quantity: foundBox.quantity,
+          });
+        } else {
+          setBoxData(null);
+        }
+      } else {
+        setBoxData(null);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching box data:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBoxData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!boxData) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Box not found
+      </div>
+    );
+  }
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
   };
 
   return (
-    <div 
-      className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      role="article"
-      aria-label="Box Details Information"
-    >
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <FaBox className="w-8 h-8 text-blue-500" />
-          <h2 className="text-2xl font-bold text-gray-800">Box Details</h2>
-        </div>
-        <BsBoxSeam className={`w-6 h-6 text-blue-500 transform transition-transform duration-300 ${isHovered ? "rotate-12" : ""}`} />
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-          <FaArrowRight className="w-5 h-5 text-blue-500" />
-          <div>
-            <p className="text-sm text-gray-500">Contribute ID</p>
-            <p className="font-semibold text-gray-800">{boxData.contributeID}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-          <MdOutlineCategory className="w-5 h-5 text-blue-500" />
-          <div>
-            <p className="text-sm text-gray-500">Type</p>
-            <p className="font-semibold text-gray-800">{boxData.type}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-          <FaVolumeUp className="w-5 h-5 text-blue-500" />
-          <div>
-            <p className="text-sm text-gray-500">Volume</p>
-            <p className="font-semibold text-gray-800">{boxData.volume}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-          <FaDollarSign className="w-5 h-5 text-blue-500" />
-          <div>
-            <p className="text-sm text-gray-500">Price</p>
-            <p className="font-semibold text-gray-800">${boxData.price}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-            {boxData.quantity}
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Quantity</p>
-            <p className="font-semibold text-gray-800">{boxData.quantity} units</p>
-          </div>
-        </div>
-      </div>
-
-      <button 
-        className="mt-6 w-full py-3 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 focus:outline-none transition-colors duration-200"
-        aria-label="View More Details"
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100 p-4">
+      <motion.div
+        className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        whileHover={{ scale: 1.02 }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
       >
-        View More Details
-      </button>
+        <div className="relative h-36 bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
+          <motion.div
+            className="absolute inset-0 bg-black opacity-0"
+            animate={{ opacity: isHovered ? 0.1 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white" role="heading">
+                {boxData.type}
+              </h2>
+              <p className="mt-2 text-blue-100">Box ID: {boxData.id}</p>
+            </div>
+            <FaBox className="text-4xl text-white" />
+          </div>
+        </div>
+
+        <div className="space-y-6 p-6">
+          <motion.div
+            className="flex items-center justify-between rounded-xl bg-gray-50 p-4"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center space-x-3">
+              <FaCube className="text-xl text-blue-500" />
+              <div>
+                <p className="text-sm text-gray-600">Volume</p>
+                <p className="font-semibold text-gray-900">{boxData.volume}</p>
+              </div>
+            </div>
+            <FaArrowRight className="text-gray-400" />
+          </motion.div>
+
+          <motion.div
+            className="flex items-center justify-between rounded-xl bg-gray-50 p-4"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center space-x-3">
+              <FaMoneyBillWave className="text-xl text-green-500" />
+              <div>
+                <p className="text-sm text-gray-600">Price</p>
+                <p className="font-semibold text-gray-900">
+                  {formatPrice(boxData.price)}
+                </p>
+              </div>
+            </div>
+            <FaArrowRight className="text-gray-400" />
+          </motion.div>
+
+          <motion.div
+            className="flex items-center justify-between rounded-xl bg-gray-50 p-4"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="rounded-lg bg-blue-100 p-2">
+                <span className="font-semibold text-blue-600">
+                  {boxData.quantity}
+                </span>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Quantity</p>
+                <p className="font-semibold text-gray-900">Units</p>
+              </div>
+            </div>
+            <FaArrowRight className="text-gray-400" />
+          </motion.div>
+        </div>
+
+        <motion.button
+          className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 py-4 text-lg font-semibold text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+          aria-label="Back"
+          onClick={() => navigate(-1)} // Navigate back to the previous page
+        >
+          &lt;&lt; Back to previous page
+        </motion.button>
+      </motion.div>
     </div>
   );
 };

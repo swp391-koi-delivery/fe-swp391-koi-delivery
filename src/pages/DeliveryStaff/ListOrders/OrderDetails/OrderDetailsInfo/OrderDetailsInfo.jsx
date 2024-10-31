@@ -12,6 +12,7 @@ import {
   FaRuler,
   FaWarehouse,
   FaBoxes,
+  FaArrowLeft,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useParams, Link } from "react-router-dom";
@@ -38,31 +39,34 @@ const OrderDetailsInfo = () => {
 
   const fetchOrder = async () => {
     try {
-      const response = await api.get(`order/listOrderPaid`);
-      const data = response.data;
-      console.log(data);
+      const responses = await Promise.all([
+        api.get("order/listOrderShipping"),
+        api.get("order/listOrderPaid"),
+        api.get("order/listOrderDelivered"),
+      ]);
 
-      // Find the order where any of its `orderDetails` contains the matching `id`
-      const foundOrder = data.find((item) =>
+      const fetchedOrders = responses
+        .map((response) => response?.data.content || []) // Use an empty array if data is undefined
+        .flat(); // Flatten the resulting array of arrays
+
+      console.log(fetchedOrders);
+
+      const foundOrder = fetchedOrders.find((item) =>
         item.orderDetails.some((detail) => detail.id === parseInt(id)),
       );
 
       if (foundOrder) {
-        // Extract the specific orderDetails that match the given `id`
         const matchingDetails = foundOrder.orderDetails.filter(
           (detail) => detail.id === parseInt(id),
         );
-        console.log("Matching orderDetails:", matchingDetails);
-
-        // Set the found order along with its matching orderDetails
         setOrder({ ...foundOrder, orderDetails: matchingDetails });
       } else {
-        setOrder(null); // Set order to null if no matching order is found
+        setOrder(null);
       }
-      setLoading(false); // Stop loading after fetching
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching order:", error);
-      setLoading(false); // Stop loading even in case of an error
+      setLoading(false);
     }
   };
 
@@ -88,11 +92,9 @@ const OrderDetailsInfo = () => {
     );
   }
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-VN", {
       style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      currency: "VND",
     }).format(price);
   };
 
@@ -101,47 +103,13 @@ const OrderDetailsInfo = () => {
     tap: { scale: 0.95 },
   };
 
-  const changeHealthFishStatus = async (index) => {
-    const statuses = ["HEALTHY", "UNHEALTHY"];
-    const currentIndex = statuses.indexOf(order.orderDetails[index].healthFishStatus);
-    const nextIndex = (currentIndex + 1) % statuses.length;
-    const newHealthStatus = statuses[nextIndex];
-  
-    // Update the status of orderDetails
-    const newStatus = order.orderDetails.map((detail, i) =>
-      i === index ? { ...detail, healthFishStatus: newHealthStatus } : detail
-    );
-  
-    // Update local state
-    setOrder({ ...order, orderDetails: newStatus });
-  
-    // Update the status in the backend
-    const orderDetailId = order.orderDetails[index].id; // Assuming there's an id field
-    await updateHealthFishStatus(orderDetailId, newHealthStatus);
-  };
-  
-  const updateHealthFishStatus = async (id, newStatus) => {
-    try {
-      await api.put(`delivery/${id}`, {
-        healthFishStatus: newStatus,
-      });
-      toast.success("Updated successfully");
-      // Fetch orders again after successful update
-      fetchOrders();
-    } catch (error) {
-      console.error("Error updating Health Fish Status:", error);
-      toast.error("Update failed");
-    }
-  };
-  
-
   const formatDateToInput = (dateString) => {
     const [day, month, year] = dateString.split("/");
     return `${year}-${month}-${day}`; // Return yyyy-MM-dd
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-200 to-indigo-200 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100 p-4">
       {order.orderDetails.length > 0 ? (
         order.orderDetails.map((detail, index) => (
           <motion.div
@@ -372,14 +340,14 @@ const OrderDetailsInfo = () => {
                           className="flex items-center justify-between rounded-lg bg-blue-500 p-4 font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:bg-blue-400 hover:shadow-lg"
                         >
                           <Link
-                            to={`boxDetails_Deli/${box.id}`}
+                            to={`/deliveryStaff/boxDetails_Deli/${box.boxes.id}`}
                             className="flex-grow text-white transition duration-300 ease-in-out hover:text-white"
                           >
                             <span className="mr-2">📦</span>{" "}
                             <span className="mr-2">Box ID: {box.id}</span>
                           </Link>
                           <span className="ml-auto text-white">
-                            Type: {box.box.type}
+                            {box.boxes.type}
                           </span>
                         </div>
                       ))}
@@ -407,13 +375,6 @@ const OrderDetailsInfo = () => {
                     className="w-full rounded-l-md bg-gray-100 p-2 text-black transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     aria-label="Health Fish Status"
                   />
-                  <button
-                    onClick={() => changeHealthFishStatus(index)}
-                    className="rounded-r-md bg-green-500 p-2 text-white transition-all duration-300 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    aria-label="Update Health Fish Status"
-                  >
-                    <FaArrowRight />
-                  </button>
                 </div>
               </motion.div>
             </div>

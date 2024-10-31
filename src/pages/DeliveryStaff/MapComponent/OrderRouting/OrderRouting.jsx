@@ -193,7 +193,7 @@ const RoutingComponent = () => {
         <div className="mt-8 rounded-md bg-white p-4 shadow-md">
           <h2 className="text-lg font-bold text-blue-500">Route Information</h2>
           <p className="text-red-500">
-            <strong>Total Distance:</strong> {routeInfo.totalDistance}
+            <strong>Total Distance:</strong> {routeInfo.totalDistance} km
           </p>
           <p className="text-red-500">
             <strong>Estimated Time:</strong> {routeInfo.totalTime}

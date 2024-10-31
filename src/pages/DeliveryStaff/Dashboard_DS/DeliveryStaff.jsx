@@ -28,21 +28,21 @@ const Dashboard = () => {
   }, []);
 
   const tabs = [
-    { key: "1", icon: FaUser, label: "Profile User", path: "/profileUser" },
+    { key: "1", icon: FaUser, label: "Profile User", path: "deliStaffProfile" },
     {
       key: "2",
       icon: FaListAlt,
       label: "List Orders",
       path: "listOrders_Deli",
     },
-    { key: "3", icon: FaComments, label: "Chat", path: "chat_Deli" },
+    // { key: "3", icon: FaComments, label: "Chat", path: "chat_Deli" },
     {
-      key: "4",
+      key: "3",
       icon: FaMapMarkedAlt,
       label: "Map & Routing",
       path: "MapComponent",
     },
-    { key: "5", icon: FaSignOutAlt, label: "Log Out" },
+    { key: "4", icon: FaSignOutAlt, label: "Log Out" },
   ];
 
   const pageVariants = {
@@ -64,20 +64,21 @@ const Dashboard = () => {
   };
 
   const handleTabChange = (tab) => {
-    if (tab.key === "5") {
+    if (tab.key === "4") {
       setActiveTab(tab.key);
     } else if (activeTab !== tab.key) {
       // Only navigate if tabs are different
       setActiveTab(tab.key);
       setTimeout(() => {
         navigate(tab.path); // Navigate to the path of the selected tab after animation
-      }, 500);C// Match the time with the transition time
+      }, 500);
+      C; // Match the time with the transition time
     }
   };
 
   const renderContent = () => {
     switch (activeTab) {
-      case "5": //  log Out
+      case "4": //  log Out
         return (
           <div className="flex h-full items-center justify-center">
             <div className="space-y-4 text-center">
@@ -102,8 +103,8 @@ const Dashboard = () => {
           </div>
         );
       default:
-        return <Outlet />; 
-        // Render routed components
+        return <Outlet />;
+      // Render routed components
     }
   };
 
@@ -112,7 +113,7 @@ const Dashboard = () => {
       <div className="flex h-screen w-full">
         <div className={`${isMobile ? "w-full" : "w-1/5"} bg-gray-800 p-4`}>
           <h2 className="mb-6 text-center text-3xl font-bold text-blue-500">
-            Dashboard
+            Menu
           </h2>
           <hr className="mb-4 border-white" />
           <nav className="space-y-1">
