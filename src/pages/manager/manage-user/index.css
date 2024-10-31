@@ -139,7 +139,7 @@
     font-size: 1.5rem;
     color: #1890ff;
   }
-  .loyalty-silver {
+  /* .loyalty-silver {
     background: linear-gradient(45deg, #c0c0c0, #f0f0f0);
     animation: shine 2s infinite linear;
   }
@@ -161,5 +161,23 @@
     100% {
       background-position: 100% 50%;
     }
+  } */
+  
+  .shiny-silver {
+    color: silver;
+    animation: shine 2s ease-in-out infinite;
+  }
+  .shiny-gold {
+    color: gold;
+    animation: shine 2s ease-in-out infinite;
+  }
+  .shiny-diamond {
+    color: #b9f2ff;
+    animation: shine 2s ease-in-out infinite;
   }
   
+  @keyframes shine {
+    0% { text-shadow: 0 0 10px white; }
+    50% { text-shadow: 0 0 20px white, 0 0 30px white; }
+    100% { text-shadow: 0 0 10px white; }
+  }
