@@ -158,7 +158,7 @@ const ManageProfile = () => {
             <div className="rounded-lg bg-gray-50 p-4">
               <p className="text-sm font-medium text-gray-500">Balance</p>
               <p className="text-lg font-semibold text-gray-900">
-                {formatPrice(profileData.balance)}
+                {formatPrice(profileData.balance || 0)}
               </p>
             </div>
 
@@ -216,7 +216,7 @@ const ManageProfile = () => {
                   },
                 ]}
               >
-                <Input />
+                <Input disabled/>
               </Form.Item>
               <Form.Item
                 label="Password"

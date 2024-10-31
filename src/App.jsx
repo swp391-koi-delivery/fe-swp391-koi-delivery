@@ -24,7 +24,7 @@ import OrderDetailsInfoStaff from "./pages/sales-staff/orderDetailInfo";
 import ManageBox from "./pages/manager/manage-box";
 import ManageWarehouse from "./pages/manager/manage-warehouse";
 import ManageProfile from "./pages/manager/ManagerProfile";
-
+import BoxDetailsStaff from "./pages/sales-staff/BoxDetails-staff";
 import ProfileUser from "./pages/ProfileUser/ProfileUser";
 // Delivery Staff
 import DeliveryStaff from "./pages/DeliveryStaff/Dashboard_DS/DeliveryStaff";
@@ -43,6 +43,7 @@ import "./index.css";
 import "./App.css";
 import SuccessPage from "./pages/success/Success";
 import ErrorPage from "./pages/error/ErrorPage";
+
 function App() {
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -151,6 +152,10 @@ function App() {
           path: "orderDetailsInfo/:id",
           element: <OrderDetailsInfoStaff />,
         },
+        {
+          path: "boxDetails/:id",
+          element: <BoxDetailsStaff />,
+        },
       ],
     },
     {
@@ -180,6 +185,10 @@ function App() {
         {
           path: "orderDetailsInfo/:id",
           element: <OrderDetailsInfoStaff />,
+        },
+        {
+          path: "boxDetails/:id",
+          element: <BoxDetailsStaff />,
         },
         {
           path:"box",

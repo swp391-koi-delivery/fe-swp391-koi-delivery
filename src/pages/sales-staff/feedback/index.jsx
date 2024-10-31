@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUser, FaStar, FaCalendar, FaReply, FaBriefcase } from "react-icons/fa";
+import { FaUser, FaStar, FaCalendar, FaReply, FaBriefcase, FaChevronDown } from "react-icons/fa";
 //import axios from 'axios'; // or use fetch
 import api from "../../../config/axios";
 import { Rate } from "antd";
@@ -48,10 +48,10 @@ const FeedbackForm = ({id}) => {
     if (newReply.trim() === "") return;
   
     try {
-      const response = await api.post(`feedBack/${feedbackId}/reply`, {
-        replyContent: newReply,  // Assuming the API expects this field
-        repliedBy: "Staff Member",  // Adjust this as necessary
-        replyDate: new Date().toISOString().split('T')[0],  // Send current date in ISO format
+      const response = await api.post(`feedBack/${feedbackId}/reply`, newReply, {
+        headers: {
+          'Content-Type': 'text/plain', // Ensure the server interprets it as plain text
+        },
       });
   
       if (response.status === 200) {
@@ -161,6 +161,11 @@ const FeedbackForm = ({id}) => {
                     Submit Reply
                   </button>
                 </div>
+              </div>
+            )}
+            {feedback.type === "customer" && (
+              <div className="flex justify-center py-4">
+                <FaChevronDown className="text-gray-500" />
               </div>
             )}
           </div>
