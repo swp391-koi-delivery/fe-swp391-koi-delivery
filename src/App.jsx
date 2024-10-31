@@ -17,7 +17,7 @@ import ResetPasswordPage from "./pages/reset-password/ResetPasswordPage";
 import ForgotPasswordPage from "./pages/forgot-password/ForgotPasswordPage";
 import OrderPage from "./pages/order/OrderPage";
 import OrderListPage from "./pages/order-list/OrderListPage";
-import OrderSearchPage from "./pages/order-search/OrderSearch";
+import OrderSearchPage from "./pages/order-search/OrderSearchPage";
 import OrderHistoryPage from "./pages/order-history/OrderHistory";
 import SuccessPage from "./pages/success/SuccessPage";
 import ErrorPage from "./pages/error/ErrorPage";
