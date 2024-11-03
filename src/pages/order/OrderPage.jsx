@@ -12,161 +12,162 @@ function OrderPage() {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [hasShownToast, setHasShownToast] = useState(false);
   const [form] = useForm();
 
-   const handleDarkMode = () => {
-     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
-     const handleScroll = () => {
-       const ud_header = document.querySelector(".ud-header");
-       const logo = document.querySelectorAll(".header-logo");
-       const sticky = ud_header ? ud_header.offsetTop : 0;
+  const handleDarkMode = () => {
+    // ======= Sticky Header and Back-to-Top Button Scroll Behavior
+    const handleScroll = () => {
+      const ud_header = document.querySelector(".ud-header");
+      const logo = document.querySelectorAll(".header-logo");
+      const sticky = ud_header ? ud_header.offsetTop : 0;
 
-       if (window.pageYOffset > sticky) {
-         ud_header.classList.add("sticky");
-       } else {
-         ud_header.classList.remove("sticky");
-       }
+      if (window.pageYOffset > sticky) {
+        ud_header.classList.add("sticky");
+      } else {
+        ud_header.classList.remove("sticky");
+      }
 
-       // Show or hide the back-to-top button
-       const backToTop = document.querySelector(".back-to-top");
-       if (backToTop) {
-         if (window.scrollY > 50) {
-           backToTop.style.display = "flex";
-         } else {
-           backToTop.style.display = "none";
-         }
-       }
-     };
+      // Show or hide the back-to-top button
+      const backToTop = document.querySelector(".back-to-top");
+      if (backToTop) {
+        if (window.scrollY > 50) {
+          backToTop.style.display = "flex";
+        } else {
+          backToTop.style.display = "none";
+        }
+      }
+    };
 
-     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
-     // ===== Navbar Toggle Behavior
-     const navbarToggler = document.querySelector("#navbarToggler");
-     const navbarCollapse = document.querySelector("#navbarCollapse");
+    // ===== Navbar Toggle Behavior
+    const navbarToggler = document.querySelector("#navbarToggler");
+    const navbarCollapse = document.querySelector("#navbarCollapse");
 
-     const handleNavbarToggle = () => {
-       navbarToggler.classList.toggle("navbarTogglerActive");
-       navbarCollapse.classList.toggle("hidden");
-     };
+    const handleNavbarToggle = () => {
+      navbarToggler.classList.toggle("navbarTogglerActive");
+      navbarCollapse.classList.toggle("hidden");
+    };
 
-     if (navbarToggler) {
-       navbarToggler.addEventListener("click", handleNavbarToggle);
-     }
+    if (navbarToggler) {
+      navbarToggler.addEventListener("click", handleNavbarToggle);
+    }
 
-     // Close Navbar on Link Click
-     const closeNavbarOnClick = () => {
-       navbarToggler.classList.remove("navbarTogglerActive");
-       navbarCollapse.classList.add("hidden");
-     };
+    // Close Navbar on Link Click
+    const closeNavbarOnClick = () => {
+      navbarToggler.classList.remove("navbarTogglerActive");
+      navbarCollapse.classList.add("hidden");
+    };
 
-     const navbarLinks = document.querySelectorAll(
-       "#navbarCollapse ul li:not(.submenu-item) a",
-     );
-     navbarLinks.forEach((link) =>
-       link.addEventListener("click", closeNavbarOnClick),
-     );
+    const navbarLinks = document.querySelectorAll(
+      "#navbarCollapse ul li:not(.submenu-item) a",
+    );
+    navbarLinks.forEach((link) =>
+      link.addEventListener("click", closeNavbarOnClick),
+    );
 
-     // ===== Sub-menu Toggle
-     const submenuItems = document.querySelectorAll(".submenu-item");
-     submenuItems.forEach((el) => {
-       el.querySelector("a").addEventListener("click", () => {
-         el.querySelector(".submenu").classList.toggle("hidden");
-       });
-     });
+    // ===== Sub-menu Toggle
+    const submenuItems = document.querySelectorAll(".submenu-item");
+    submenuItems.forEach((el) => {
+      el.querySelector("a").addEventListener("click", () => {
+        el.querySelector(".submenu").classList.toggle("hidden");
+      });
+    });
 
-     // ===== FAQ Accordion
-     const faqs = document.querySelectorAll(".single-faq");
-     faqs.forEach((el) => {
-       el.querySelector(".faq-btn").addEventListener("click", () => {
-         el.querySelector(".icon").classList.toggle("rotate-180");
-         el.querySelector(".faq-content").classList.toggle("hidden");
-       });
-     });
+    // ===== FAQ Accordion
+    const faqs = document.querySelectorAll(".single-faq");
+    faqs.forEach((el) => {
+      el.querySelector(".faq-btn").addEventListener("click", () => {
+        el.querySelector(".icon").classList.toggle("rotate-180");
+        el.querySelector(".faq-content").classList.toggle("hidden");
+      });
+    });
 
-     // ===== wow.js for animations
-     // new WOW.WOW().init();
+    // ===== wow.js for animations
+    // new WOW.WOW().init();
 
-     // ===== Scroll-to-Top Functionality
-     const scrollTo = (element, to = 0, duration = 500) => {
-       const start = element.scrollTop;
-       const change = to - start;
-       const increment = 20;
-       let currentTime = 0;
+    // ===== Scroll-to-Top Functionality
+    const scrollTo = (element, to = 0, duration = 500) => {
+      const start = element.scrollTop;
+      const change = to - start;
+      const increment = 20;
+      let currentTime = 0;
 
-       const animateScroll = () => {
-         currentTime += increment;
-         const val = Math.easeInOutQuad(currentTime, start, change, duration);
-         element.scrollTop = val;
+      const animateScroll = () => {
+        currentTime += increment;
+        const val = Math.easeInOutQuad(currentTime, start, change, duration);
+        element.scrollTop = val;
 
-         if (currentTime < duration) {
-           setTimeout(animateScroll, increment);
-         }
-       };
+        if (currentTime < duration) {
+          setTimeout(animateScroll, increment);
+        }
+      };
 
-       animateScroll();
-     };
+      animateScroll();
+    };
 
-     Math.easeInOutQuad = function (t, b, c, d) {
-       t /= d / 2;
-       if (t < 1) return (c / 2) * t * t + b;
-       t--;
-       return (-c / 2) * (t * (t - 2) - 1) + b;
-     };
+    Math.easeInOutQuad = function (t, b, c, d) {
+      t /= d / 2;
+      if (t < 1) return (c / 2) * t * t + b;
+      t--;
+      return (-c / 2) * (t * (t - 2) - 1) + b;
+    };
 
-     const backToTopButton = document.querySelector(".back-to-top");
-     if (backToTopButton) {
-       backToTopButton.onclick = () => scrollTo(document.documentElement);
-     }
+    const backToTopButton = document.querySelector(".back-to-top");
+    if (backToTopButton) {
+      backToTopButton.onclick = () => scrollTo(document.documentElement);
+    }
 
-     // ===== Theme Switcher
-     const themeSwitcher = document.getElementById("themeSwitcher");
-     const userTheme = localStorage.getItem("theme");
-     const systemTheme = window.matchMedia(
-       "(prefers-color-scheme: dark)",
-     ).matches;
+    // ===== Theme Switcher
+    const themeSwitcher = document.getElementById("themeSwitcher");
+    const userTheme = localStorage.getItem("theme");
+    const systemTheme = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
 
-     const themeCheck = () => {
-       if (userTheme === "dark" || (!userTheme && systemTheme)) {
-         document.documentElement.classList.add("dark");
-       }
-     };
+    const themeCheck = () => {
+      if (userTheme === "dark" || (!userTheme && systemTheme)) {
+        document.documentElement.classList.add("dark");
+      }
+    };
 
-     const themeSwitch = () => {
-       if (document.documentElement.classList.contains("dark")) {
-         document.documentElement.classList.remove("dark");
-         localStorage.setItem("theme", "light");
-       } else {
-         document.documentElement.classList.add("dark");
-         localStorage.setItem("theme", "dark");
-       }
-     };
+    const themeSwitch = () => {
+      if (document.documentElement.classList.contains("dark")) {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      } else {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      }
+    };
 
-     if (themeSwitcher) {
-       themeSwitcher.addEventListener("click", themeSwitch);
-     }
+    if (themeSwitcher) {
+      themeSwitcher.addEventListener("click", themeSwitch);
+    }
 
-     themeCheck();
+    themeCheck();
 
-     // Cleanup on unmount
-     return () => {
-       window.removeEventListener("scroll", handleScroll);
-       if (navbarToggler) {
-         navbarToggler.removeEventListener("click", handleNavbarToggle);
-       }
-       navbarLinks.forEach((link) =>
-         link.removeEventListener("click", closeNavbarOnClick),
-       );
-     };
-   };
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (navbarToggler) {
+        navbarToggler.removeEventListener("click", handleNavbarToggle);
+      }
+      navbarLinks.forEach((link) =>
+        link.removeEventListener("click", closeNavbarOnClick),
+      );
+    };
+  };
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
   };
 
-   useEffect(() => {
-     handleDarkMode();
-   }, []);
+  useEffect(() => {
+    handleDarkMode();
+  }, []);
 
   const [orderDetails, setOrderDetails] = useState([
     {
@@ -206,10 +207,19 @@ function OrderPage() {
     }
   };
 
-  const handleLocationChange = () => {
+  const handleLocationChange = (e) => {
+    const inputValue = e.target.value;
+
+    if (inputValue && !hasShownToast) {
       toast.info(
         "The more specific the location, the more accurate the shipping price.",
       );
+      setHasShownToast(true);
+    }
+
+    if (!inputValue) {
+      setHasShownToast(false);
+    }
   };
 
   const handleOrderDetailChange = (index, field, value) => {
@@ -649,7 +659,9 @@ function OrderPage() {
                 >
                   <div className="flex w-full flex-wrap">
                     <Form.Item
-                      label="Origin Location"
+                      label={
+                        <span className="dark:text-white">Origin Location</span>
+                      }
                       name="originLocation"
                       className="mb-4 w-full px-2 md:w-1/2"
                       onChange={handleLocationChange}
@@ -667,7 +679,11 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
-                      label="Destination Location"
+                      label={
+                        <span className="dark:text-white">
+                          Destination Location
+                        </span>
+                      }
                       name="destinationLocation"
                       className="mb-4 w-full px-2 md:w-1/2"
                       onChange={handleLocationChange}
@@ -685,7 +701,9 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
-                      label="Customer Notes"
+                      label={
+                        <span className="dark:text-white">Customer Notes</span>
+                      }
                       name="customerNotes"
                       className="mb-4 w-full px-2 md:w-1/2"
                       rules={[
@@ -702,7 +720,9 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
-                      label="Recipient Info"
+                      label={
+                        <span className="dark:text-white">Recipient Info</span>
+                      }
                       name="recipientInfo"
                       className="mb-4 w-full px-2 md:w-1/2"
                       rules={[
@@ -722,7 +742,9 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
-                      label="Order Type"
+                      label={
+                        <span className="dark:text-white">Order Type</span>
+                      }
                       name="describeOrder"
                       className="mb-4 w-full px-2 md:w-1/2"
                       rules={[
@@ -743,7 +765,11 @@ function OrderPage() {
                       />
                     </Form.Item>
                     <Form.Item
-                      label="Transport Method"
+                      label={
+                        <span className="dark:text-white">
+                          Transport Method
+                        </span>
+                      }
                       name="methodTransPort"
                       className="mb-4 w-full px-2 md:w-1/2"
                       rules={[
@@ -777,7 +803,11 @@ function OrderPage() {
                         } w-full`}
                       >
                         <Form.Item
-                          label="Price Of Fish (USD)"
+                          label={
+                            <span className="dark:text-white">
+                              Price Of Fish ($)
+                            </span>
+                          }
                           name={`orderDetails[${index}].priceOfFish`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -790,7 +820,7 @@ function OrderPage() {
                           rules={[
                             {
                               required: true,
-                              message: "Please input price of fish in USD",
+                              message: "Please input price of fish in $",
                             },
                           ]}
                           style={{ textAlign: "left" }}
@@ -799,12 +829,14 @@ function OrderPage() {
                             type="number"
                             min="1"
                             pattern="[0-9]+(\.[0-9]+)?"
-                            placeholder="Price Of Fish In USD"
+                            placeholder="Price Of Fish In $"
                             className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                           />
                         </Form.Item>
                         <Form.Item
-                          label="Farm Name"
+                          label={
+                            <span className="dark:text-white">Farm Name</span>
+                          }
                           name={`orderDetails[${index}].nameFarm`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -828,7 +860,11 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
-                          label="Farm Address"
+                          label={
+                            <span className="dark:text-white">
+                              Farm Address
+                            </span>
+                          }
                           name={`orderDetails[${index}].farmAddress`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -852,7 +888,9 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
-                          label="Origin"
+                          label={
+                            <span className="dark:text-white">Origin</span>
+                          }
                           name={`orderDetails[${index}].origin`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -876,7 +914,11 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
-                          label="Fish Species"
+                          label={
+                            <span className="dark:text-white">
+                              Fish Species
+                            </span>
+                          }
                           name={`orderDetails[${index}].fishSpecies`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -900,7 +942,11 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
-                          label="Number Of Fish"
+                          label={
+                            <span className="dark:text-white">
+                              Number Of Fish
+                            </span>
+                          }
                           name={`orderDetails[${index}].numberOfFish`}
                           onChange={(e) =>
                             handleOrderDetailChange(
@@ -939,7 +985,11 @@ function OrderPage() {
                           />
                         </Form.Item>
                         <Form.Item
-                          label="Size Of Fish (Cm)"
+                          label={
+                            <span className="dark:text-white">
+                              Size Of Fish (Cm)
+                            </span>
+                          }
                           name={`orderDetails[${index}].sizeOfFish`}
                           onChange={(e) =>
                             handleOrderDetailChange(

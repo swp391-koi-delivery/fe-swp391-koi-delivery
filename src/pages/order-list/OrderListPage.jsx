@@ -451,7 +451,8 @@ function OrderListPage() {
                         {order?.orderStatus}
                       </p>
                     )}
-                    {order?.orderStatus === "REJECTED" && (
+                    {(order?.orderStatus === "REJECTED" ||
+                      order?.orderStatus === "CANCELED") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-red-50 px-3 py-0.5 text-sm font-medium leading-6 text-red-600 lg:mt-3">
                         {order.orderStatus}
                       </p>
