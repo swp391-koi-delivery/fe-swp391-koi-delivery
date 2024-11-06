@@ -32,6 +32,7 @@ import api from "../../../config/axios";
 import uploadFile from "../../../utils/file";
 import "boxicons";
 import "./index.css";
+import 'animate.css';
 function ManageUser() {
   //const api = "https://66ebf57e2b6cf2b89c5c9df5.mockapi.io/User";
   const [users, setUsers] = useState([]);
@@ -70,8 +71,16 @@ function ManageUser() {
       //lấy dữ liệu từ BE và set nó
       // setUsers(response.data);
       // setFilteredUsers(response.data); // khởi tạo filteredUsers bằng tất cả user
-      setUsers(Array.isArray(response.data.content) ? response.data.content.filter(user => user.role !== "MANAGER") : []);
-      setFilteredUsers(Array.isArray(response.data.content) ?response.data.content.filter(user => user.role !== "MANAGER") : []);
+      setUsers(
+        Array.isArray(response.data.content)
+          ? response.data.content.filter((user) => user.role !== "MANAGER")
+          : [],
+      );
+      setFilteredUsers(
+        Array.isArray(response.data.content)
+          ? response.data.content.filter((user) => user.role !== "MANAGER")
+          : [],
+      );
       console.log(response.data.content);
     } catch (error) {
       toast.error(error.response.data);
@@ -208,11 +217,18 @@ function ManageUser() {
       align: "left",
     },
     {
-      title: <span className="custom-table-header w-20 h-20">Image</span>,
+      title: <span className="custom-table-header h-20 w-20">Image</span>,
       dataIndex: "image",
       key: "image",
       render: (image) => {
-        return <img src={image || "../public/assets/images/vodanh.jpg"} alt="" width={100} height={140} />;
+        return (
+          <img
+            src={image || "../assets/images/vodanh.jpg"}
+            alt=""
+            width={100}
+            height={140}
+          />
+        );
       },
     },
     {
@@ -251,6 +267,23 @@ function ManageUser() {
       key: "loyaltyPoint",
       align: "left",
       sorter: (a, b) => a.loyaltyPoint - b.loyaltyPoint,
+      render: (loyaltyPoint) => {
+        let color;
+
+        if (loyaltyPoint >= 100 && loyaltyPoint <= 10000) {
+          color = "purple";
+        } else if (loyaltyPoint > 10000 && loyaltyPoint <= 200000) {
+          color = "gold";
+        } else if (loyaltyPoint > 200000) {
+          color = "blue"; // Example for diamond level
+        }
+
+        return (
+          <Tag bordered={false} color={color} style={{ fontSize: "22px" }}>
+            {loyaltyPoint}
+          </Tag>
+        );
+      },
     },
     {
       title: <span className="custom-table-header">User Status</span>,

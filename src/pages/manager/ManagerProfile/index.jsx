@@ -109,7 +109,7 @@ const ManageProfile = () => {
           <div className="mb-6 text-center">
             <div className="relative inline-block">
               <img
-                src={profileData.image || "../public/assets/images/vodanh.jpg"}
+                src={profileData.image || "../assets/images/vodanh.jpg"}
                 alt=""
                 className="h-32 w-32 rounded-full border-4 border-blue-100 object-cover"
               />
