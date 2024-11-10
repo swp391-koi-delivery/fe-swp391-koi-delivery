@@ -326,8 +326,6 @@ function OrderHistoryPage() {
       const response = await api.post("feedBack", values);
       toast.success("Successfully send feedback");
       setOpenModal(false);
-       const currentPage = localStorage.getItem("currentPage") || 1;
-       fetchOrder(currentPage);
     } catch (err) {
       toast.error(err.response.data || "Failed to send feedback");
     } finally {

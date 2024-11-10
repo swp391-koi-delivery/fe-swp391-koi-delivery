@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import useGetParams from "../../hooks/useGetParams";
 import api from "../../config/axios";
 import { useNavigate } from "react-router-dom";
-
 function SuccessPage() {
   const navigate = useNavigate();
   const params = useGetParams();
@@ -14,7 +13,9 @@ function SuccessPage() {
 
   const postOrderID = async () => {
     try {
-      const response = await api.post(`/customer/transaction?orderId=${orderID}`);
+      const response = await api.post(
+        `/customer/transaction?orderId=${orderID}`,
+      );
       console.log(response);
     } catch (e) {
       console.log(e);
@@ -45,7 +46,7 @@ function SuccessPage() {
             }}
           >
             Back To Order List
-          </Button>
+          </Button>,
         ]}
       />
     </>

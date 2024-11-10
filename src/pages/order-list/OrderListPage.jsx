@@ -16,6 +16,7 @@ import {
   TruckOutlined,
 } from "@ant-design/icons";
 
+
 function OrderListPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -221,9 +222,7 @@ function OrderListPage() {
       const response = await api.post(`customer/orderPaymentUrl/${values}`);
       console.log(response);
       window.open(response.data);
-      toast.success("Successfully pay for order");
-      const currentPage = localStorage.getItem("currentPage") || 1;
-      fetchOrder(currentPage);
+    
     } catch (err) {
       toast.error(err.response.data || "Failed to pay for order");
     } finally {

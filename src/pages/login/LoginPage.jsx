@@ -8,24 +8,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/features/userSlice";
 import { useForm } from "antd/es/form/Form";
+
 function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [form] = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const handleLogin = async (values) => {
     try {
       setLoading(true);
-
       const response = await api.post("/authentication/login", values);
-      toast.success("Successfully login account");
-
       console.log(response.data);
       dispatch(login(response.data));
       const { role, token } = response.data;
       localStorage.setItem("token", token);
-     if (role === "CUSTOMER") {
+      if (role === "CUSTOMER") {
         navigate("/");
       } else if (role === "MANAGER") {
         navigate("/dashboard");
@@ -34,6 +31,7 @@ function LoginPage() {
       } else if (role === "DELIVERING_STAFF") {
         navigate("/deliveryStaff");
       }
+      toast.success("Successfully login account");
     } catch (err) {
       toast.error(err.response.data || "Failed to login account");
     } finally {
