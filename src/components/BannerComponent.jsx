@@ -1,20 +1,5 @@
 import React from "react";
-import { messaging } from "../config/firebase";
-import { getToken } from "firebase/messaging";
-import { Button } from "antd";
-import { toast } from "react-toastify";
 function BannerComponent() {
-  // const handleNotification = async () => {
-  //   try {
-  //     const fcmToken = await getToken(messaging, {
-  //       vapidKey:
-  //         "BISAgGnMeCO3fnZfV40ZgYwD4D1aLk5katFjBSI4DzZqe8tReTeFv5mU6kPDIMbtyEOgVDGGZkfRtomnUWlJ9D8",
-  //     });
-  //     console.log(fcmToken);
-  //   } catch (err) {
-  //     toast.error(err.response.data || "Failed to login account");
-  //   }
-  // };
   return (
     <>
       <div

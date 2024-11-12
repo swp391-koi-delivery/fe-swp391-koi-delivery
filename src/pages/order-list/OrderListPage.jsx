@@ -15,7 +15,7 @@ import {
   LoadingOutlined,
   TruckOutlined,
 } from "@ant-design/icons";
-
+import useRealTime from "../../hooks/useRealTime";
 
 function OrderListPage() {
   const [loading, setLoading] = useState(false);
@@ -222,7 +222,6 @@ function OrderListPage() {
       const response = await api.post(`customer/orderPaymentUrl/${values}`);
       console.log(response);
       window.open(response.data);
-    
     } catch (err) {
       toast.error(err.response.data || "Failed to pay for order");
     } finally {
@@ -320,7 +319,9 @@ function OrderListPage() {
                 <td className="px-2 py-1">{detail.totalBox}</td>
                 <td className="px-2 py-1">{detail.totalVolume}</td>
                 <td className="px-6 py-1">{detail.priceOfFish}</td>
-                <td className="px-2 py-1">{detail.healthFishStatus}</td>
+                {detail?.healthFishStatus !== null && (
+                <td className="px-2 py-1">{detail?.healthFishStatus}</td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -415,6 +416,12 @@ function OrderListPage() {
     fetchOrder(savedPage);
   }, []);
 
+  useRealTime((body) => {
+    if (body.body === "Customer payment success");
+    const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
+    fetchOrder(savedPage);
+  });
+
   const Order = ({ order }) => {
     const currentStepIndex =
       order?.progresses.filter((progress) => progress.inProgress === true)
@@ -445,7 +452,8 @@ function OrderListPage() {
                       </p>
                     )}
                     {(order?.orderStatus === "PENDING" ||
-                      order?.orderStatus === "SHIPPING") && (
+                      order?.orderStatus === "SHIPPING" ||
+                      order?.orderStatus === "BOOKING") && (
                       <p className="mb-3 whitespace-nowrap rounded-full bg-indigo-50 px-3 py-0.5 text-sm font-medium leading-6 text-indigo-600 lg:mt-3">
                         {order?.orderStatus}
                       </p>
@@ -599,7 +607,7 @@ function OrderListPage() {
                               currentStepIndex >= 0 ? currentStepIndex : 0
                             }
                           >
-                            {renderSteps(order.progresses)}
+                            {renderSteps(order?.progresses)}
                           </Steps>
                           {/*  */}
                         </div>
@@ -760,7 +768,8 @@ function OrderListPage() {
                       )}
                       {(order.orderStatus === "PENDING" ||
                         order.orderStatus === "AWAITING_PAYMENT" ||
-                        order.orderStatus === "PAID") && (
+                        order.orderStatus === "PAID" ||
+                        order.orderStatus === "BOOKING") && (
                         <Button
                           style={{ color: "#ff4d4f" }}
                           danger
@@ -897,7 +906,7 @@ function OrderListPage() {
 
                     <li className="group relative">
                       <a
-                        href="blog-grids.html"
+                        href="/#blog"
                         className="ud-menu-scroll mx-8 flex py-2 text-base font-medium text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-body-color dark:lg:text-dark-6 xl:ml-10"
                       >
                         Blog
