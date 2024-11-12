@@ -187,13 +187,13 @@ function BlogComponent() {
             </div>
             
             {Array.isArray(posts) && posts.map((post) => (
-              <div key={post.blogId} className="w-full px-4 md:w-1/2 lg:w-1/3">
+              <div key={post.content.blogId} className="w-full px-4 md:w-1/2 lg:w-1/3">
                 <div className="wow fadeInUp group mb-10" data-wow-delay=".1s">
                   <div className="mb-8 overflow-hidden rounded-[5px]" >
                     <a href="javascript:void(0)" className="block">
                       <img
                         src={
-                          post.img
+                          post.content.img
                         } // Nếu không có ảnh, dùng ảnh mặc định
                         alt={post.post}
                         className="w-full transition group-hover:rotate-6 group-hover:scale-125 w-[370px] h-[220px]"
@@ -209,7 +209,7 @@ function BlogComponent() {
                         href="javascript:void(0)"
                         className="mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl"
                       >
-                        {post.post} {/* Hiển thị tiêu đề blog */}
+                        {post.content.post} {/* Hiển thị tiêu đề blog */}
                       </a>
                     </h3>
                     <p className="max-w-[370px] text-base text-body-color dark:text-dark-6">

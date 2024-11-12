@@ -1,7 +1,6 @@
 import React from "react";
 import CRUDTemplate from "../../../components/crud-template";
 import { Form, Input, InputNumber, Tag } from "antd";
-import "./index.css";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 function ManageBox() {
   const columns = [

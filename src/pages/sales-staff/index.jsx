@@ -272,7 +272,7 @@ const OrderList = () => {
               style={{ height: "4px" }}
             />
             <div className="mt-1 text-xs text-gray-600">
-              Price Range: {priceRange[0]} - {priceRange[1]}
+              Price Range: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
             </div>
           </div>
         </div>
