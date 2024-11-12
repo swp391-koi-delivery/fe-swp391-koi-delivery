@@ -26,7 +26,7 @@ const { Option } = Select;
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [priceRange, setPriceRange] = useState([0, 100]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
@@ -40,7 +40,7 @@ const OrderList = () => {
 
   const options = [
     {
-      value: "PAID",
+      value: "BOOKING",
       icon: <FaMoneyBillWave className="h-4 w-4 text-indigo-500" />,
     },
     {
@@ -64,8 +64,8 @@ const OrderList = () => {
         case "SHIPPING":
           endpoint = `order/listOrderShipping?page=${currentPage}&size=${ordersPerPage}`;
           break;
-        case "PAID":
-          endpoint = `order/listOrderPaid?page=${currentPage}&size=${ordersPerPage}`;
+        case "BOOKING":
+          endpoint = `order/listOrderBooking?page=${currentPage}&size=${ordersPerPage}`;
           break;
         case "DELIVERED":
           endpoint = `order/listOrderDelivered?page=${currentPage}&size=${ordersPerPage}`;
@@ -230,7 +230,7 @@ const OrderList = () => {
 
   const getOrderStatusIcon = (orderStatus) => {
     switch (orderStatus) {
-      case "PAID":
+      case "BOOKING":
         return <FaCheckCircle className="text-purple-500" />;
       case "SHIPPING":
         return <FaTruck className="text-yellow-500" />;
@@ -253,7 +253,7 @@ const OrderList = () => {
   };
 
   return (
-    <div className="mx-auto max-w-7xl bg-gradient-to-br from-blue-100 to-purple-100 p-6">
+    <div className="max-w-8xl mx-auto bg-gradient-to-br from-blue-100 to-purple-100 p-6">
       <div className="mx-auto max-w-2xl space-y-5 rounded-lg bg-white p-4 shadow-md">
         <h1 className="mb-2 text-center text-2xl font-bold text-indigo-800">
           Order Management
@@ -278,7 +278,7 @@ const OrderList = () => {
             <Slider
               range
               min={0}
-              max={1000000}
+              max={100000000}
               value={priceRange}
               onChange={handlePriceRangeChange}
               className="w-full" // Ensure this is full width
@@ -423,8 +423,9 @@ const OrderList = () => {
                       )}
                     </div>
                     {/* Render edit button conditionally based on order status */}
-                    {order.orderStatus !== "DELIVERED" &&
-                      (order.orderStatus !== "CANCELED" && (
+                    {order.orderStatus !== "SHIPPING" &&
+                      order.orderStatus !== "DELIVERED" &&
+                      order.orderStatus !== "CANCELED" && (
                         <FaEdit
                           className="cursor-pointer text-gray-500"
                           onClick={(e) => {
@@ -436,7 +437,7 @@ const OrderList = () => {
                             }
                           }}
                         />
-                      ))}
+                      )}
                   </div>
                 </div>
                 <div className="mt-0.5 flex items-center justify-between">

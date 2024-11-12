@@ -54,7 +54,9 @@ const RoutingComponent = () => {
   const parseRouteResponse = (data) => {
     const lines = data.split("\n").filter((line) => line.trim() !== "");
     if (lines.length < 4) {
-      throw new Error("Invalid route response data. Expected at least 4 lines.");
+      throw new Error(
+        "Invalid route response data. Expected at least 4 lines.",
+      );
     }
 
     const totalDistanceMatch = lines[0].match(/(\d+.\d+)/);
@@ -67,14 +69,17 @@ const RoutingComponent = () => {
     const totalDistance = totalDistanceMatch[0];
     const totalTime = totalTimeMatch[0];
 
-    const steps = lines.slice(2).map((line) => {
-      const match = line.match(/- (.+?) \((\d+.\d+) km\)/);
-      if (!match) {
-        console.warn(`Invalid step format for line: ${line}`);
-        return null;
-      }
-      return { instruction: match[1], distance: parseFloat(match[2]) };
-    }).filter((step) => step !== null);
+    const steps = lines
+      .slice(2)
+      .map((line) => {
+        const match = line.match(/- (.+?) \((\d+.\d+) km\)/);
+        if (!match) {
+          console.warn(`Invalid step format for line: ${line}`);
+          return null;
+        }
+        return { instruction: match[1], distance: parseFloat(match[2]) };
+      })
+      .filter((step) => step !== null);
 
     // Group steps into stages of 10 steps each
     const stages = [];
@@ -101,7 +106,10 @@ const RoutingComponent = () => {
         <div className="flex flex-col gap-4 md:flex-row">
           {/* Origin input */}
           <div className="flex-1">
-            <label htmlFor="origin" className="mb-1 block text-sm font-bold text-gray-700">
+            <label
+              htmlFor="origin"
+              className="mb-1 block text-sm font-bold text-gray-700"
+            >
               Origin Location (Address):
             </label>
             <div className="relative">
@@ -126,7 +134,10 @@ const RoutingComponent = () => {
 
           {/* Destination input */}
           <div className="flex-1">
-            <label htmlFor="destination" className="mb-1 block text-sm font-bold text-gray-700">
+            <label
+              htmlFor="destination"
+              className="mb-1 block text-sm font-bold text-gray-700"
+            >
               Destination Location (Address):
             </label>
             <div className="relative">
@@ -155,36 +166,36 @@ const RoutingComponent = () => {
           type="submit"
           className="btn-submit_2 mt-4 w-full rounded-md bg-indigo-600 px-4 py-2 text-white transition-all duration-200 ease-in-out hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           disabled={isLoading}
-        >        
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 004 12H0c0 4.418 3.582 8 8 8v-4.709z"
-                  ></path>
-                </svg>
-                Loading...
-              </span>
-            ) : (
-              <span className="flex items-center justify-center">
+        >
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 004 12H0c0 4.418 3.582 8 8 8v-4.709z"
+                ></path>
+              </svg>
+              Loading...
+            </span>
+          ) : (
+            <span className="flex items-center justify-center">
               <MdDirections className="mr-2" /> Get Route
             </span>
-            )} 
+          )}
         </button>
       </form>
 
@@ -226,7 +237,9 @@ const RoutingComponent = () => {
           )}
         </div>
       ) : (
-        <p className="mt-8 text-gray-500 text-center">You need enter data to display route information</p>
+        <p className="mt-8 text-center text-gray-500">
+          You need enter data to display route information
+        </p>
       )}
     </div>
   );

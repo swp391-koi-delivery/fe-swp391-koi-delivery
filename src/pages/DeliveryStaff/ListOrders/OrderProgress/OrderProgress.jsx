@@ -51,7 +51,9 @@ const OrderTrackingSystem = () => {
   const fetchOrder = async () => {
     try {
       const response = await api.get(`delivery/progress/${id}`);
-      const response2 = await api.get(`order/listOrderShipping?page=1&size=10000000`);
+      const response2 = await api.get(
+        `order/listOrderShipping?page=1&size=10000000`,
+      );
       const progressData = response.data;
       let orders = response2.data.content;
 
@@ -362,8 +364,8 @@ const OrderTrackingSystem = () => {
                                       ? orderDetails?.originLocation
                                       : "N/A"}{" "}
                                   </p>
-                                  <p>Box: {event.totalBox}</p>
-                                  <p>Volume: {event.totalVolume}</p>
+                                  <p>Box: {orderDetails.totalBox}</p>
+                                  <p>Volume: {orderDetails.totalVolume}</p>
                                 </>
                               )}
                               {index === 1 && ( // Only display dropdown for FISH_CHECKED stage
@@ -420,8 +422,8 @@ const OrderTrackingSystem = () => {
                                       </Select>
                                     )}
                                   </p>
-                                  <p>Box: {event.totalBox}</p>
-                                  <p>Volume: {event.totalVolume}</p>
+                                  <p>Box: {orderDetails.totalBox}</p>
+                                  <p>Volume: {orderDetails.totalVolume}</p>
 
                                   {event.canUpload && !isHealthStatusLocked && (
                                     <div className="flex flex-col">
@@ -445,16 +447,83 @@ const OrderTrackingSystem = () => {
                                     Address:{" "}
                                     {event.status === ProgressStatus.EN_ROUTE
                                       ? orderDetails?.destinationLocation
-                                      : "N/A"}{" "}
+                                      : "N/A"}
                                   </p>
-                                  <p>Box: {event.totalBox}</p>
-                                  <p>Volume: {event.totalVolume}</p>
+                                  <p>
+                                    Health Fish:{" "}
+                                    <span
+                                      style={{
+                                        color:
+                                          selectedHealthStatus ===
+                                          HealthFishStatus.UNHEALTHY
+                                            ? "red"
+                                            : "green", // Set color based on health status
+                                        display: "flex", // Use flexbox to align icon and text
+                                        alignItems: "center", // Center align the items
+                                      }}
+                                    >
+                                      {selectedHealthStatus ===
+                                      HealthFishStatus.UNHEALTHY ? (
+                                        <>
+                                          <FiAlertCircle
+                                            style={{ marginRight: "0.5rem" }}
+                                          />{" "}
+                                          {/* Icon for Unhealthy */}
+                                          Unhealthy
+                                        </>
+                                      ) : (
+                                        <>
+                                          <FiCheckCircle
+                                            style={{ marginRight: "0.5rem" }}
+                                          />{" "}
+                                          {/* Icon for Healthy */}
+                                          Healthy
+                                        </>
+                                      )}
+                                    </span>
+                                  </p>
+                                  <p>Box: {orderDetails.totalBox}</p>
+                                  <p>Volume: {orderDetails.totalVolume}</p>
                                 </>
                               )}
+
                               {(index === 2 || index === 4) && ( // Display for index 2, 4
                                 <>
-                                  <p>Total Box: {event.totalBox}</p>
-                                  <p>Total Volume: {event.totalVolume}</p>
+                                  <p>
+                                    Health Fish:{" "}
+                                    <span
+                                      style={{
+                                        color:
+                                          selectedHealthStatus ===
+                                          HealthFishStatus.UNHEALTHY
+                                            ? "red"
+                                            : "green", // Set color based on health status
+                                        display: "flex", // Use flexbox to align icon and text
+                                        alignItems: "center", // Center align the items
+                                      }}
+                                    >
+                                      {selectedHealthStatus ===
+                                      HealthFishStatus.UNHEALTHY ? (
+                                        <>
+                                          <FiAlertCircle
+                                            style={{ marginRight: "0.5rem" }}
+                                          />{" "}
+                                          {/* Icon for Unhealthy */}
+                                          Unhealthy
+                                        </>
+                                      ) : (
+                                        <>
+                                          <FiCheckCircle
+                                            style={{ marginRight: "0.5rem" }}
+                                          />{" "}
+                                          {/* Icon for Healthy */}
+                                          Healthy
+                                        </>
+                                      )}
+                                    </span>
+                                  </p>
+                                  <p>Box: {orderDetails.totalBox}</p>
+                                  <p>Volume: {orderDetails.totalVolume}</p>
                                 </>
                               )}
                             </div>

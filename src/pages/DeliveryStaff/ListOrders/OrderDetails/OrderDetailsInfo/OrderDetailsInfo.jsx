@@ -92,9 +92,9 @@ const OrderDetailsInfo = () => {
     );
   }
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-VN", {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "VND",
+      currency: "USD",
     }).format(price);
   };
 
