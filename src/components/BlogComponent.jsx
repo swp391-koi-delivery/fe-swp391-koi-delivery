@@ -57,24 +57,19 @@ function BlogComponent() {
     </button>
   );
 
+
   const fetchPosts = async () => {
     try {
-      const response = await api.get(
-        "free-access/allBlog?page=1&size=1000000000",
-      );
-      const fetchedPosts = response.data.content
-      console.log(response.data); // Kiểm tra cấu trúc dữ liệu ở đây
-      setPosts(Array.isArray(fetchedPosts) ? fetchedPosts : []);
+      const response = await api.get("free-access/allBlog?page=1&size=1000000000");
+      setPosts(Array.isArray(response.data.content) ? response.data.content : []);
     } catch (error) {
       console.error("Error fetching posts:", error);
       setPosts([]); // Set to empty array on error
     }
   };
-
   useEffect(() => {
     fetchPosts();
-  }, []);
-
+  },[])
   const handleSubmitPosts = async (blog) => {
     if (fileList.length > 0) {
       const file = fileList[0];
@@ -86,7 +81,7 @@ function BlogComponent() {
       setSubmitting(true);
       //const response = await axios.post(api, blog);
       if (blog.blogId) {
-        const response = await api.put(`customer/blog/${blog.id}`, blog);
+        const response = await api.put(`customer/blog/${blog.blogId}`, blog);
       } else {
         const response = await api.post("customer/blog", blog);
       }
@@ -126,8 +121,7 @@ function BlogComponent() {
                   Our Recent News
                 </h2>
                 <p className="text-base text-body-color dark:text-dark-6">
-                  There are many variations of experiences and feedbacks of
-                  customers who use our delivery service
+                  There are many variations of experiences and feedbacks of customers who use our delivery service
                 </p>
               </div>
             </div>
@@ -180,7 +174,7 @@ function BlogComponent() {
                   >
                     <Input />
                   </Form.Item>
-                  <Form.Item label="image" name="image">
+<Form.Item label="image" name="image">
                     <Upload
                       action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                       listType="picture-card"
@@ -194,64 +188,59 @@ function BlogComponent() {
                 </Form>
               </Modal>
             </div>
-
-            {Array.isArray(posts) &&
-              posts.map((post) => (
-                <div
-                  key={post.blogId}
-                  className="w-full px-4 md:w-1/2 lg:w-1/3"
-                >
-                  <div
-                    className="wow fadeInUp group mb-10"
-                    data-wow-delay=".1s"
-                  >
-                    <div className="mb-8 overflow-hidden rounded-[5px]">
-                      <a href="javascript:void(0)" className="block">
-                        <img
-                          src={post.img} // Nếu không có ảnh, dùng ảnh mặc định
-                          alt={post.post}
-                          className="h-[220px] w-[370px] w-full transition group-hover:rotate-6 group-hover:scale-125"
-                        />
-                      </a>
-                    </div>
-                    <div>
-                      <span className="mb-6 inline-block rounded-[5px] bg-primary px-4 py-0.5 text-center text-xs font-medium leading-loose text-white">
-                        Jan 05, 2023 {/* Hiển thị ngày nếu có */}
-                      </span>
-                      <h3>
-                        <a
-                          href="javascript:void(0)"
-                          className="mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl"
-                        >
-                          {post.post} {/* Hiển thị tiêu đề blog */}
-                        </a>
-                      </h3>
-                      <p className="max-w-[370px] text-base text-body-color dark:text-dark-6">
-                        Lorem Ipsum is simply dummy text of the printing and
-                        typesetting industry. {/* Nội dung blog */}
-                      </p>
-                      <Button
-                        icon={<EditTwoTone />}
-                        onClick={() => setOpenModal(true)}
+            
+            {Array.isArray(posts) && posts.map((post) => (
+              <div key={post.blogId} className="w-full px-4 md:w-1/2 lg:w-1/3">
+                <div className="wow fadeInUp group mb-10" data-wow-delay=".1s">
+                  <div className="mb-8 overflow-hidden rounded-[5px]" >
+                    <a href="javascript:void(0)" className="block">
+                      <img
+                        src={
+                          post.img
+                        } // Nếu không có ảnh, dùng ảnh mặc định
+                        alt=""
+                        className="w-full transition group-hover:rotate-6 group-hover:scale-125 w-[370px] h-[220px]"
                       />
-                      <Popconfirm
-                        title="Delete"
-                        description="Are you sure want to delete?"
-                        onConfirm={() => handleDeletePost(post.id)}
+                    </a>
+                  </div>
+                  <div>
+                    <span className="mb-6 inline-block rounded-[5px] bg-primary px-4 py-0.5 text-center text-xs font-medium leading-loose text-white">
+                      Jan 05, 2023 {/* Hiển thị ngày nếu có */}
+                    </span>
+                    <h3>
+                      <a
+                        href="javascript:void(0)"
+                        className="mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl"
                       >
-                        <Button
-                          icon={<DeleteOutlined />}
-                          danger /* Thêm nút xóa */
-                        />
-                      </Popconfirm>
-                    </div>
+                        {post.post} {/* Hiển thị tiêu đề blog */}
+                      </a>
+                    </h3>
+                    <p className="max-w-[370px] text-base text-body-color dark:text-dark-6">
+                      Lorem Ipsum is simply dummy text of the printing and
+                      typesetting industry. {/* Nội dung blog */}
+                    </p>
+                    <Button
+                      icon={<EditTwoTone />}
+                      onClick={() => setOpenModal(true)}
+                    />
+                    <Popconfirm
+                      title="Delete"
+                      description="Are you sure want to delete?"
+                      onConfirm={() => handleDeletePost(post.id)}
+                    >
+                      <Button
+                        icon={<DeleteOutlined />}
+                        danger /* Thêm nút xóa */
+                      />
+                    </Popconfirm>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         </div>
       </section>
-      {previewImage && (
+{previewImage && (
         <Image
           wrapperStyle={{
             display: "none",
