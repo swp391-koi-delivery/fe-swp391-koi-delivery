@@ -11,7 +11,7 @@ const MapRoutingComponent = () => {
   };
 
   return (
-    <div className="mx-auto max-w-5xl p-6 bg-gradient-to-br from-blue-200 to-green-100" >
+    <div className="mx-auto max-w-8xl p-6 bg-gradient-to-br from-blue-200 to-green-100" >
       <h1 className="text-center text-3xl font-bold text-indigo-800 mb-6">Map & Routing</h1>
       {/* Toggle Button */}
       <div className="mb-4 text-center">

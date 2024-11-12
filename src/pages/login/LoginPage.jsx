@@ -29,7 +29,7 @@ function LoginPage() {
       } else if (role === "SALE_STAFF") {
         navigate("/dashboard");
       } else if (role === "DELIVERING_STAFF") {
-        navigate("/deliveryStaff");
+        navigate("/deliveryStaff/listOrders_Deli");
       }
       toast.success("Successfully login account");
     } catch (err) {
