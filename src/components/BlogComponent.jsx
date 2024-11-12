@@ -57,15 +57,6 @@ function BlogComponent() {
     </button>
   );
 
-  // const fetchPosts = async () => {
-  //   //const response = await axios.get(api);
-  //   //console.log(response.data);
-  //   const response = await api.get("free-access/allBlog?page=1&size=1000000000");
-  //   setPosts(response.data);
-  // };
-  // useEffect(() => {
-  //   fetchPosts();
-  // }, []);
 
   const fetchPosts = async () => {
     try {

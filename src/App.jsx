@@ -6,7 +6,6 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import requestPermissions from "./config/notification";
 
 // Customer
 import LayoutTemplate from "./components/layout/LayoutTemplate";
@@ -53,9 +52,6 @@ import OrderRouting from "./pages/DeliveryStaff/MapComponent/OrderRouting/OrderR
 
 
 function App() {
-  useEffect(() => {
-    requestPermissions();
-  }, []);
 
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
