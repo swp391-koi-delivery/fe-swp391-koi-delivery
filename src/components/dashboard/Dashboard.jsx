@@ -138,9 +138,9 @@ const Dashboard = () => {
             <Outlet />
           </div>
         </Content>
-        <Footer className="py-4 text-center">
+        {/* <Footer className="py-4 text-center">
           Ant Design ©{new Date().getFullYear()} Created by Ant UED
-        </Footer>
+        </Footer> */}
       </Layout>
     </Layout>
   );

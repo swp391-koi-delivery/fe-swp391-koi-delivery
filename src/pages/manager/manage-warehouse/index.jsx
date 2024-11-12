@@ -8,9 +8,7 @@ function ManageWarehouse() {
         { title: "Location", dataIndex: "location", key: "location",align: "left", },
         { title: "Max Capacity", dataIndex: "maxCapacity", key: "maxCapacity",align: "left", },
         { title: "Current Capacity", dataIndex: "currentCapacity", key: "currentCapacity",align: "left", },
-
     ];
-
     const formItems = [
         <>
           <Form.Item name="id" hidden>

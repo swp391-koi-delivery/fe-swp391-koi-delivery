@@ -48,22 +48,22 @@ function ManageUser() {
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
 
-  const useStyle = createStyles(({ css, token }) => {
-    const { antCls } = token;
-    return {
-      customTable: css`
-        ${antCls}-table {
-          ${antCls}-table-container {
-            ${antCls}-table-body,
-            ${antCls}-table-content {
-              scrollbar-width: thin;
-              scrollbar-color: unset;
-            }
-          }
-        }
-      `,
-    };
-  });
+  // const useStyle = createStyles(({ css, token }) => {
+  //   const { antCls } = token;
+  //   return {
+  //     customTable: css`
+  //       ${antCls}-table {
+  //         ${antCls}-table-container {
+  //           ${antCls}-table-body,
+  //           ${antCls}-table-content {
+  //             scrollbar-width: thin;
+  //             scrollbar-color: unset;
+  //           }
+  //         }
+  //       }
+  //     `,
+  //   };
+  // });
   const fetchUser = async () => {
     // const response = await axios.get(api);
     try {
@@ -164,7 +164,7 @@ function ManageUser() {
       setSubmitting(false);
     }
   };
-  const { styles } = useStyle();
+  // const { styles } = useStyle();
   //mở modal
   const handleOpenModal = (user) => {
     setEditingUser(user); // Lưu người dùng đang được chỉnh sửa
@@ -369,7 +369,7 @@ function ManageUser() {
         Add
       </Button>
       <Table
-        className={styles.customTable}
+        // className={styles.customTable}
         columns={columns}
         dataSource={filteredUsers}
         rowKey="id"
