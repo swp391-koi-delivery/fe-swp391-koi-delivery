@@ -62,6 +62,11 @@ function ManageOrder() {
 
  
   useEffect(() => {
+
+    fetchOrders();
+  }, [currentPage, ordersPerPage]); // Chỉ gọi lại khi currentPage hoặc ordersPerPage thay đổi
+
+  useEffect(() => {
     const filtered = orders.filter((order) => {
       const orderId = String(order.id);
       return (
@@ -71,9 +76,7 @@ function ManageOrder() {
       );
     });
     setFilteredOrders(filtered);
-    fetchOrders();
-  }, [searchTerm, priceRange, orders,currentPage, ordersPerPage]);
-
+  }, [searchTerm, priceRange, orders]);
   const handleSearch = (value) => {
     setSearchTerm(value);
   };

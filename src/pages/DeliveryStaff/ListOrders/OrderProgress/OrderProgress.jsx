@@ -13,6 +13,9 @@ import {
   CarryOutOutlined,
   ApartmentOutlined,
 } from "@ant-design/icons";
+import { MdCancel, MdLocalShipping } from "react-icons/md";
+import { IoWarning } from "react-icons/io5";
+import { BiLoaderAlt } from "react-icons/bi";
 import { motion, AnimatePresence, color } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { Checkbox, Select } from "antd"; // Import Checkbox from Ant Design
@@ -34,6 +37,14 @@ const HealthFishStatus = {
   UNHEALTHY: "UNHEALTHY",
 };
 
+const reasons = [
+  "Wrong delivery address",
+  "Delivery delayed",
+  "Order damaged during shipping",
+  "Incorrect order items",
+  "Other",
+];
+
 const OrderTrackingSystem = () => {
   const { id } = useParams();
 
@@ -47,6 +58,11 @@ const OrderTrackingSystem = () => {
   const [isHealthStatusLocked, setIsHealthStatusLocked] = useState(false);
   const [imageFiles, setImageFiles] = useState({});
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [error, setError] = useState("");
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [cancellationReason, setCancellationReason] = useState("");
 
   const fetchOrder = async () => {
     try {
@@ -110,6 +126,54 @@ const OrderTrackingSystem = () => {
     }
     fetchOrder();
   }, [id]);
+
+  const handleCancelOrder = async () => {
+    if (!cancellationReason) {
+      setError("Please select a reason for cancellation");
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 3000);
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Find the specific event to cancel based on the selected stage (orderStatus.stage or another criteria)
+      const progressEvent = orderStatus.events.find(
+        (event) =>
+          event.status === Object.values(ProgressStatus)[orderStatus.stage - 1],
+      );
+
+      if (!progressEvent) {
+        throw new Error("No progress event found to cancel.");
+      }
+
+      const { progressId } = progressEvent; // Retrieve the progressId from the found event
+
+      // Send the DELETE request with the progressId and reason as query parameters
+      await api.delete(`delivery/${progressId}`, {
+        params: {
+          reason: cancellationReason, // Pass the cancellation reason as query parameter
+        },
+      });
+
+      // Handle post-cancellation actions
+      setShowConfirmation(false);
+      setCancellationReason("");
+      setIsHealthStatusLocked(true); // Lock health status after cancellation
+      toast.error("Your order has been canceled!");
+      setTimeout(() => {
+        navigate(-1); // Go back to the previous page after cancellation
+      }, 1000);
+    } catch (err) {
+      setError(err.message);
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 3000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const updateOrderStatus = async (index) => {
     try {
@@ -568,6 +632,115 @@ const OrderTrackingSystem = () => {
             ))}
           </AnimatePresence>
         </div>
+      </div>
+      {/*Delete order progress */}
+      <div className="relative">
+        <button
+          onClick={() => setShowConfirmation(true)}
+          className="group relative inline-flex transform items-center justify-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 text-base font-medium text-white shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={isLoading}
+          aria-label="Cancel Order"
+          role="button"
+        >
+          {isLoading ? (
+            <BiLoaderAlt className="mr-2 h-5 w-5 animate-spin" />
+          ) : (
+            <MdCancel className="mr-2 h-5 w-5" />
+          )}
+          Cancel Order
+        </button>
+
+        {error && showTooltip && (
+          <div className="absolute -top-12 left-1/2 flex -translate-x-1/2 transform animate-bounce items-center space-x-2 rounded-lg bg-red-100 px-4 py-2 text-red-800 shadow-md">
+            <IoWarning className="h-5 w-5" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {showConfirmation && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div className="animate-modal-appear w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all duration-300 ease-in-out">
+              <div className="mb-6 flex items-center space-x-4">
+                <MdLocalShipping className="h-10 w-10 text-purple-500" />
+                <div>
+                  <h3 className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-gray-900 text-transparent">
+                    Cancel Delivery Order
+                  </h3>
+                  <p className="text-gray-600">
+                    Please select your reason for cancellation
+                  </p>
+                </div>
+              </div>
+
+              <div className="mb-6 space-y-4">
+                {reasons.map((reason, index) => (
+                  <label
+                    key={index}
+                    className={`flex cursor-pointer items-center rounded-lg border-2 p-4 transition-all duration-200 ${
+                      cancellationReason === reason
+                        ? "border-purple-500 bg-purple-50"
+                        : "border-gray-200 hover:border-purple-200 hover:bg-purple-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="cancellationReason"
+                      value={reason}
+                      checked={cancellationReason === reason}
+                      onChange={(e) => setCancellationReason(e.target.value)}
+                      className="hidden"
+                    />
+                    <div className="w-full">
+                      <span className="font-medium text-gray-700">
+                        {reason}
+                      </span>
+                    </div>
+                    <div
+                      className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                        cancellationReason === reason
+                          ? "border-purple-500 bg-purple-500"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      {cancellationReason === reason && (
+                        <div className="h-3 w-3 rounded-full bg-white" />
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {cancellationReason === "Other" && (
+                <textarea
+                  className="mb-6 w-full rounded-lg border-2 border-gray-200 p-3 transition-all duration-200 focus:border-purple-500 focus:ring focus:ring-purple-200"
+                  placeholder="Please specify your reason..."
+                  rows="3"
+                />
+              )}
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => {
+                    setShowConfirmation(false);
+                    setCancellationReason("");
+                  }}
+                  className="flex transform items-center rounded-lg bg-gray-200 px-6 py-3 font-medium text-black transition-all duration-300 hover:scale-105 hover:bg-gray-300"
+                >
+                  Keep Order
+                </button>
+                <button
+                  onClick={handleCancelOrder}
+                  className="flex transform items-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-purple-600 hover:to-pink-600"
+                >
+                  {isLoading && (
+                    <BiLoaderAlt className="mr-2 h-5 w-5 animate-spin" />
+                  )}
+                  Confirm Cancellation
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

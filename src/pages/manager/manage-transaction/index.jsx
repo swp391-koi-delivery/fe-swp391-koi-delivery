@@ -57,13 +57,21 @@ const ManageTransaction = () => {
       }).format(amount);
     };
   
-    const formatDate = (dateString) => {
-      return new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-    };
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat("en-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(price);
+      };
+    
+    // const formatDate = (dateString) => {
+    //   return new Date(dateString).toLocaleDateString("en-US", {
+    //     year: "numeric",
+    //     month: "short",
+    //     day: "numeric",
+    //   });
+    // };
+
   
     return (
       <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -94,7 +102,7 @@ const ManageTransaction = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800">{transaction.description}</h3>
-                    <p className="text-sm text-gray-500">{formatDate(transaction.payments.createPayment)}</p>
+                    <p className="text-sm text-gray-500">{transaction.payments.createPayment}</p>
                     <div className="flex items-center space-x-2">
                       <span className="font-medium">{formatAmount(transaction.payments.orderResponse.totalPrice)}</span>
                       <span className={`font-semibold ${transaction.transactionStatus === "SUCCESS" ? "text-green-600" : "text-yellow-600"}`}>

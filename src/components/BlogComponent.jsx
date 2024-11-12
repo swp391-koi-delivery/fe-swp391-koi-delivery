@@ -174,7 +174,7 @@ function BlogComponent() {
                   >
                     <Input />
                   </Form.Item>
-                  <Form.Item label="image" name="image">
+<Form.Item label="image" name="image">
                     <Upload
                       action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                       listType="picture-card"
@@ -240,7 +240,7 @@ function BlogComponent() {
           </div>
         </div>
       </section>
-      {previewImage && (
+{previewImage && (
         <Image
           wrapperStyle={{
             display: "none",
