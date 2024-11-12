@@ -61,12 +61,15 @@ function BlogComponent() {
   const fetchPosts = async () => {
     try {
       const response = await api.get("free-access/allBlog?page=1&size=1000000000");
-      setPosts(Array.isArray(response.data) ? response.data : []);
+      setPosts(Array.isArray(response.data.content) ? response.data.content : []);
     } catch (error) {
       console.error("Error fetching posts:", error);
       setPosts([]); // Set to empty array on error
     }
   };
+  useEffect(() => {
+    fetchPosts();
+  },[])
   const handleSubmitPosts = async (blog) => {
     if (fileList.length > 0) {
       const file = fileList[0];
@@ -78,7 +81,7 @@ function BlogComponent() {
       setSubmitting(true);
       //const response = await axios.post(api, blog);
       if (blog.blogId) {
-        const response = await api.put(`customer/blog/${blog.id}`, blog);
+        const response = await api.put(`customer/blog/${blog.blogId}`, blog);
       } else {
         const response = await api.post("customer/blog", blog);
       }
@@ -187,15 +190,15 @@ function BlogComponent() {
             </div>
             
             {Array.isArray(posts) && posts.map((post) => (
-              <div key={post.content.blogId} className="w-full px-4 md:w-1/2 lg:w-1/3">
+              <div key={post.blogId} className="w-full px-4 md:w-1/2 lg:w-1/3">
                 <div className="wow fadeInUp group mb-10" data-wow-delay=".1s">
                   <div className="mb-8 overflow-hidden rounded-[5px]" >
                     <a href="javascript:void(0)" className="block">
                       <img
                         src={
-                          post.content.img
+                          post.img
                         } // Nếu không có ảnh, dùng ảnh mặc định
-                        alt={post.post}
+                        alt=""
                         className="w-full transition group-hover:rotate-6 group-hover:scale-125 w-[370px] h-[220px]"
                       />
                     </a>
@@ -209,7 +212,7 @@ function BlogComponent() {
                         href="javascript:void(0)"
                         className="mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl"
                       >
-                        {post.content.post} {/* Hiển thị tiêu đề blog */}
+                        {post.post} {/* Hiển thị tiêu đề blog */}
                       </a>
                     </h3>
                     <p className="max-w-[370px] text-base text-body-color dark:text-dark-6">
