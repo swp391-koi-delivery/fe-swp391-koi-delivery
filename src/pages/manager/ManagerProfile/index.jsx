@@ -13,6 +13,7 @@ const ManageProfile = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -26,6 +27,7 @@ const ManageProfile = () => {
   }, []);
 
   const handleUpdateProfile = async (values) => {
+    setSubmitting(true);
     if (fileList.length > 0) {
       const file = fileList[0];
       const url = await uploadFile(file.originFileObj); // Gọi hàm upload file
@@ -40,6 +42,8 @@ const ManageProfile = () => {
     } catch (error) {
       //console.error("Error updating profile:", error);
       toast.error("Failed to update profile.");
+    }finally{
+      setSubmitting(false);
     }
   };
 
@@ -162,19 +166,6 @@ const ManageProfile = () => {
               </p>
             </div>
 
-            {/* <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm font-medium text-gray-500">Email Status</p>
-              <div className="flex items-center">
-                <FaCheck className="text-green-500 mr-2" />
-                <p className="text-lg font-semibold text-gray-900">{profileData.emailStatus}</p>
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm font-medium text-gray-500">Loyalty Points</p>
-              <p className="text-lg font-semibold text-gray-900">{profileData.loyaltyPoint} pts</p>
-            </div> */}
-
             <div className="rounded-lg bg-gray-50 p-4">
               <p className="text-sm font-medium text-gray-500">
                 Account Status
@@ -192,6 +183,7 @@ const ManageProfile = () => {
 
           <Modal
             title="Update Profile"
+            confirmLoading={submitting}
             visible={isModalOpen}
             onCancel={closeModal}
             onOk={() => form.submit()}

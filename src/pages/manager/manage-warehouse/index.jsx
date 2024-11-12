@@ -6,12 +6,9 @@ function ManageWarehouse() {
     const columns = [
         { title: "ID", dataIndex: "id", key: "id",align: "left", },
         { title: "Location", dataIndex: "location", key: "location",align: "left", },
-        { title: "Available", dataIndex: "available", key: "available",align: "left", render: (available) => (<Tag style={{fontSize:"22px"}}
-            icon={available ? <CloseCircleOutlined /> : <CheckCircleOutlined />} 
-            color={available ? 'success' : 'error'} // Màu đỏ cho Inactive, xanh cho Active
-          >
-            {available ? 'Available' : 'Unavailable'}
-          </Tag>),},
+        { title: "Max Capacity", dataIndex: "maxCapacity", key: "maxCapacity",align: "left", },
+        { title: "Current Capacity", dataIndex: "currentCapacity", key: "currentCapacity",align: "left", },
+
     ];
 
     const formItems = [
@@ -22,9 +19,20 @@ function ManageWarehouse() {
           <Form.Item
             name="location"
             label="Location"
-            rules={[{ required: true, message: "Please input type of Box" }]}
+            rules={[{ required: true, message: "Please input warehouse name" }]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+            name="maxCapacity"
+            label="Max Capacity"
+            rules={[{ required: true, message: "Please input capacity" },{
+              type: "number",
+              min: 0,
+              message: "Invalid capacity",
+            },]}
+          >
+            <InputNumber />
           </Form.Item>
         </>,
       ];

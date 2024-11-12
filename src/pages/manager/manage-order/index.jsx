@@ -13,6 +13,7 @@ import {
   FaEdit,
   FaChevronDown,
   FaChevronUp,
+  FaWarehouse,
 } from "react-icons/fa";
 import { MdDeliveryDining } from "react-icons/md";
 import api from "../../../config/axios";
@@ -157,6 +158,8 @@ function ManageOrder() {
         return <FaMoneyBillWave className="text-orange-500" />;
       case "PAID":
         return <FaCheckCircle className="text-green-500" />;
+      case "BOOKING":
+        return <FaWarehouse className="text-blue-500" />;
       case "SHIPPING":
         return <FaTruck className="text-blue-500" />;
       case "DELIVERED":
@@ -168,9 +171,6 @@ function ManageOrder() {
     }
   };
 
-  // const startIndex = (currentPage - 1) * ordersPerPage;
-  // const endIndex = startIndex + ordersPerPage;
-  // const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-4">
@@ -251,53 +251,13 @@ function ManageOrder() {
                         </span>
                       </div>
                       <div className="flex items-center space-x-1">
-                        {editingOrderId === order.id ? (
-                          <Select
-                            defaultValue={order.orderStatus}
-                            onChange={handleOrderStatusChange}
-                            className="w-32"
-                          >
-                            <Option key="PENDING" value="PENDING">
-                              PENDING
-                            </Option>
-                            <Option key="ACCEPTED" value="ACCEPTED">
-                              ACCEPTED
-                            </Option>
-                            <Option key="REJECTED" value="REJECTED">
-                              REJECTED
-                            </Option>
-                            <Option key="CANCELED" value="CANCELED">
-                              CANCELED
-                            </Option>
-                            {/* <Option value="AWAITING_RESPONSE">AWAITING_RESPONSE</Option> */}
-                            {/* <Option value="AWAITING_PAYMENT">AWAITING PAYMENT</Option> */}
-                            <Option key="PAID" value="PAID">
-                              PAID
-                            </Option>
-                            <Option key="SHIPPING" value="SHIPPING">
-                              SHIPPING
-                            </Option>
-                            <Option key="DELIVERED" value="DELIVERED">
-                              DELIVERED
-                            </Option>
-                          </Select>
-                        ) : (
                           <>
                             {getOrderStatusIcon(order.orderStatus)}
                             <span className="text-xs font-bold text-gray-700">
                               {order.orderStatus}
                             </span>
                           </>
-                        )}
                       </div>
-                      {/* <FaEdit
-                      className="text-gray-500 cursor-pointer"
-                      onClick={() =>
-                        editingOrderId === order.id
-                          ? handleEditStatus(order.id)
-                          : setEditingOrderId(order.id)
-                      }
-                    /> */}
                     </div>
                   </div>
                   <div className="mt-0.5 flex items-center justify-between">
@@ -315,7 +275,6 @@ function ManageOrder() {
                   {/* Toggle nội dung riêng biệt cho từng order */}
                   {expandedOrderId === order.id && (
                     <div className="mt-4 text-center text-lg text-gray-700">
-                      Hello, this is extra content for Order ID: {order.id}
                       <FeedbackForm id={order.id} />
                     </div>
                   )}

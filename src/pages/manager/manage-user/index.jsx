@@ -386,90 +386,6 @@ function ManageUser() {
         title="Update User"
       >
         <Form form={form} layout="vertical">
-          {/* <Form.Item
-            name="username"
-            label="UserName"
-            rules={[
-              {
-                required: true,
-                message: "Please imput username!",
-              },
-              {
-                min: 6,
-                message: "Username must be at least 6 characters",
-              },
-            ]}
-          >
-            <AntInput />
-          </Form.Item> */}
-          {/* <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              {
-                required: true,
-                message: "Please imput username!",
-              },
-            ]}
-          >
-            <AntInput />
-          </Form.Item> */}
-          {/* <Form.Item
-            name="fullname"
-            label="FullName"
-            rules={[
-              {
-                required: true,
-                message: "Please imput fullname!",
-              },
-            ]}
-          >
-            <AntInput />
-          </Form.Item> */}
-          {/* <Form.Item
-            name="address"
-            label="Address"
-            rules={[
-              {
-                required: true,
-                message: "Please input address!",
-              },
-            ]}
-          >
-            <AntInput />
-          </Form.Item> */}
-          {/* <Form.Item
-            name="phone"
-            label="Phone"
-            rules={[
-              {
-                required: true,
-                message: "Please input phone number!",
-              },
-              {
-                pattern: "^0[0-9]{9}$",
-                message: "Invalid format!(0*********)",
-              },
-            ]}
-          >
-            <AntInput />
-          </Form.Item> */}
-          {/* <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              {
-                required: true,
-                message: "Please input email!",
-              },
-              {
-                type: "email",
-                message: "Invalid email's format!",
-              },
-            ]}
-          >
-            <AntInput />
-          </Form.Item> */}
           <Form.Item
             name="loyaltyPoint"
             label="LoyaltyPoint"
@@ -605,24 +521,6 @@ function ManageUser() {
             ]}
           >
             <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="loyaltyPoint"
-            label="LoyaltyPoint"
-            rules={[
-              {
-                required: true,
-                message: "Please input loyalty point!",
-              },
-              {
-                type: "number",
-                min: 0,
-                max: 100,
-                message: "Invalid loyalty point",
-              },
-            ]}
-          >
-            <InputNumber />
           </Form.Item>
           <Form.Item name="deleted" label="Status">
             <Select>
