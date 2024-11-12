@@ -62,6 +62,11 @@ function ManageOrder() {
 
  
   useEffect(() => {
+
+    fetchOrders();
+  }, [currentPage, ordersPerPage]); // Chỉ gọi lại khi currentPage hoặc ordersPerPage thay đổi
+
+  useEffect(() => {
     const filtered = orders.filter((order) => {
       const orderId = String(order.id);
       return (
@@ -71,9 +76,7 @@ function ManageOrder() {
       );
     });
     setFilteredOrders(filtered);
-    fetchOrders();
-  }, [searchTerm, priceRange, orders,currentPage, ordersPerPage]);
-
+  }, [searchTerm, priceRange, orders]);
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
@@ -178,31 +181,6 @@ function ManageOrder() {
         <h1 className="mb-2 text-center text-2xl font-bold text-indigo-800">
           Order Management
         </h1>
-
-        <div className="flex flex-col items-center justify-between space-y-2 md:flex-row md:space-x-2 md:space-y-0">
-          <div className="w-full md:w-1/2">
-            <Input
-              placeholder="Search by Order ID"
-              prefix={<FaSearch className="text-gray-400" />}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full rounded-md border border-gray-300 p-1 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="w-full md:w-1/2">
-            <Slider
-              range
-              min={0}
-              max={100}
-              value={priceRange}
-              onChange={handlePriceRangeChange}
-              className="w-full"
-              style={{ height: "4px" }}
-            />
-            <div className="mt-1 text-xs text-gray-600">
-              Price Range: ${priceRange[0]} - ${priceRange[1]}
-            </div>
-          </div>
-        </div>
 
         {totalElement === 0 ? (
           <div className="mt-4 text-center text-sm text-gray-500">
