@@ -57,13 +57,21 @@ const ManageTransaction = () => {
       }).format(amount);
     };
   
-    const formatDate = (dateString) => {
-      return new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-    };
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat("en-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(price);
+      };
+    
+    // const formatDate = (dateString) => {
+    //   return new Date(dateString).toLocaleDateString("en-US", {
+    //     year: "numeric",
+    //     month: "short",
+    //     day: "numeric",
+    //   });
+    // };
+
   
     return (
       <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -75,29 +83,6 @@ const ManageTransaction = () => {
             <span className="text-red-700">{error}</span>
           </div>
         )}
-  
-        {/* <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-          <select
-            value={selectedFilter}
-            onChange={(e) => setSelectedFilter(e.target.value)}
-            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Filter transactions"
-          >
-            <option value="all">All Transactions</option>
-            <option value="deposit">Deposits</option>
-            <option value="withdrawal">Withdrawals</option>
-            <option value="transfer">Transfers</option>
-          </select>
-  
-          <button
-            onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
-            className="flex items-center justify-center p-2 border rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label={`Sort by date ${sortOrder === "desc" ? "ascending" : "descending"}`}
-          >
-            Sort by Date
-            {sortOrder === "desc" ? <FiChevronDown className="ml-2" /> : <FiChevronUp className="ml-2" />}
-          </button>
-        </div> */}
   
         <div className="space-y-4">
           {filterTransactions().map((transaction) => (
@@ -117,14 +102,14 @@ const ManageTransaction = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800">{transaction.description}</h3>
-                    <p className="text-sm text-gray-500">{formatDate(transaction.payments.createPayment)}</p>
+                    <p className="text-sm text-gray-500">{transaction.payments.createPayment}</p>
                     <div className="flex items-center space-x-2">
-                      <span className="font-medium">{formatAmount(transaction.payments.orderResponse.totalPrice)}</span>
-                      <p className="text-sm text-gray-500">{transaction.from?.fullname}</p>
+                      <span className="font-medium">{formatPrice(transaction.payments.orderResponse.totalPrice)}</span>
                       <span className={`font-semibold ${transaction.transactionStatus === "SUCCESS" ? "text-green-600" : "text-yellow-600"}`}>
                         {transaction.transactionStatus}
                       </span>
                     </div>
+                      <p className="text-sm text-gray-500">{transaction.from?.fullname}</p>
                   </div>
                 </div>
               </div>
