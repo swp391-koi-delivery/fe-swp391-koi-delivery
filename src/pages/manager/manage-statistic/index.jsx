@@ -21,6 +21,7 @@ import { MdErrorOutline } from "react-icons/md";
 import axios from "axios";
 import api from "../../../config/axios";
 import { Rate } from "antd";
+import ManageTransaction from "../manage-transaction";
 const ManageStatistic = () => {
   const [orderData, setOrderData] = useState([]);
   const [user, setUser] = useState([]);
@@ -33,14 +34,6 @@ const ManageStatistic = () => {
   const [previousMonthRevenue, setPreviousMonthRevenue] = useState(0);
   const [filterType, setFilterType] = useState("detail"); // Loại filter: "day", "month", "year"
 
-  const stats = {
-    totalSales: 150000,
-    customers: 1200,
-    orders: 3500,
-  };
-  // const activeCustomers = user.filter(
-  //   (user) => user.role === "CUSTOMER" && user.deleted === false,
-  // );
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("en-VN", {
@@ -49,23 +42,8 @@ const ManageStatistic = () => {
     }).format(price);
   };
 
-  const activeCustomers = Array.isArray(user)
-    ? user.filter((user) => user.role === "CUSTOMER" && user.deleted === false)
-    : [];
   const handleFilterChange = (event) => {
     setFilterType(event.target.value);
-  };
-
-  // Đếm số lượng khách hàng
-  const customerCount = activeCustomers.length;
-
-  // const calculateTotalOrders = () => {
-  //   return orderData.length;
-  // };
-
-  //PAID
-  const calculateTotalOrders = () => {
-    return orderData.filter((order) => order.orderStatus === "PAID").length;
   };
 
   const handleStatClick = (statType) => {
@@ -124,182 +102,22 @@ const ManageStatistic = () => {
       <span className="text-sm text-gray-500">{label}</span>
     </div>
   );
-  if (!stats.totalSales && !stats.customers && !stats.orders) {
-    return (
-      <div
-        className="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
-        role="alert"
-      >
-        <strong className="font-bold">Error!</strong>
-        <span className="block sm:inline">
-          {" "}
-          Unable to load stats. Please try again later.
-        </span>
-        <span className="absolute bottom-0 right-0 top-0 px-4 py-3">
-          <MdErrorOutline className="h-6 w-6 text-red-500" />
-        </span>
-      </div>
-    );
-  }
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //const response = await axios.get("http://14.225.220.122:8080/api/order");
-        // const response1 = await api.get(
-        //   "order/allOrder?page=1&size=1000000000",
-        // );
-        // const response1 = await api.get("manager/dashboard/orderStatistics?filter=month")
-        // const response2 = await api.get("manager/allUser?page=1&size=1000000000");
         const response1 = await api.get(
           `manager/dashboard/orderStatistics?filter=${filterType}`,
         );
         const response2 = await api.get("manager/dashboard/dashboardStats");
         setOrderData(response1.data);
         setUser(response2.data);
-        calculateMonthlyRevenue();
       } catch (error) {
         console.error("Error fetching order data:", error);
       }
     };
     fetchData();
   }, []);
-
-  const calculateMonthlyRevenue = () => {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth(); // Get the current month (0-11)
-    const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1; // Handle December to January transition
-    const currentYear = currentDate.getFullYear();
-    const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-
-    const currentMonthOrders = orderData.filter((order) => {
-      const [day, month, year] = order.orderDate.split("/").map(Number); // Split date string
-      const orderDate = new Date(year, month - 1, day); // Create Date object
-      return (
-        orderDate.getMonth() === currentMonth &&
-        orderDate.getFullYear() === currentYear &&
-        order.orderStatus === "PAID"
-      );
-    });
-
-    const previousMonthOrders = orderData.filter((order) => {
-      const [day, month, year] = order.orderDate.split("/").map(Number); // Split date string
-      const orderDate = new Date(year, month - 1, day); // Create Date object
-      return (
-        orderDate.getMonth() === previousMonth &&
-        orderDate.getFullYear() === previousYear &&
-        order.orderStatus === "PAID"
-      );
-    });
-
-    const currentMonthTotalRevenue = currentMonthOrders.reduce(
-      (sum, order) => sum + order.totalPrice,
-      0,
-    );
-    const previousMonthTotalRevenue = previousMonthOrders.reduce(
-      (sum, order) => sum + order.totalPrice,
-      0,
-    );
-
-    setCurrentMonthRevenue(currentMonthTotalRevenue);
-    setPreviousMonthRevenue(previousMonthTotalRevenue);
-  };
-
-  // Calculate revenue growth percentage
-  // const calculateRevenueGrowth = () => {
-  //   if (previousMonthRevenue === 0) return "Calculating..."; // Avoid division by zero
-  //   const growth =
-  //     ((currentMonthRevenue - previousMonthRevenue) / previousMonthRevenue) *
-  //     100;
-  //   return growth.toFixed(2);
-  // };
-
-  // const processChartData = () => {
-  //   const chartData = orderData.map((order) => ({
-  //     orderDate: formatDate(convertToDate(order.date)), // Use convertToDate to parse DD/MM/YYYY format
-  //     totalPrice: order.totalPrice,
-  //   }));
-  //   console.log(chartData.sort((a, b) => new Date(a.date) - new Date(b.date)));
-  //   return chartData.sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by the parsed date
-  // };
-
-  //PAID
-  // const processChartData = () => {
-  //   const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
-  //   const chartData = paidOrders.map(order => ({
-  //     orderDate: formatDate(convertToDate(order.orderDate)), // Parse DD/MM/YYYY format
-  //     totalPrice: order.totalPrice,
-  //   }));
-
-  //   return chartData.sort((a, b) => new Date(a.orderDate) - new Date(b.orderDate)); // Sort by parsed date
-  // };
-
-  // //PAID
-  // const processChartDataDate = () => {
-  //   const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
-  //   const combinedData = paidOrders.map(order => ({
-  //     orderDate: formatDate(convertToDate(order.orderDate)), // Convert date format
-  //     totalPrice: order.totalPrice, // Order price
-  //   }));
-
-  //   const aggregatedData = combinedData.reduce((acc, curr) => {
-  //     const date = new Date(curr.orderDate);
-  //     let key;
-
-  //     if (filterType === "detail") {
-  //       return processChartData(); // Call the original process function
-  //     } else if (filterType === "month") {
-  //       key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Format as "YYYY-MM"
-  //     } else if (filterType === "year") {
-  //       key = `${date.getFullYear()}`; // Only year
-  //     } else {
-  //       key = curr.orderDate; // By date
-  //     }
-
-  //     const existing = acc.find(item => item.key === key);
-
-  //     if (existing) {
-  //       existing.totalPrice += curr.totalPrice; // Sum total price if key exists
-  //     } else {
-  //       acc.push({ key, totalPrice: curr.totalPrice }); // Add if key doesn't exist
-  //     }
-
-  //     return acc;
-  //   }, []);
-
-  //   return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sort by key
-  // };
-
-  // const processChartDataDate = () => {
-  //   const combinedData = orderData.map((order) => ({
-  //     orderDate: formatDate(convertToDate(order.date)), // Chuyển đổi định dạng ngày
-  //     totalPrice: order.totalPrice, // Giá của đơn hàng
-  //   }));
-  //   const aggregatedData = combinedData.reduce((acc, curr) => {
-  //     const date = new Date(curr.date);
-  //     let key;
-  //     if (filterType === "detail") {
-  //       return processChartData();
-  //     } else if (filterType === "month") {
-  //       key = `${date.getFullYear()}-${date.getMonth() + 1}`; // Chuỗi định dạng "YYYY-MM"
-  //     } else if (filterType === "year") {
-  //       key = `${date.getFullYear()}`; // Chỉ năm
-  //     } else {
-  //       key = curr.date; // Theo ngày
-  //     }
-
-  //     const existing = acc.find((item) => item.key === key);
-
-  //     if (existing) {
-  //       existing.totalPrice += curr.totalPrice; // Cộng dồn giá nếu key đã tồn tại
-  //     } else {
-  //       acc.push({ key, totalPrice: curr.totalPrice }); // Nếu chưa tồn tại, thêm vào mảng
-  //     }
-  //     console.log(acc)
-  //     return acc;
-  //   }, []);
-
-  //   return aggregatedData.sort((a, b) => new Date(a.key) - new Date(b.key)); // Sắp xếp theo key
-  // };
+  
 
   const processChartDataDate = () => {
     if (filterType === "detail") {
@@ -350,68 +168,6 @@ const ManageStatistic = () => {
     return [];
   };
 
-  //PAID
-  // const processChartData = () => {
-  //   const paidOrders = orderData.filter(order => order.orderStatus === "PAID");
-  //   const chartData = paidOrders.map(order => ({
-  //     orderDate: order.orderDate,
-  //     totalPrice: order.totalPrice,
-  //   }));
-  //   return chartData.sort((a, b) => new Date(a.orderDate) - new Date(b.orderDate));
-  // };
-
-  // const calculateTotalRevenue = () => {
-  //   return orderData
-  //     .reduce((sum, order) => sum + order.totalPrice, 0)
-  //     .toFixed(2);
-  // };
-
-  //PAID
-  const calculateTotalRevenue = () => {
-    const paidOrders = orderData.filter(
-      (order) => order.orderStatus === "PAID",
-    );
-    return paidOrders
-      .reduce((sum, order) => sum + order.totalPrice, 0)
-      .toFixed(2);
-  };
-
-  // const calculateAverageOrderValue = () => {
-  //   return (calculateTotalRevenue() / orderData.length).toFixed(2);
-  // };
-
-  //PAID
-  const calculateAverageOrderValue = () => {
-    const totalOrders = calculateTotalOrders();
-    if (totalOrders === 0) return "0.00";
-    return (calculateTotalRevenue() / totalOrders).toFixed(2);
-  };
-
-  // Helper function to convert DD/MM/YYYY to YYYY-MM-DD
-
-  const getMostActiveDay = () => {
-    const dailyTotals = orderData.reduce((acc, order) => {
-      const orderDate = formatDate(convertToDate(order.orderDate)); // Chuyển đổi định dạng ngày
-      if (!acc[orderDate]) {
-        acc[orderDate] = 0; // Khởi tạo nếu chưa có
-      }
-      acc[orderDate] += order.totalPrice; // Cộng dồn doanh thu
-      return acc;
-    }, {});
-
-    // Tìm ngày có doanh thu cao nhất
-    let mostActiveDay = null;
-    let highestRevenue = 0;
-
-    for (const date in dailyTotals) {
-      if (dailyTotals[date] > highestRevenue) {
-        highestRevenue = dailyTotals[date];
-        mostActiveDay = date;
-      }
-    }
-
-    return { mostActiveDay, highestRevenue };
-  };
 
   const convertToDate = (dateString) => {
     if (!dateString) return null;
@@ -426,7 +182,6 @@ const ManageStatistic = () => {
     const dd = String(date?.getDate()).padStart(2, "0");
     return `${dd}/${mm}/${yyyy}`;
   };
-  const { mostActiveDay, highestRevenue } = getMostActiveDay();
 
   const OrderStatsCard = () => {
     const xAxisKey =
@@ -453,39 +208,26 @@ const ManageStatistic = () => {
           >
             <option value="detail">Detail</option>
             <option value="synthetic">Synthetic</option>
-            <option value="month">Month</option>
+            {/* <option value="month">Month</option> */}
             <option value="year">Year</option>
           </select>
         </div>
         <div className="flex-grow">
-        <ResponsiveContainer width="100%" height={450}>
-          <LineChart data={processChartDataDate()}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey={xAxisKey}
-              // Uncomment if you want to customize the tick formatter
-              // tickFormatter={(value) => {
-              //   if (filterType === "month") {
-              //     // Show month and year (MM/YYYY)
-              //     return value;
-              //   } else if (filterType === "year") {
-              //     // Show only year
-              //     return value;
-              //   }
-              //   return value; // Default is full date
-              // }}
-            />
-            <YAxis />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="totalPrice"
-              stroke="#8884d8"
-              activeDot={{ r: 8 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+          <ResponsiveContainer width="100%" height={450}>
+            <LineChart data={processChartDataDate()}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey={xAxisKey} />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="totalPrice"
+                stroke="#8884d8"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
         <p className="mt-4 text-sm text-gray-600">
           Order trends based on total price over time.
         </p>
@@ -643,7 +385,6 @@ const ManageStatistic = () => {
     <>
       <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-8">
         <div className="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-lg">
-          {/*</div>h2 className="text-2xl font-bold text-center mb-6">Monthly Statistics</h2> */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <StatItem
               icon={
@@ -701,6 +442,9 @@ const ManageStatistic = () => {
             <OrderDateInsightsCard />
             <OrderRatingCard />
           </div>
+        </div>
+        <div className="container mx-auto p-6">
+          <ManageTransaction />
         </div>
       </div>
     </>

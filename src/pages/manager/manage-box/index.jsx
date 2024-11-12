@@ -10,8 +10,8 @@ function ManageBox() {
     { title: "Volume", dataIndex: "volume", key: "volume",align: "left", },
     { title: "Price", dataIndex: "price", key: "price",align: "left", render: (price) => formatPrice(price), },
     { title: "Available", dataIndex: "available", key: "available",align: "left", render: (available) => (<Tag style={{fontSize:"22px"}}
-      icon={available ? <CloseCircleOutlined /> : <CheckCircleOutlined />} 
-      color={available ? 'success' : 'error'} // Màu đỏ cho Inactive, xanh cho Active
+      icon={available ? <CheckCircleOutlined /> :<CloseCircleOutlined /> } 
+      color={available ? 'success' : 'error'}
     >
       {available ? 'Available' : 'Unavailable'}
     </Tag>),},
@@ -67,7 +67,7 @@ function ManageBox() {
   ];
   return (
     <div className="p-8 min-h-screen bg-gradient-to-br from-blue-100 to-purple-200">
-      <CRUDTemplate columns={columns} formItems={formItems} path="box" path2="allBox" />
+      <CRUDTemplate columns={columns} formItems={formItems} path="box" path2="availableBox" />
     </div>
   );
 }

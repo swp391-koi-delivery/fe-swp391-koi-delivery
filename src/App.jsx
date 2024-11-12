@@ -28,14 +28,16 @@ import OrderDetailStaff from "./pages/sales-staff/orderDetails-staff";
 import OrderDetailsInfoStaff from "./pages/sales-staff/orderDetailInfo";
 import ManageBox from "./pages/manager/manage-box";
 import ManageWarehouse from "./pages/manager/manage-warehouse";
+import ManageTransaction from "./pages/manager/manage-transaction"; 
 
 import ManageProfile from "./pages/manager/ManagerProfile";
 import BoxDetailsStaff from "./pages/sales-staff/BoxDetails-staff";
 import ManageUser from "./pages/manager/manage-user";
 import ManageOrder from "./pages/manager/manage-order";
 import ManageStatistic from "./pages/manager/manage-statistic";
-
+import StaffProfile from "./pages/sales-staff/staffProfile";
 import ProfileUser from "./pages/ProfileUser/ProfileUser";
+import WareHouseList from "./pages/sales-staff/warehouse";
 // Delivery Staff
 import DeliveryStaff from "./pages/DeliveryStaff/Dashboard_DS/DeliveryStaff";
 import DeliStaffProfile from "./pages/DeliveryStaff/DeliStaffProfile/DeliStaffProfile";
@@ -49,6 +51,8 @@ import BoxDetails from "./pages/DeliveryStaff/ListOrders/OrderDetails/BoxDetails
 import MapComponent from "./pages/DeliveryStaff/MapComponent/MapComponent";
 import MapPlatform from "./pages/DeliveryStaff/MapComponent/MapPlatform/MapPlatform";
 import OrderRouting from "./pages/DeliveryStaff/MapComponent/OrderRouting/OrderRouting";
+
+
 
 
 function App() {
@@ -160,8 +164,16 @@ function App() {
       ),
       children: [
         {
+          path: "profileStaff",
+          element: <StaffProfile />,
+        },
+        {
           path: "orderListManagement",
           element: <OrderList />,
+        },
+        {
+          path: "listWarehouse",
+          element: <WareHouseList />,
         },
         {
           path: "orderDetails/:id",
