@@ -188,7 +188,7 @@ function ManageOrder() {
               className="w-full rounded-md border border-gray-300 p-1 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="w-full md:w-1/2">
+          {/* <div className="w-full md:w-1/2">
             <Slider
               range
               min={0}
@@ -201,7 +201,7 @@ function ManageOrder() {
             <div className="mt-1 text-xs text-gray-600">
               Price Range: ${priceRange[0]} - ${priceRange[1]}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {totalElement === 0 ? (

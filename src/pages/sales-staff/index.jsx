@@ -80,32 +80,6 @@ const OrderList = () => {
   };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await api.get(
-          `order/allOrder?page=${currentPage}&size=${ordersPerPage}`,
-        );
-        const fetchedOrders = response.data;
-        setOrders(fetchedOrders.content);
-        setFilteredOrders(fetchedOrders.content);
-        setTotalElement(fetchedOrders.totalElements);
-        setPriceRange([
-          0,
-          Math.max(
-            Array.isArray(fetchedOrders.content)
-              ? fetchedOrders.content.map((order) => order.totalPrice)
-              : [0],
-          ),
-        ]);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        notification.error({
-          message: "Error",
-          description: "Failed to fetch orders.",
-        });
-      }
-    };
-
     fetchOrders();
   }, [currentPage, ordersPerPage]); // Chỉ gọi lại khi currentPage hoặc ordersPerPage thay đổi
 
@@ -261,7 +235,7 @@ const OrderList = () => {
               className="w-full rounded-md border border-gray-300 p-1 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="w-full md:w-1/2">
+          {/* <div className="w-full md:w-1/2">
             <Slider
               range
               min={0}
@@ -274,7 +248,7 @@ const OrderList = () => {
             <div className="mt-1 text-xs text-gray-600">
               Price Range: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {totalElements === 0 ? (
