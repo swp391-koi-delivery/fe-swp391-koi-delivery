@@ -401,10 +401,11 @@ function OrderHistoryPage() {
           title={<span className="dark:text-white">{title}</span>}
           description={
             <div>
-              <span className="dark:text-white">
-                Fish status: {progress.healthFishStatus || "Unknown"}
-              </span>
-              {image}
+              {progress.healthFishStatus !== null && (
+                <span className="dark:text-white">
+                  Fish status: {progress.healthFishStatus}
+                </span>
+              )}
             </div>
           }
           icon={icon}

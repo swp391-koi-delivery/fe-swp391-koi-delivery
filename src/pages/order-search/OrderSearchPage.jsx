@@ -96,7 +96,6 @@ function OrderSearchPage() {
   const Order = ({ order }) => {
     const currentStepIndex =
       order.filter((progress) => progress.inProgress).length - 1;
-
     return (
       <>
         {order && order.length > 0 && (
