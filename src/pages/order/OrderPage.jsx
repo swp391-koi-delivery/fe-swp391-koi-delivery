@@ -668,7 +668,7 @@ function OrderPage() {
                       rules={[
                         {
                           required: true,
-                          message: "Please input origin location",
+                          message: "Please input destination location",
                         },
                       ]}
                       style={{ textAlign: "left" }}
@@ -692,6 +692,21 @@ function OrderPage() {
                           required: true,
                           message: "Please input destination location",
                         },
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (
+                              !value ||
+                              getFieldValue("originLocation") !== value
+                            ) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(
+                              new Error(
+                                "Origin location and destination location cannot be the same.",
+                              ),
+                            );
+                          },
+                        }),
                       ]}
                       style={{ textAlign: "left" }}
                     >
