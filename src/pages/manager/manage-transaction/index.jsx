@@ -104,7 +104,7 @@ const ManageTransaction = () => {
                     <h3 className="font-semibold text-gray-800">{transaction.description}</h3>
                     <p className="text-sm text-gray-500">{transaction.payments.createPayment}</p>
                     <div className="flex items-center space-x-2">
-                      <span className="font-medium">{formatAmount(transaction.payments.orderResponse.totalPrice)}</span>
+                      <span className="font-medium">{formatPrice(transaction.payments.orderResponse.totalPrice)}</span>
                       <span className={`font-semibold ${transaction.transactionStatus === "SUCCESS" ? "text-green-600" : "text-yellow-600"}`}>
                         {transaction.transactionStatus}
                       </span>

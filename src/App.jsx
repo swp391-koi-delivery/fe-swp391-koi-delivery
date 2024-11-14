@@ -43,7 +43,6 @@ import DeliveryStaff from "./pages/DeliveryStaff/Dashboard_DS/DeliveryStaff";
 import DeliStaffProfile from "./pages/DeliveryStaff/DeliStaffProfile/DeliStaffProfile";
 import ListOrders from "./pages/DeliveryStaff/ListOrders/ListOrders";
 import OrderDetails from "./pages/DeliveryStaff/ListOrders/OrderDetails/OrderDetails";
-import Chat from "./pages/DeliveryStaff/Chat/Chat";
 import OrderProgress from "./pages/DeliveryStaff/ListOrders/OrderProgress/OrderProgress";
 import OrderDetailsInfo from "./pages/DeliveryStaff/ListOrders/OrderDetails/OrderDetailsInfo/OrderDetailsInfo";
 import BoxDetails from "./pages/DeliveryStaff/ListOrders/OrderDetails/BoxDetails/BoxDetails";
@@ -252,10 +251,6 @@ function App() {
         {
           path: "listOrders_Deli",
           element: <ListOrders />,
-        },
-        {
-          path: "chat_Deli",
-          element: <Chat />,
         },
         {
           path: "deliStaffProfile",
