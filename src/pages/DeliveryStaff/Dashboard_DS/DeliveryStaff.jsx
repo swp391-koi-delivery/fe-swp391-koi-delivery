@@ -113,7 +113,7 @@ const Dashboard = () => {
       <div className="flex h-screen w-full">
         <div className={`${isMobile ? "w-full" : "w-1/5"} bg-gray-800 p-4`}>
           <h2 className="mb-6 text-center text-3xl font-bold text-blue-500">
-            Menu
+            Delivery App
           </h2>
           <hr className="mb-4 border-white" />
           <nav className="space-y-1">

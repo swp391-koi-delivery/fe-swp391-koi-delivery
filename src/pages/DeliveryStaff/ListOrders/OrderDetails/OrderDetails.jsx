@@ -9,6 +9,7 @@ import {
   FaTruck,
   FaBoxOpen,
 } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
 import { useParams, Link } from "react-router-dom";
 import api from "../../../../config/axios";
 
@@ -20,9 +21,7 @@ const OrderDetails = () => {
   const fetchOrder = async () => {
     try {
       const responses = await Promise.all([
-        api.get("order/listOrderShipping"),
-        api.get("order/listOrderPaid"),
-        api.get("order/listOrderDelivered"),
+        api.get("order/allOrder?page=1&size=100000000"),
       ]);
 
       const fetchedOrders = responses
@@ -63,6 +62,8 @@ const OrderDetails = () => {
         return <FaCheckCircle className="text-green-500" />;
       case "PAID":
         return <FaCheckCircle className="text-purple-500" />;
+      case "CANCELED":
+        return <MdCancel className="text-red-500" />;
       default:
         return null;
     }
