@@ -320,7 +320,7 @@ function OrderListPage() {
                 <td className="px-2 py-1">{detail.totalVolume}</td>
                 <td className="px-6 py-1">{detail.priceOfFish}</td>
                 {detail?.healthFishStatus !== null && (
-                <td className="px-2 py-1">{detail?.healthFishStatus}</td>
+                  <td className="px-2 py-1">{detail?.healthFishStatus}</td>
                 )}
               </tr>
             ))}
@@ -398,9 +398,11 @@ function OrderListPage() {
           title={<span className="dark:text-white">{title}</span>}
           description={
             <div>
+              {progress.healthFishStatus !== null && (
               <span className="dark:text-white">
-                Fish status: {progress.healthFishStatus || "Unknown"}
+                Fish status: {progress.healthFishStatus}
               </span>
+               )}
               {image}
             </div>
           }
@@ -417,9 +419,17 @@ function OrderListPage() {
   }, []);
 
   useRealTime((body) => {
-    if (body.body === "Customer payment success");
-    const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
-    fetchOrder(savedPage);
+    if (
+      body.body === "CUSTOMER PAYMENT SUCCESS" ||
+      body.body === "SALE UPDATE ORDER" ||
+      body.body === "SALE BOOKING SLOT WAREHOUSE" ||
+      body.body === "DELIVERY CREATE PROGRESS" ||
+      body.body === "DELIVERY UPDATE PROGRESS" ||
+      body.body === "DELIVERY UPDATE ORDER SUCCESS"
+    ) {
+      const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
+      fetchOrder(savedPage);
+    }
   });
 
   const Order = ({ order }) => {

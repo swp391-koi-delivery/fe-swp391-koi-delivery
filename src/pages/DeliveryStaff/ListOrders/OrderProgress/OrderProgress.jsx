@@ -63,6 +63,7 @@ const OrderTrackingSystem = () => {
   const [error, setError] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
+  const [otherReason, setOtherReason] = useState(""); // State for "Other" reason
 
   const fetchOrder = async () => {
     try {
@@ -76,11 +77,6 @@ const OrderTrackingSystem = () => {
       console.log("Progress Data:", progressData);
       console.log("Orders Data:", orders);
       console.log("totalElement:", response2.data.totalElements1);
-
-      // // Check if orders is an array, if not try accessing orders list if nested
-      // if (!Array.isArray(orders)) {
-      //   orders = orders.orders || []; // Adjust to the actual path if nested
-      // }
 
       const order = orders.find((item) => item.id === parseInt(id));
       if (order) {
@@ -102,7 +98,7 @@ const OrderTrackingSystem = () => {
           healthStatus: progress.healthFishStatus,
           totalBox: progress.totalBox,
           totalVolume: progress.totalVolume,
-          canUpload: index === 1 || index === 4, // Enable upload for specific stages
+          canUpload: index === 1 || index === 2 || index === 3 || index === 4, // Enable upload for specific stages
         }));
 
         const newStage = events.filter((event) => event.completed).length;
@@ -128,7 +124,20 @@ const OrderTrackingSystem = () => {
   }, [id]);
 
   const handleCancelOrder = async () => {
-    if (!cancellationReason) {
+    let reason = cancellationReason;
+
+    // Nếu chọn "Other", sử dụng lý do từ textarea
+    if (cancellationReason === "Other") {
+      if (!otherReason.trim()) {
+        setError("Please specify your reason for cancellation");
+        setShowTooltip(true);
+        setTimeout(() => setShowTooltip(false), 3000);
+        return;
+      }
+      reason = otherReason; // Sử dụng lý do nhập vào
+    }
+
+    if (!reason) {
       setError("Please select a reason for cancellation");
       setShowTooltip(true);
       setTimeout(() => setShowTooltip(false), 3000);
@@ -139,7 +148,6 @@ const OrderTrackingSystem = () => {
     setError("");
 
     try {
-      // Find the specific event to cancel based on the selected stage (orderStatus.stage or another criteria)
       const progressEvent = orderStatus.events.find(
         (event) =>
           event.status === Object.values(ProgressStatus)[orderStatus.stage - 1],
@@ -149,22 +157,22 @@ const OrderTrackingSystem = () => {
         throw new Error("No progress event found to cancel.");
       }
 
-      const { progressId } = progressEvent; // Retrieve the progressId from the found event
+      const { progressId } = progressEvent;
 
-      // Send the DELETE request with the progressId and reason as query parameters
+      // Gửi yêu cầu DELETE với lý do hủy đơn hàng
       await api.delete(`delivery/${progressId}`, {
         params: {
-          reason: cancellationReason, // Pass the cancellation reason as query parameter
+          reason,
         },
       });
 
-      // Handle post-cancellation actions
       setShowConfirmation(false);
       setCancellationReason("");
-      setIsHealthStatusLocked(true); // Lock health status after cancellation
+      setOtherReason(""); // Reset textarea
+      setIsHealthStatusLocked(true);
       toast.error("Your order has been canceled!");
       setTimeout(() => {
-        navigate(-1); // Go back to the previous page after cancellation
+        navigate(-1);
       }, 1000);
     } catch (err) {
       setError(err.message);
@@ -177,6 +185,12 @@ const OrderTrackingSystem = () => {
 
   const updateOrderStatus = async (index) => {
     try {
+      // Ensure that the next stage can only be updated after the current one is completed
+      if (index !== orderStatus.stage) {
+        toast.error("You need to complete the previous stage first.");
+        return;
+      }
+
       const nextEvent = orderStatus.events[index];
 
       if (!nextEvent) return; // Exit if no further stage to update
@@ -188,8 +202,8 @@ const OrderTrackingSystem = () => {
         progressId: nextEvent.progressId,
       };
 
-      // Check if the index is either 1 or 4 for image upload
-      if (index === 1) {
+      // Check if the index is 1 or 4 for image upload
+      if (index === 1 || index === 4) {
         const file = imageFiles[index]; // Assuming imageFiles is an array of files
 
         if (file) {
@@ -198,10 +212,10 @@ const OrderTrackingSystem = () => {
           console.log("Uploaded image URL:", imageUrl);
           updateData.image = imageUrl; // Include the uploaded image URL
 
-          // Updates the image to its current state
+          // Update the events with the new image
           const updatedEvents = orderStatus.events.map((event, idx) => {
             if (idx === index) {
-              return { ...event, image: imageUrl }; // Update the image for the current event
+              return { ...event, image: imageUrl }; // Update image for the current event
             }
             return event; // Leave other events unchanged
           });
@@ -211,11 +225,24 @@ const OrderTrackingSystem = () => {
             events: updatedEvents,
           }));
         } else {
-          toast.error("Please select an image to upload.");
-          return; // Exit if no image file is provided
+          // If no image is provided, set image to null
+          updateData.image = null;
+
+          // Update the events with null image
+          const updatedEvents = orderStatus.events.map((event, idx) => {
+            if (idx === index) {
+              return { ...event, image: null }; // Set image to null for the current event
+            }
+            return event; // Leave other events unchanged
+          });
+
+          setOrderStatus((prev) => ({
+            ...prev,
+            events: updatedEvents,
+          }));
         }
       } else {
-        // If not index 1 or 4, use existing image if available
+        // For other stages, use the existing image if available
         if (nextEvent.image) {
           updateData.image = nextEvent.image; // Include existing image URL if it exists
         }
@@ -236,6 +263,7 @@ const OrderTrackingSystem = () => {
           return;
         }
       }
+
       if (index === 4) {
         setTimeout(() => {
           toast.success("You have successfully delivered!");
@@ -246,7 +274,7 @@ const OrderTrackingSystem = () => {
       // Update the events after a successful API call
       const updatedEvents = orderStatus.events.map((event, idx) => ({
         ...event,
-        completed: idx <= index,
+        completed: idx <= index, // Mark all previous stages as completed
         status: Object.values(ProgressStatus)[idx],
       }));
 
@@ -296,6 +324,38 @@ const OrderTrackingSystem = () => {
         />
       </motion.div>
     );
+  };
+
+  const formatDateWithAMPM = (dateString) => {
+    // Split the date and time parts from the string in the format "dd/mm/yyyy hh:mm:ss"
+    const [datePart, timePart] = dateString.split(" ");
+    const [day, month, year] = datePart.split("/");
+    const [hours, minutes, seconds] = timePart.split(":");
+
+    // Create a Date object using the year, month, day, hours, minutes, and seconds
+    const date = new Date(year, month - 1, day, hours, minutes, seconds); // JavaScript uses months starting from 0 (0 is January)
+
+    // Check if the Date object is valid
+    if (isNaN(date.getTime())) {
+      return "Invalid date"; // Return an error message if the date is invalid
+    }
+
+    // Extract the day, month, year, hours, minutes, and seconds
+    const formattedDay = date.getDate().toString().padStart(2, "0");
+    const formattedMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+    const formattedYear = date.getFullYear();
+    let formattedHours = date.getHours();
+    const formattedMinutes = date.getMinutes().toString().padStart(2, "0");
+    const formattedSeconds = date.getSeconds().toString().padStart(2, "0");
+
+    // Determine AM/PM
+    const ampm = formattedHours >= 12 ? "PM" : "AM";
+    formattedHours = formattedHours % 12; // Convert to 12-hour format
+    formattedHours = formattedHours ? formattedHours : 12; // If hour is 0 (12 AM), change to 12
+    formattedHours = formattedHours.toString().padStart(2, "0");
+
+    // Return the formatted date string
+    return `${formattedDay}/${formattedMonth}/${formattedYear} ${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
   };
 
   return (
@@ -379,10 +439,8 @@ const OrderTrackingSystem = () => {
                       </span>
 
                       <p className="ml-2 text-xs text-gray-500">
-                        {" "}
-                        {/* Add margin for spacing */}
                         {event.timestamp
-                          ? new Date(event.timestamp).toLocaleString()
+                          ? formatDateWithAMPM(event.timestamp)
                           : ""}
                       </p>
                     </div>
@@ -548,6 +606,19 @@ const OrderTrackingSystem = () => {
                                   </p>
                                   <p>Box: {orderDetails.totalBox}</p>
                                   <p>Volume: {orderDetails.totalVolume}</p>
+                                  {event.canUpload && (
+                                    <div className="flex flex-col">
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) =>
+                                          handleImageChange(index, e)
+                                        }
+                                        aria-label="Upload Health Check Image"
+                                      />
+                                      {/* Uncomment the button if you want to allow uploading */}
+                                    </div>
+                                  )}
                                 </>
                               )}
 
@@ -588,6 +659,19 @@ const OrderTrackingSystem = () => {
                                   </p>
                                   <p>Box: {orderDetails.totalBox}</p>
                                   <p>Volume: {orderDetails.totalVolume}</p>
+                                  {event.canUpload && (
+                                    <div className="flex flex-col">
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) =>
+                                          handleImageChange(index, e)
+                                        }
+                                        aria-label="Upload Health Check Image"
+                                      />
+                                      {/* Uncomment the button if you want to allow uploading */}
+                                    </div>
+                                  )}
                                 </>
                               )}
                             </div>
@@ -633,6 +717,7 @@ const OrderTrackingSystem = () => {
           </AnimatePresence>
         </div>
       </div>
+
       {/*Delete order progress */}
       <div className="relative">
         <button
@@ -658,7 +743,7 @@ const OrderTrackingSystem = () => {
         )}
 
         {showConfirmation && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="fixed inset-0 z-50 flex h-full items-center justify-center bg-black bg-opacity-50 p-4">
             <div className="animate-modal-appear w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all duration-300 ease-in-out">
               <div className="mb-6 flex items-center space-x-4">
                 <MdLocalShipping className="h-10 w-10 text-purple-500" />
@@ -715,6 +800,8 @@ const OrderTrackingSystem = () => {
                   className="mb-6 w-full rounded-lg border-2 border-gray-200 p-3 transition-all duration-200 focus:border-purple-500 focus:ring focus:ring-purple-200"
                   placeholder="Please specify your reason..."
                   rows="3"
+                  value={otherReason}
+                  onChange={(e) => setOtherReason(e.target.value)}
                 />
               )}
 

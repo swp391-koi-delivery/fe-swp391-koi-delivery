@@ -10,7 +10,7 @@ function useRealTime(callback) {
   useEffect(() => {
     const onConnected = () => {
       console.log("WebSocket connected");
-      stomp.subscribe(`/topic/create/transaction`, (message) => {
+      stomp.subscribe(`/topic/general`, (message) => {
         console.log(message);
         callback && callback(message);
       });
