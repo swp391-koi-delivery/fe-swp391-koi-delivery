@@ -12,14 +12,14 @@ import {
   FaEdit,
   FaChevronDown,
   FaChevronUp,
-  FaRegCircle,
+  FaList
 } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import api from "../../../config/axios";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
-import { FiCheck, FiPackage, FiTruck } from "react-icons/fi";
+import {  FiTruck } from "react-icons/fi";
 
 const { Option } = Select;
 
@@ -34,7 +34,7 @@ const OrderList = () => {
   const [newOrderStatus, setNewOrderStatus] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("SHIPPING");
+  const [selectedOption, setSelectedOption] = useState("BOOKING");
   const dropdownRef = useRef(null);
   const ordersPerPage = 3;
 
@@ -60,7 +60,7 @@ const OrderList = () => {
   const fetchOrders = async () => {
     try {
       let endpoint;
-      switch (selectedOption) {
+      switch (selectedOption) {      
         case "SHIPPING":
           endpoint = `order/listOrderShipping?page=${currentPage}&size=${ordersPerPage}`;
           break;
@@ -74,7 +74,7 @@ const OrderList = () => {
           endpoint = `order/listOrderCanceled?page=${currentPage}&size=${ordersPerPage}`;
           break;
         default:
-          endpoint = `order/listOrderShipping?page=${currentPage}&size=${ordersPerPage}`;
+          endpoint = `order/listOrderBooking?page=${currentPage}&size=${ordersPerPage}`;
       }
 
       const response = await api.get(endpoint);
@@ -85,6 +85,7 @@ const OrderList = () => {
       setFilteredOrders(fetchedOrders);
       setTotalElements(totalElements);
 
+      console.log("order: ", fetchedOrders);
       setPriceRange([
         0,
         Math.max(...fetchedOrders.map((order) => order.totalPrice)),
@@ -146,7 +147,7 @@ const OrderList = () => {
       );
     });
     setFilteredOrders(filtered);
-  }, [searchTerm, priceRange, orders]); // Only depend on changes to orders, searchTerm, and priceRange
+  }, [searchTerm, priceRange]); // Only depend on changes to orders, searchTerm, and priceRange
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -244,11 +245,11 @@ const OrderList = () => {
   };
 
   const toggleContent = (orderId) => {
-    // Toggle trạng thái mở/đóng nội dung của từng order
+    // Switch the open/closed status of each order's content
     if (expandedOrderId === orderId) {
-      setExpandedOrderId(null); // Đóng nếu đang mở
+      setExpandedOrderId(null); // Close if open
     } else {
-      setExpandedOrderId(orderId); // Mở thẻ hiện tại
+      setExpandedOrderId(orderId); // Open the current tab
     }
   };
 
@@ -258,6 +259,7 @@ const OrderList = () => {
         <h1 className="mb-2 text-center text-2xl font-bold text-indigo-800">
           Order Management
         </h1>
+
         <div className="flex flex-col items-center justify-between space-y-2 md:flex-row md:space-x-2 md:space-y-0">
           {/* Search */}
           <div className="w-40 md:w-1/5">
@@ -422,6 +424,7 @@ const OrderList = () => {
                         </>
                       )}
                     </div>
+
                     {/* Render edit button conditionally based on order status */}
                     {order.orderStatus !== "SHIPPING" &&
                       order.orderStatus !== "DELIVERED" &&

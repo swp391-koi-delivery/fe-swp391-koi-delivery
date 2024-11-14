@@ -31,7 +31,7 @@ function calculateDistance(route) {
   return distance;
 }
 
-// Function to calculate the distance between two coordinates (in km)
+// Function (Harversine) to calculate the distance between two coordinates (in km)
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   const R = 6371; // Radius of the Earth (km)
   const dLat = deg2rad(lat2 - lat1);

@@ -52,8 +52,6 @@ import MapPlatform from "./pages/DeliveryStaff/MapComponent/MapPlatform/MapPlatf
 import OrderRouting from "./pages/DeliveryStaff/MapComponent/OrderRouting/OrderRouting";
 
 
-
-
 function App() {
 
   const ProtectRouteManagerAuth = ({ children }) => {

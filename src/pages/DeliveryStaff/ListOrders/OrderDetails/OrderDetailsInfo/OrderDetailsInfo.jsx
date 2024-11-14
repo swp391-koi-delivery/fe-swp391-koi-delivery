@@ -40,9 +40,7 @@ const OrderDetailsInfo = () => {
   const fetchOrder = async () => {
     try {
       const responses = await Promise.all([
-        api.get("order/listOrderShipping"),
-        api.get("order/listOrderPaid"),
-        api.get("order/listOrderDelivered"),
+        api.get("order/allOrder?page=1&size=100000000"),
       ]);
 
       const fetchedOrders = responses
