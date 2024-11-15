@@ -26,7 +26,6 @@ function OrderSearchPage() {
       const response = await api.get(
         `/free-access/trackingOrder?trackingOrder=${value.trackingOrder}`,
       );
-      // Set order based on the response data
       setOrder(response.data);
     } catch (err) {
       console.log("Failed to fetch order", err);
@@ -72,7 +71,7 @@ function OrderSearchPage() {
 
       // Dynamically load image if it exists in progress data
       image = progress.image ? (
-        <img src={progress.image} alt={title} className="mt-2" />
+        <img src={progress.image} alt={title} className="mt-2 h-1/5 w-1/4" />
       ) : null;
 
       return (
@@ -94,8 +93,7 @@ function OrderSearchPage() {
   };
 
   const Order = ({ order }) => {
-    const currentStepIndex =
-      order.filter((progress) => progress.inProgress).length - 1;
+    const currentStepIndex = order.length - 1;
     return (
       <>
         {order && order.length > 0 && (
@@ -111,6 +109,7 @@ function OrderSearchPage() {
                         </h2>
                         <div className="w-full flex-col items-center justify-center md:flex-row">
                           <Steps
+                            direction="vertical"
                             current={
                               currentStepIndex >= 0 ? currentStepIndex : 0
                             }

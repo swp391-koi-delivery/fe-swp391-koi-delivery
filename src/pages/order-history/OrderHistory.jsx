@@ -422,9 +422,7 @@ function OrderHistoryPage() {
   }, []);
 
   const Order = ({ order }) => {
-    const currentStepIndex =
-      order?.progresses.filter((progress) => progress.inProgress === true)
-        .length - 1;
+  const currentStepIndex = order?.progresses.length - 1;
     return (
       <>
         <div className="order my-8">

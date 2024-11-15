@@ -433,9 +433,7 @@ function OrderListPage() {
   });
 
   const Order = ({ order }) => {
-    const currentStepIndex =
-      order?.progresses.filter((progress) => progress.inProgress === true)
-        .length - 1;
+    const currentStepIndex = order?.progresses.length - 1;
     return (
       <>
         <div className="order my-8">
@@ -600,6 +598,24 @@ function OrderListPage() {
                           className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
+                         {order?.orderStatus === "SHIPPING" && (
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Tracking Order
+                          </span>
+                        }
+                        initialValue={order?.trackingOrder}
+                        name="trackingOrder"
+                        className="mb-1 w-full md:w-1/2 md:pr-4"
+                      >
+                        <Input
+                          readOnly
+                          placeholder="Tracking Order"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                         )}
                     </div>
                   </Form>
                 </div>
