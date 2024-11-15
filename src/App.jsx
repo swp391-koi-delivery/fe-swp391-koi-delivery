@@ -6,6 +6,7 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
+import requestPermissions from "./config/notification";
 
 // Customer
 import LayoutTemplate from "./components/layout/LayoutTemplate";
@@ -28,7 +29,6 @@ import OrderDetailStaff from "./pages/sales-staff/orderDetails-staff";
 import OrderDetailsInfoStaff from "./pages/sales-staff/orderDetailInfo";
 import ManageBox from "./pages/manager/manage-box";
 import ManageWarehouse from "./pages/manager/manage-warehouse";
-import ManageTransaction from "./pages/manager/manage-transaction"; 
 
 import ManageProfile from "./pages/manager/ManagerProfile";
 import BoxDetailsStaff from "./pages/sales-staff/BoxDetails-staff";
@@ -51,8 +51,10 @@ import MapComponent from "./pages/DeliveryStaff/MapComponent/MapComponent";
 import MapPlatform from "./pages/DeliveryStaff/MapComponent/MapPlatform/MapPlatform";
 import OrderRouting from "./pages/DeliveryStaff/MapComponent/OrderRouting/OrderRouting";
 
-
 function App() {
+  useEffect(() => {
+    requestPermissions();
+  }, []);
 
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
@@ -220,9 +222,8 @@ function App() {
           element: <BoxDetailsStaff />,
         },
         {
-          path:"box",
-          element:<ManageBox/>
-
+          path: "box",
+          element: <ManageBox />,
         },
         {
           path: "warehouse",
