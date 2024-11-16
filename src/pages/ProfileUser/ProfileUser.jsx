@@ -84,7 +84,7 @@ const UserProfile = ({ token }) => {
   );
 
   const openModal = () => {
-    form.setFieldsValue(profileData);
+    form.setFieldsValue(null);
     setIsModalOpen(true);
   };
 
@@ -161,12 +161,12 @@ const UserProfile = ({ token }) => {
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-100 p-4">
+            {/* <div className="rounded-lg bg-gray-100 p-4">
               <p className="text-sm font-medium text-gray-500">Balance</p>
               <p className="text-lg font-semibold text-gray-900">
                 {formatPrice(profileData.balance || 0)}
               </p>
-            </div>
+            </div> */}
 
             {/* <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm font-medium text-gray-500">Email Status</p>
