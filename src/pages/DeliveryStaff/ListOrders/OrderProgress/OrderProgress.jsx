@@ -55,8 +55,10 @@ const OrderTrackingSystem = () => {
   const [selectedHealthStatus, setSelectedHealthStatus] = useState(null);
   const [orderDetails, setOrderDetails] = useState(null);
   const [showHealthInfo, setShowHealthInfo] = useState([]); // Toggle state for each event
+  const [showImg, setShowImg] = useState([]); // Toggle state for each event
   const [isHealthStatusLocked, setIsHealthStatusLocked] = useState(false);
   const [imageFiles, setImageFiles] = useState({});
+  const [uploadLocked, setUploadLocked] = useState({});
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -185,100 +187,76 @@ const OrderTrackingSystem = () => {
 
   const updateOrderStatus = async (index) => {
     try {
-      // Ensure that the next stage can only be updated after the current one is completed
+      // Kiểm tra nếu chưa hoàn thành giai đoạn trước đó
       if (index !== orderStatus.stage) {
         toast.error("You need to complete the previous stage first.");
         return;
       }
 
       const nextEvent = orderStatus.events[index];
+      if (!nextEvent) return; // Không có giai đoạn tiếp theo để cập nhật
 
-      if (!nextEvent) return; // Exit if no further stage to update
-
-      // Prepare data for the API call
       const updateData = {
         healthFishStatus: selectedHealthStatus,
         progressStatus: Object.values(ProgressStatus)[index],
         progressId: nextEvent.progressId,
       };
 
-      // Check if the index is 1 or 4 for image upload
-      if (index === 1 || index === 4) {
-        const file = imageFiles[index]; // Assuming imageFiles is an array of files
+      // Xử lý upload hình ảnh cho các giai đoạn cụ thể
+      if ([1, 2, 3, 4].includes(index)) {
+        const file = imageFiles[index];
 
         if (file) {
-          // Handle image upload
+          // Upload file nếu người dùng chọn ảnh mới
           const imageUrl = await uploadFile(file);
-          console.log("Uploaded image URL:", imageUrl);
-          updateData.image = imageUrl; // Include the uploaded image URL
-
-          // Update the events with the new image
-          const updatedEvents = orderStatus.events.map((event, idx) => {
-            if (idx === index) {
-              return { ...event, image: imageUrl }; // Update image for the current event
-            }
-            return event; // Leave other events unchanged
-          });
-
-          setOrderStatus((prev) => ({
-            ...prev,
-            events: updatedEvents,
-          }));
+          updateData.image = imageUrl; // Lưu lại ảnh mới tải lên
         } else {
-          // If no image is provided, set image to null
-          updateData.image = null;
-
-          // Update the events with null image
-          const updatedEvents = orderStatus.events.map((event, idx) => {
-            if (idx === index) {
-              return { ...event, image: null }; // Set image to null for the current event
-            }
-            return event; // Leave other events unchanged
-          });
-
-          setOrderStatus((prev) => ({
-            ...prev,
-            events: updatedEvents,
-          }));
-        }
-      } else {
-        // For other stages, use the existing image if available
-        if (nextEvent.image) {
-          updateData.image = nextEvent.image; // Include existing image URL if it exists
+          // Nếu không có ảnh mới, sử dụng ảnh cũ đã có
+          updateData.image = nextEvent.image || null;
         }
       }
 
-      // Make API call to update order status
+      // Gọi API để cập nhật trạng thái
       await api.put(`delivery/${nextEvent.progressId}`, updateData);
 
       if (index === 1) {
-        localStorage.setItem(`orderStatus_${id}`, selectedHealthStatus); // Save status to localStorage
+        localStorage.setItem(`orderStatus_${id}`, selectedHealthStatus);
         setIsHealthStatusLocked(true);
 
         if (selectedHealthStatus === HealthFishStatus.UNHEALTHY) {
           toast.error("Your order has been canceled!");
           setTimeout(() => {
-            navigate(-1); // Back to order page
-          }, 1000); // Adjust the timeout duration as needed
+            navigate(-1);
+          }, 1000);
           return;
         }
       }
 
       if (index === 4) {
+        toast.success("You have successfully delivered!");
         setTimeout(() => {
-          toast.success("You have successfully delivered!");
           navigate(-1);
         }, 1000);
       }
 
-      // Update the events after a successful API call
+      // Cập nhật trạng thái sự kiện
       const updatedEvents = orderStatus.events.map((event, idx) => ({
         ...event,
-        completed: idx <= index, // Mark all previous stages as completed
-        status: Object.values(ProgressStatus)[idx],
+        completed: idx <= index,
+        timestamp:
+          idx === index ? new Date().toLocaleString() : event.timestamp,
       }));
 
       setOrderStatus({ stage: index + 1, events: updatedEvents });
+
+      // Khóa upload cho giai đoạn hiện tại sau khi chuyển trạng thái
+      setUploadLocked((prev) => {
+        const newLocked = { ...prev };
+        if (index >= 2 && index <= 4) {
+          newLocked[index] = true;
+        }
+        return newLocked;
+      });
     } catch (error) {
       console.error("Error updating order status:", error);
     }
@@ -296,7 +274,39 @@ const OrderTrackingSystem = () => {
 
   const handleImageChange = (index, event) => {
     const file = event.target.files[0];
-    setImageFiles((prev) => ({ ...prev, [index]: file }));
+    setImageFiles((prev) => {
+      const updatedFiles = { ...prev };
+      updatedFiles[index] = file;
+
+      //  Automatically update photos as soon as a file is selected
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const updatedEvents = [...orderStatus.events];
+          updatedEvents[index] = {
+            ...updatedEvents[index],
+            image: reader.result, // Save image as base64
+          };
+          setOrderStatus({ ...orderStatus, events: updatedEvents });
+        };
+        reader.readAsDataURL(file);
+      }
+      return updatedFiles;
+    });
+  };
+
+  // Call image to render
+  const renderImage = (event, index) => {
+    if (event.image) {
+      return (
+        <img
+          src={event.image}
+          alt={`Progress ${index}`}
+          className="h-20 rounded-lg object-cover"
+        />
+      );
+    }
+    return null; // Return nothing if there's no image
   };
 
   const renderIcon = (index) => {
@@ -324,38 +334,6 @@ const OrderTrackingSystem = () => {
         />
       </motion.div>
     );
-  };
-
-  const formatDateWithAMPM = (dateString) => {
-    // Split the date and time parts from the string in the format "dd/mm/yyyy hh:mm:ss"
-    const [datePart, timePart] = dateString.split(" ");
-    const [day, month, year] = datePart.split("/");
-    const [hours, minutes, seconds] = timePart.split(":");
-
-    // Create a Date object using the year, month, day, hours, minutes, and seconds
-    const date = new Date(year, month - 1, day, hours, minutes, seconds); // JavaScript uses months starting from 0 (0 is January)
-
-    // Check if the Date object is valid
-    if (isNaN(date.getTime())) {
-      return "Invalid date"; // Return an error message if the date is invalid
-    }
-
-    // Extract the day, month, year, hours, minutes, and seconds
-    const formattedDay = date.getDate().toString().padStart(2, "0");
-    const formattedMonth = (date.getMonth() + 1).toString().padStart(2, "0");
-    const formattedYear = date.getFullYear();
-    let formattedHours = date.getHours();
-    const formattedMinutes = date.getMinutes().toString().padStart(2, "0");
-    const formattedSeconds = date.getSeconds().toString().padStart(2, "0");
-
-    // Determine AM/PM
-    const ampm = formattedHours >= 12 ? "PM" : "AM";
-    formattedHours = formattedHours % 12; // Convert to 12-hour format
-    formattedHours = formattedHours ? formattedHours : 12; // If hour is 0 (12 AM), change to 12
-    formattedHours = formattedHours.toString().padStart(2, "0");
-
-    // Return the formatted date string
-    return `${formattedDay}/${formattedMonth}/${formattedYear} ${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
   };
 
   return (
@@ -439,9 +417,7 @@ const OrderTrackingSystem = () => {
                       </span>
 
                       <p className="ml-2 text-xs text-gray-500">
-                        {event.timestamp
-                          ? formatDateWithAMPM(event.timestamp)
-                          : ""}
+                        {event.timestamp}
                       </p>
                     </div>
                   </div>
@@ -460,10 +436,10 @@ const OrderTrackingSystem = () => {
                   <AnimatePresence>
                     {showHealthInfo[index] && (
                       <motion.div
-                        className="mt-2 rounded-md border border-gray-200 p-4"
+                        className="mt-2 rounded-md border border-gray-300 p-4"
                         style={{
-                          minWidth: "250px", // Set minimum width
-                          width: "50%", // Set width to 50% of parent or use a specific pixel value
+                          minWidth: "300px", // Set minimum width
+                          width: "60%", // Set width to 50% of parent or use a specific pixel value
                           marginLeft: "auto", // Align to the right
                           marginRight: "0", // Remove right margin
                         }}
@@ -471,7 +447,7 @@ const OrderTrackingSystem = () => {
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
                       >
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-center justify-start space-x-3">
                           {" "}
                           {/* Flex container for info and image */}
                           <div className="flex-1">
@@ -494,7 +470,7 @@ const OrderTrackingSystem = () => {
                                 <>
                                   <p>
                                     Health Fish:{" "}
-                                    {isHealthStatusLocked ? (
+                                    {isHealthStatusLocked && index === 1 ? (
                                       <span
                                         style={{
                                           color:
@@ -547,19 +523,31 @@ const OrderTrackingSystem = () => {
                                   <p>Box: {orderDetails.totalBox}</p>
                                   <p>Volume: {orderDetails.totalVolume}</p>
 
-                                  {event.canUpload && !isHealthStatusLocked && (
-                                    <div className="flex flex-col">
-                                      <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) =>
-                                          handleImageChange(index, e)
-                                        }
-                                        aria-label="Upload Health Check Image"
-                                      />
-                                      {/* Uncomment the button if you want to allow uploading */}
-                                    </div>
-                                  )}
+                                  {/* Upload Section */}
+                                  <div className="flex-shrink-0">
+                                    {/* Check if event is completed and no image uploaded */}
+                                    {event.completed && !event.image ? (
+                                      <p className="text-red-500">
+                                        No image upload!
+                                      </p> // Show message if event is completed but no image is uploaded
+                                    ) : event.completed &&
+                                      event.image ? null : ( // Display the uploaded image if it's available
+                                      // Show file upload input only if no image and canUpload is true
+                                      !event.image &&
+                                      event.canUpload && (
+                                        <div className="flex flex-col">
+                                          <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) =>
+                                              handleImageChange(index, e)
+                                            } // Handle file change
+                                            aria-label="Upload Health Check Image"
+                                          />
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
                                 </>
                               )}
 
@@ -573,52 +561,66 @@ const OrderTrackingSystem = () => {
                                   </p>
                                   <p>
                                     Health Fish:{" "}
-                                    <span
-                                      style={{
-                                        color:
-                                          selectedHealthStatus ===
-                                          HealthFishStatus.UNHEALTHY
-                                            ? "red"
-                                            : "green", // Set color based on health status
-                                        display: "flex", // Use flexbox to align icon and text
-                                        alignItems: "center", // Center align the items
-                                      }}
-                                    >
-                                      {selectedHealthStatus ===
-                                      HealthFishStatus.UNHEALTHY ? (
-                                        <>
-                                          <FiAlertCircle
-                                            style={{ marginRight: "0.5rem" }}
-                                          />{" "}
-                                          {/* Icon for Unhealthy */}
-                                          Unhealthy
-                                        </>
-                                      ) : (
-                                        <>
-                                          <FiCheckCircle
-                                            style={{ marginRight: "0.5rem" }}
-                                          />{" "}
-                                          {/* Icon for Healthy */}
-                                          Healthy
-                                        </>
-                                      )}
-                                    </span>
+                                    {isHealthStatusLocked && (
+                                      <span
+                                        style={{
+                                          color:
+                                            selectedHealthStatus ===
+                                            HealthFishStatus.UNHEALTHY
+                                              ? "red"
+                                              : "green", // Set color based on health status
+                                          display: "flex", // Use flexbox to align icon and text
+                                          alignItems: "center", // Center align the items
+                                        }}
+                                      >
+                                        {selectedHealthStatus ===
+                                        HealthFishStatus.UNHEALTHY ? (
+                                          <>
+                                            <FiAlertCircle
+                                              style={{ marginRight: "0.5rem" }}
+                                            />{" "}
+                                            {/* Icon for Unhealthy */}
+                                            Unhealthy
+                                          </>
+                                        ) : (
+                                          <>
+                                            <FiCheckCircle
+                                              style={{ marginRight: "0.5rem" }}
+                                            />{" "}
+                                            {/* Icon for Healthy */}
+                                            Healthy
+                                          </>
+                                        )}
+                                      </span>
+                                    )}
                                   </p>
                                   <p>Box: {orderDetails.totalBox}</p>
                                   <p>Volume: {orderDetails.totalVolume}</p>
-                                  {event.canUpload && (
-                                    <div className="flex flex-col">
-                                      <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) =>
-                                          handleImageChange(index, e)
-                                        }
-                                        aria-label="Upload Health Check Image"
-                                      />
-                                      {/* Uncomment the button if you want to allow uploading */}
-                                    </div>
-                                  )}
+                                  {/* Upload Section */}
+                                  <div className="flex-shrink-0">
+                                    {/* Check if event is completed and no image uploaded */}
+                                    {event.completed && !event.image ? (
+                                      <p className="text-red-500">
+                                        No image upload!
+                                      </p> // Show message if event is completed but no image is uploaded
+                                    ) : event.completed &&
+                                      event.image ? null : ( // Display the uploaded image if it's available
+                                      // Show file upload input only if no image and canUpload is true
+                                      !event.image &&
+                                      event.canUpload && (
+                                        <div className="flex flex-col">
+                                          <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) =>
+                                              handleImageChange(index, e)
+                                            } // Handle file change
+                                            aria-label="Upload Health Check Image"
+                                          />
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
                                 </>
                               )}
 
@@ -626,70 +628,79 @@ const OrderTrackingSystem = () => {
                                 <>
                                   <p>
                                     Health Fish:{" "}
-                                    <span
-                                      style={{
-                                        color:
-                                          selectedHealthStatus ===
-                                          HealthFishStatus.UNHEALTHY
-                                            ? "red"
-                                            : "green", // Set color based on health status
-                                        display: "flex", // Use flexbox to align icon and text
-                                        alignItems: "center", // Center align the items
-                                      }}
-                                    >
-                                      {selectedHealthStatus ===
-                                      HealthFishStatus.UNHEALTHY ? (
-                                        <>
-                                          <FiAlertCircle
-                                            style={{ marginRight: "0.5rem" }}
-                                          />{" "}
-                                          {/* Icon for Unhealthy */}
-                                          Unhealthy
-                                        </>
-                                      ) : (
-                                        <>
-                                          <FiCheckCircle
-                                            style={{ marginRight: "0.5rem" }}
-                                          />{" "}
-                                          {/* Icon for Healthy */}
-                                          Healthy
-                                        </>
-                                      )}
-                                    </span>
+                                    {isHealthStatusLocked && (
+                                      <span
+                                        style={{
+                                          color:
+                                            selectedHealthStatus ===
+                                            HealthFishStatus.UNHEALTHY
+                                              ? "red"
+                                              : "green", // Set color based on health status
+                                          display: "flex", // Use flexbox to align icon and text
+                                          alignItems: "center", // Center align the items
+                                        }}
+                                      >
+                                        {selectedHealthStatus ===
+                                        HealthFishStatus.UNHEALTHY ? (
+                                          <>
+                                            <FiAlertCircle
+                                              style={{ marginRight: "0.5rem" }}
+                                            />{" "}
+                                            {/* Icon for Unhealthy */}
+                                            Unhealthy
+                                          </>
+                                        ) : (
+                                          <>
+                                            <FiCheckCircle
+                                              style={{ marginRight: "0.5rem" }}
+                                            />{" "}
+                                            {/* Icon for Healthy */}
+                                            Healthy
+                                          </>
+                                        )}
+                                      </span>
+                                    )}
                                   </p>
                                   <p>Box: {orderDetails.totalBox}</p>
                                   <p>Volume: {orderDetails.totalVolume}</p>
-                                  {event.canUpload && (
-                                    <div className="flex flex-col">
-                                      <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) =>
-                                          handleImageChange(index, e)
-                                        }
-                                        aria-label="Upload Health Check Image"
-                                      />
-                                      {/* Uncomment the button if you want to allow uploading */}
-                                    </div>
-                                  )}
+                                  {/* Upload Section */}
+                                  <div className="flex-shrink-0">
+                                    {/* Check if event is completed and no image uploaded */}
+                                    {event.completed && !event.image ? (
+                                      <p className="text-red-500">
+                                        No image upload!
+                                      </p> // Show message if event is completed but no image is uploaded
+                                    ) : event.completed &&
+                                      event.image ? null : ( // Display the uploaded image if it's available
+                                      // Show file upload input only if no image and canUpload is true
+                                      !event.image &&
+                                      event.canUpload && (
+                                        <div className="flex flex-col">
+                                          <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) =>
+                                              handleImageChange(index, e)
+                                            } // Handle file change
+                                            aria-label="Upload Health Check Image"
+                                          />
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
                                 </>
                               )}
                             </div>
                           </div>
-                          {/* Image section, aligned to the right */}
-                          {event.image && (
-                            <img
-                              src={event.image}
-                              alt={`Progress ${index}`}
-                              className="ml-4 mt-2 h-20 rounded-lg object-cover" // Adjust spacing with margin-left
-                            />
-                          )}
+                          {/* Image */}
+                          {renderImage(event, index)}
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
+                {/* Tick Check BOX */}
                 <div className="flex w-full justify-center md:justify-end">
                   <div className="flex items-center">
                     {event.completed ? (
@@ -700,10 +711,16 @@ const OrderTrackingSystem = () => {
                       <Checkbox
                         checked={event.completed}
                         onChange={(e) => {
+                          // Only allow tick if health status is selected (index === 1)
+                          if (index === 1 && !selectedHealthStatus) {
+                            alert("Please check the health fish status!");
+                            return; // Prevent updating if health status is not selected
+                          }
                           if (e.target.checked) {
                             updateOrderStatus(index);
                           }
                         }}
+                        disabled={index === 1 && !selectedHealthStatus} // Disable checkbox if no health status selected
                         style={{
                           transform: "scale(1.5)", // Increase checkbox size
                           marginRight: "10px", // Space between checkbox and tick mark
@@ -716,118 +733,118 @@ const OrderTrackingSystem = () => {
             ))}
           </AnimatePresence>
         </div>
-      </div>
 
-      {/*Delete order progress */}
-      <div className="relative">
-        <button
-          onClick={() => setShowConfirmation(true)}
-          className="group relative inline-flex transform items-center justify-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 text-base font-medium text-white shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isLoading}
-          aria-label="Cancel Order"
-          role="button"
-        >
-          {isLoading ? (
-            <BiLoaderAlt className="mr-2 h-5 w-5 animate-spin" />
-          ) : (
-            <MdCancel className="mr-2 h-5 w-5" />
+        {/*Delete order progress */}
+        <div className="relative flex justify-center">
+          <button
+            onClick={() => setShowConfirmation(true)}
+            className="group relative inline-flex transform items-center justify-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 text-base font-medium text-white shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isLoading}
+            aria-label="Cancel Order"
+            role="button"
+          >
+            {isLoading ? (
+              <BiLoaderAlt className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <MdCancel className="mr-2 h-5 w-5" />
+            )}
+            Cancel Order
+          </button>
+
+          {error && showTooltip && (
+            <div className="absolute -top-12 left-1/2 flex -translate-x-1/2 transform animate-bounce items-center space-x-2 rounded-lg bg-red-100 px-4 py-2 text-red-800 shadow-md">
+              <IoWarning className="h-5 w-5" />
+              <span>{error}</span>
+            </div>
           )}
-          Cancel Order
-        </button>
 
-        {error && showTooltip && (
-          <div className="absolute -top-12 left-1/2 flex -translate-x-1/2 transform animate-bounce items-center space-x-2 rounded-lg bg-red-100 px-4 py-2 text-red-800 shadow-md">
-            <IoWarning className="h-5 w-5" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {showConfirmation && (
-          <div className="fixed inset-0 z-50 flex h-full items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="animate-modal-appear w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all duration-300 ease-in-out">
-              <div className="mb-6 flex items-center space-x-4">
-                <MdLocalShipping className="h-10 w-10 text-purple-500" />
-                <div>
-                  <h3 className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-gray-900 text-transparent">
-                    Cancel Delivery Order
-                  </h3>
-                  <p className="text-gray-600">
-                    Please select your reason for cancellation
-                  </p>
+          {showConfirmation && (
+            <div className="fixed inset-0 z-50 flex h-full items-center justify-center bg-black bg-opacity-50 p-4">
+              <div className="animate-modal-appear w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all duration-300 ease-in-out">
+                <div className="mb-6 flex items-center space-x-4">
+                  <MdLocalShipping className="h-10 w-10 text-purple-500" />
+                  <div>
+                    <h3 className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-gray-900 text-transparent">
+                      Cancel Delivery Order
+                    </h3>
+                    <p className="text-gray-600">
+                      Please select your reason for cancellation
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-6 space-y-4">
-                {reasons.map((reason, index) => (
-                  <label
-                    key={index}
-                    className={`flex cursor-pointer items-center rounded-lg border-2 p-4 transition-all duration-200 ${
-                      cancellationReason === reason
-                        ? "border-purple-500 bg-purple-50"
-                        : "border-gray-200 hover:border-purple-200 hover:bg-purple-50"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="cancellationReason"
-                      value={reason}
-                      checked={cancellationReason === reason}
-                      onChange={(e) => setCancellationReason(e.target.value)}
-                      className="hidden"
-                    />
-                    <div className="w-full">
-                      <span className="font-medium text-gray-700">
-                        {reason}
-                      </span>
-                    </div>
-                    <div
-                      className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                <div className="mb-6 space-y-4">
+                  {reasons.map((reason, index) => (
+                    <label
+                      key={index}
+                      className={`flex cursor-pointer items-center rounded-lg border-2 p-4 transition-all duration-200 ${
                         cancellationReason === reason
-                          ? "border-purple-500 bg-purple-500"
-                          : "border-gray-300"
+                          ? "border-purple-500 bg-purple-50"
+                          : "border-gray-200 hover:border-purple-200 hover:bg-purple-50"
                       }`}
                     >
-                      {cancellationReason === reason && (
-                        <div className="h-3 w-3 rounded-full bg-white" />
-                      )}
-                    </div>
-                  </label>
-                ))}
-              </div>
+                      <input
+                        type="radio"
+                        name="cancellationReason"
+                        value={reason}
+                        checked={cancellationReason === reason}
+                        onChange={(e) => setCancellationReason(e.target.value)}
+                        className="hidden"
+                      />
+                      <div className="w-full">
+                        <span className="font-medium text-gray-700">
+                          {reason}
+                        </span>
+                      </div>
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                          cancellationReason === reason
+                            ? "border-purple-500 bg-purple-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {cancellationReason === reason && (
+                          <div className="h-3 w-3 rounded-full bg-white" />
+                        )}
+                      </div>
+                    </label>
+                  ))}
+                </div>
 
-              {cancellationReason === "Other" && (
-                <textarea
-                  className="mb-6 w-full rounded-lg border-2 border-gray-200 p-3 transition-all duration-200 focus:border-purple-500 focus:ring focus:ring-purple-200"
-                  placeholder="Please specify your reason..."
-                  rows="3"
-                  value={otherReason}
-                  onChange={(e) => setOtherReason(e.target.value)}
-                />
-              )}
+                {cancellationReason === "Other" && (
+                  <textarea
+                    className="mb-6 w-full rounded-lg border-2 border-gray-200 p-3 transition-all duration-200 focus:border-purple-500 focus:ring focus:ring-purple-200"
+                    placeholder="Please specify your reason..."
+                    rows="3"
+                    value={otherReason}
+                    onChange={(e) => setOtherReason(e.target.value)}
+                  />
+                )}
 
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={() => {
-                    setShowConfirmation(false);
-                    setCancellationReason("");
-                  }}
-                  className="flex transform items-center rounded-lg bg-gray-200 px-6 py-3 font-medium text-black transition-all duration-300 hover:scale-105 hover:bg-gray-300"
-                >
-                  Keep Order
-                </button>
-                <button
-                  onClick={handleCancelOrder}
-                  className="flex transform items-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-purple-600 hover:to-pink-600"
-                >
-                  {isLoading && (
-                    <BiLoaderAlt className="mr-2 h-5 w-5 animate-spin" />
-                  )}
-                  Confirm Cancellation
-                </button>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={() => {
+                      setShowConfirmation(false);
+                      setCancellationReason("");
+                    }}
+                    className="flex transform items-center rounded-lg bg-gray-200 px-6 py-3 font-medium text-black transition-all duration-300 hover:scale-105 hover:bg-gray-300"
+                  >
+                    Keep Order
+                  </button>
+                  <button
+                    onClick={handleCancelOrder}
+                    className="flex transform items-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-purple-600 hover:to-pink-600"
+                  >
+                    {isLoading && (
+                      <BiLoaderAlt className="mr-2 h-5 w-5 animate-spin" />
+                    )}
+                    Confirm Cancellation
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
