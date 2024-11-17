@@ -12,7 +12,8 @@ import {
   FaEdit,
   FaChevronDown,
   FaChevronUp,
-  FaList
+  FaList,
+  FaWarehouse
 } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import api from "../../../config/axios";
@@ -41,7 +42,7 @@ const OrderList = () => {
   const options = [
     {
       value: "BOOKING",
-      icon: <FaMoneyBillWave className="h-4 w-4 text-indigo-500" />,
+      icon: <FaWarehouse className="h-4 w-4 text-indigo-500" />,
     },
     {
       value: "SHIPPING",

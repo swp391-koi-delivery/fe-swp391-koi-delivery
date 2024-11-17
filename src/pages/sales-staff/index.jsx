@@ -25,6 +25,7 @@ import {
   FaWarehouse,
   FaList,
 } from "react-icons/fa";
+import { toast } from "react-toastify";
 import { MdCancel } from "react-icons/md";
 import FeedbackForm from "./feedback";
 import api from "../../config/axios";
