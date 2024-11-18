@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { Button, Form, Input } from "antd";
-import { googleProvider, messaging } from "../../config/firebase";
+import { googleProvider } from "../../config/firebase";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/features/userSlice";
 import { useForm } from "antd/es/form/Form";
-import {getToken} from "firebase/messaging";
 
 function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -23,15 +22,6 @@ function LoginPage() {
       dispatch(login(response.data));
       const { role, token } = response.data;
       localStorage.setItem("token", token);
-
-       // create FCM token
-       const fcmToken = await getToken(messaging, {
-        vapidKey:
-          "BISAgGnMeCO3fnZfV40ZgYwD4D1aLk5katFjBSI4DzZqe8tReTeFv5mU6kPDIMbtyEOgVDGGZkfRtomnUWlJ9D8",
-      });
-
-      // Log the correct FCM token
-      console.log("FCM token: ", fcmToken);
 
       if (role === "CUSTOMER") {
         navigate("/");
