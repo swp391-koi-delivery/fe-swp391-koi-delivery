@@ -38,10 +38,9 @@ const HealthFishStatus = {
 };
 
 const reasons = [
-  "Wrong delivery address",
-  "Delivery delayed",
-  "Order damaged during shipping",
-  "Incorrect order items",
+  "Customer accidentally ordered the wrong product",
+  "Customer was not available at the delivery address",
+  "Customer was unhappy with the delivery time",
   "Other",
 ];
 
