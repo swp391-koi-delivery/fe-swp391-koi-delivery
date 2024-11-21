@@ -3,7 +3,7 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 function useRealTime(callback) {
   const WS_URL = "http://14.225.220.122:8080/websocket";
-  //   const WS_URL = "http://localhost:8080/websocket";
+    // const WS_URL = "http://localhost:8080/websocket";
   const socket = new SockJS(WS_URL);
   const stomp = Stomp.over(socket);
 
@@ -14,9 +14,15 @@ function useRealTime(callback) {
         console.log(message);
         callback && callback(message);
       });
+      stomp.subscribe(`/topic/orders`, (message) => {
+        console.log(message);
+        callback && callback(message);
+      });
     };
     stomp.connect({}, onConnected, null);
   }, []);
+
+  
   return <></>;
 }
 
