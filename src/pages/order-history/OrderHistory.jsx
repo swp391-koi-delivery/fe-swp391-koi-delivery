@@ -406,6 +406,7 @@ function OrderHistoryPage() {
                   Fish status: {progress.healthFishStatus}
                 </span>
               )}
+              {image}
             </div>
           }
           icon={icon}
@@ -422,7 +423,7 @@ function OrderHistoryPage() {
   }, []);
 
   const Order = ({ order }) => {
-  const currentStepIndex = order?.progresses.length - 1;
+    const currentStepIndex = order?.progresses.length - 1;
     return (
       <>
         <div className="order my-8">

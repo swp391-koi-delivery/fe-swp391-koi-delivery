@@ -398,10 +398,10 @@ function OrderListPage() {
           description={
             <div>
               {progress.healthFishStatus !== null && (
-              <span className="dark:text-white">
-                Fish status: {progress.healthFishStatus}
-              </span>
-               )}
+                <span className="dark:text-white">
+                  Fish status: {progress.healthFishStatus}
+                </span>
+              )}
               {image}
             </div>
           }
@@ -429,10 +429,9 @@ function OrderListPage() {
       const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
       fetchOrder(savedPage);
     }
-    if(body.body === "SALE UPDATE ORDER"){
+    if (body.body === "SALE UPDATE ORDER") {
       toast.success("YOUR ORDER IS ACCEPTED, AWAITING PAYMENT ");
-    }
-    if(body.body === "DELIVERY UPDATE ORDER SUCCESS"){
+    } else if (body.body === "DELIVERY UPDATE ORDER SUCCESS") {
       toast.success(`YOUR ORDER IS IN SHIPPING PROGRESS`);
     }
   });
@@ -603,24 +602,24 @@ function OrderListPage() {
                           className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
-                         {order?.orderStatus === "SHIPPING" && (
-                      <Form.Item
-                        label={
-                          <span className="dark:text-white">
-                            Tracking Order
-                          </span>
-                        }
-                        initialValue={order?.trackingOrder}
-                        name="trackingOrder"
-                        className="mb-1 w-full md:w-1/2 md:pr-4"
-                      >
-                        <Input
-                          readOnly
-                          placeholder="Tracking Order"
-                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                        />
-                      </Form.Item>
-                         )}
+                      {order?.orderStatus === "SHIPPING" && (
+                        <Form.Item
+                          label={
+                            <span className="dark:text-white">
+                              Tracking Order
+                            </span>
+                          }
+                          initialValue={order?.trackingOrder}
+                          name="trackingOrder"
+                          className="mb-1 w-full md:w-1/2 md:pr-4"
+                        >
+                          <Input
+                            readOnly
+                            placeholder="Tracking Order"
+                            className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          />
+                        </Form.Item>
+                      )}
                     </div>
                   </Form>
                 </div>
