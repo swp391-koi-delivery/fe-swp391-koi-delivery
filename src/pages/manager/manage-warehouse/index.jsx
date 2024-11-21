@@ -8,6 +8,12 @@ function ManageWarehouse() {
         { title: "Location", dataIndex: "location", key: "location",align: "left", },
         { title: "Max Capacity", dataIndex: "maxCapacity", key: "maxCapacity",align: "left", },
         { title: "Current Capacity", dataIndex: "currentCapacity", key: "currentCapacity",align: "left", },
+        {
+          title: "Booking Capacity",
+          dataIndex: "bookingCapacity",
+          key: "bookingCapacity",
+          align: "left",
+        },
     ];
     const formItems = [
         <>

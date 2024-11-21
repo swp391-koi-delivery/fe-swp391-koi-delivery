@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
 import {  FiTruck } from "react-icons/fi";
+import useRealTime from "../../../hooks/useRealTime";
 
 const { Option } = Select;
 
@@ -136,6 +137,15 @@ const OrderList = () => {
   useEffect(() => {
     fetchOrders(); // Fetch orders on component mount
   }, [currentPage, ordersPerPage, selectedOption]); // Dependency array should include only dependencies that control the fetch logic
+
+  useRealTime((body) => {
+    if (
+      body.body === "SALE BOOKING SLOT WAREHOUSE"
+    ) {
+      fetchOrders();
+      toast.success("SALE BOOKED ORDER SUCCESSFULLY, READY TO SHIP");
+    }
+  });
 
   useEffect(() => {
     if (orders.length === 0) return; // Avoid running filter on an empty array

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
 import { Button, Form, Input, Pagination, Steps } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
@@ -24,7 +24,6 @@ function OrderListPage() {
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
-
   const { Step } = Steps;
 
   const handleDarkMode = () => {
@@ -429,6 +428,12 @@ function OrderListPage() {
     ) {
       const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
       fetchOrder(savedPage);
+    }
+    if(body.body === "SALE UPDATE ORDER"){
+      toast.success("YOUR ORDER IS ACCEPTED, AWAITING PAYMENT ");
+    }
+    if(body.body === "DELIVERY UPDATE ORDER SUCCESS"){
+      toast.success(`YOUR ORDER IS IN SHIPPING PROGRESS`);
     }
   });
 
