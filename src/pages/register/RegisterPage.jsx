@@ -191,7 +191,7 @@ function RegisterPage() {
                     />
                   </Form.Item>
                   <Form.Item
-                    label={<span className="dark:text-white">Fulname</span>}
+                    label={<span className="dark:text-white">Fullname</span>}
                     name="fullname"
                     className="mb-4"
                     rules={[
