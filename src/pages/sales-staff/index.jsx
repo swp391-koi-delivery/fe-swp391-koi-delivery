@@ -54,6 +54,7 @@ const OrderList = () => {
   const ordersPerPage = 3;
   const dropdownRef = useRef(null);
   const { Title, Text } = Typography;
+  const [lastMessage, setLastMessage] = useState(null);
 
   const { Option } = Select;
 
@@ -157,12 +158,18 @@ const OrderList = () => {
   }, [currentPage, ordersPerPage, selectedOption]); // Chỉ gọi lại khi currentPage hoặc ordersPerPage thay đổi
 
   useRealTime((body) => {
-    if (
-      body.body === "CUSTOMER CREATE ORDER" ||
-      body.body === "CUSTOMER PAYMENT SUCCESS"
-    ) {
-      fetchOrders();
-      toast.success(body.body);
+    const newMessage = body.body;
+
+    // Chỉ hiển thị toast nếu tin nhắn mới khác tin nhắn cuối cùng
+    if (newMessage !== lastMessage) {
+      setLastMessage(newMessage); // Cập nhật tin nhắn cuối cùng
+      if (newMessage === "CUSTOMER CREATE ORDER") {
+        toast.success("CUSTOMER CREATE ORDER");
+        fetchOrders();
+      } else if (newMessage === "CUSTOMER PAYMENT SUCCESS") {
+        toast.success("CUSTOMER PAYMENT SUCCESS");
+        fetchOrders();
+      }
     }
   });
 
