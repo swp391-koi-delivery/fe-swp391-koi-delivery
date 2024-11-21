@@ -210,7 +210,7 @@ const OrderList = () => {
         ),
       );
 
-      toast.success("Update successfully");
+      toast.success("Order is in shipping!");
 
       // Only post progress if the new order status is SHIPPING
       if (newOrderStatus === "SHIPPING") {
