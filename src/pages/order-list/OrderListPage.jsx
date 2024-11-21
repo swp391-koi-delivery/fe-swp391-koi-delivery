@@ -435,7 +435,7 @@ function OrderListPage() {
     } else if (body.body === "DELIVERY UPDATE ORDER SUCCESS") {
       toast.success(`YOUR ORDER IS IN SHIPPING PROGRESS`);
     } else if (body.body === "ORDER HAS BEEN CANCELED") {
-      toast.success(`YOUR ORDER HAS BEEN CANCELED`);
+      toast.error(`YOUR ORDER HAS BEEN CANCELED`);
     }
   });
 
