@@ -619,7 +619,7 @@ const OrderList = () => {
                                 <div className="flex w-full justify-between">
                                   <span>{warehouse.location}</span>
                                   <span className="ml-2 text-right">
-                                    📦 {warehouse.currentCapacity}/
+                                    📦 {warehouse.bookingCapacity}/
                                     {warehouse.maxCapacity}
                                   </span>
                                 </div>
