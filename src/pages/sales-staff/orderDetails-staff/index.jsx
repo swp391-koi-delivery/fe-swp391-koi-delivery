@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { FaInfoCircle, FaFish, FaRuler, FaDollarSign, FaCheckCircle, FaSpinner, FaTruck, FaBoxOpen } from "react-icons/fa";
+import { FaInfoCircle, FaFish, FaRuler, FaDollarSign, FaCheckCircle, FaSpinner, FaTruck, FaBoxOpen, FaHourglassHalf, FaTimesCircle, FaMoneyBillWave, FaWarehouse } from "react-icons/fa";
 import { useParams, Link } from "react-router-dom";
 import api from "../../../config/axios";
+import { MdCancel } from "react-icons/md";
 
 
 function OrderDetailStaff() {
@@ -50,12 +51,28 @@ function OrderDetailStaff() {
 
   const getStatusIcon = (status) => {
     switch (status) {
+      case "PENDING":
+        return <FaHourglassHalf className="text-yellow-500" />;
+      case "CANCELED":
+        return <MdCancel className="text-red-500" />;
+      case "REJECTED":
+        return <FaTimesCircle className="text-red-500" />;
+      case "AWAITING_RESPONSE":
+        return <FaHourglassHalf className="text-yellow-500" />;
+      case "AWAITING_PAYMENT":
+        return <FaMoneyBillWave className="text-orange-500" />;
+      case "PAID":
+        return <FaCheckCircle className="text-green-500" />;
+      case "BOOKING":
+        return <FaWarehouse className="text-blue-500" />;
       case "SHIPPING":
-        return <FaTruck className="text-yellow-400 animate-spin" />;
+        return <FaTruck className="text-blue-500" />;
       case "DELIVERED":
         return <FaCheckCircle className="text-green-500" />;
+      case "ACCEPTED":
+        return <FaCheckCircle className="text-green-500" />; // Assuming "Accepted" has a green checkmark
       default:
-        return null;
+        return <FaHourglassHalf className="text-gray-500" />;
     }
   };
 
