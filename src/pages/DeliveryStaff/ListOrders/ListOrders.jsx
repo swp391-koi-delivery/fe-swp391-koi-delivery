@@ -13,14 +13,14 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaList,
-  FaWarehouse
+  FaWarehouse,
 } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import api from "../../../config/axios";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
-import {  FiTruck } from "react-icons/fi";
+import { FiTruck } from "react-icons/fi";
 
 const { Option } = Select;
 
@@ -61,7 +61,7 @@ const OrderList = () => {
   const fetchOrders = async () => {
     try {
       let endpoint;
-      switch (selectedOption) {      
+      switch (selectedOption) {
         case "SHIPPING":
           endpoint = `order/listOrderShipping?page=${currentPage}&size=${ordersPerPage}`;
           break;
@@ -200,7 +200,7 @@ const OrderList = () => {
         ),
       );
 
-      toast.success("Update successfully");
+      toast.success("The order is in shipping!");
 
       // Only post progress if the new order status is SHIPPING
       if (newOrderStatus === "SHIPPING") {
