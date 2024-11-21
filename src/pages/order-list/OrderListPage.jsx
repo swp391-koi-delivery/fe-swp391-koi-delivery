@@ -424,15 +424,18 @@ function OrderListPage() {
       body.body === "SALE BOOKING SLOT WAREHOUSE" ||
       body.body === "DELIVERY CREATE PROGRESS" ||
       body.body === "DELIVERY UPDATE PROGRESS" ||
-      body.body === "DELIVERY UPDATE ORDER SUCCESS"
+      body.body === "DELIVERY UPDATE ORDER SUCCESS" ||
+      body.body === "ORDER HAS BEEN CANCELED"
     ) {
       const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
       fetchOrder(savedPage);
     }
     if (body.body === "SALE UPDATE ORDER") {
-      toast.success("YOUR ORDER IS ACCEPTED, AWAITING PAYMENT ");
+      toast.success("YOUR ORDER IS UPDATED");
     } else if (body.body === "DELIVERY UPDATE ORDER SUCCESS") {
       toast.success(`YOUR ORDER IS IN SHIPPING PROGRESS`);
+    } else if (body.body === "ORDER HAS BEEN CANCELED") {
+      toast.success(`YOUR ORDER HAS BEEN CANCELED`);
     }
   });
 
@@ -797,9 +800,7 @@ function OrderListPage() {
                         </Button>
                       )}
                       {(order.orderStatus === "PENDING" ||
-                        order.orderStatus === "AWAITING_PAYMENT" ||
-                        order.orderStatus === "PAID" ||
-                        order.orderStatus === "BOOKING") && (
+                        order.orderStatus === "AWAITING_PAYMENT") && (
                         <Button
                           style={{ color: "#ff4d4f" }}
                           danger
