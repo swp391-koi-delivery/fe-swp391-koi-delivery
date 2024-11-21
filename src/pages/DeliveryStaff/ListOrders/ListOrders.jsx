@@ -20,7 +20,9 @@ import api from "../../../config/axios";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
+
 import { FiTruck } from "react-icons/fi";
+
 
 const { Option } = Select;
 
@@ -137,6 +139,15 @@ const OrderList = () => {
     fetchOrders(); // Fetch orders on component mount
   }, [currentPage, ordersPerPage, selectedOption]); // Dependency array should include only dependencies that control the fetch logic
 
+  useRealTime((body) => {
+    if (
+      body.body === "SALE BOOKING SLOT WAREHOUSE"
+    ) {
+      fetchOrders();
+      toast.success("SALE BOOKED ORDER SUCCESSFULLY");
+    }
+  });
+
   useEffect(() => {
     if (orders.length === 0) return; // Avoid running filter on an empty array
     const filtered = orders.filter((order) => {
@@ -200,7 +211,9 @@ const OrderList = () => {
         ),
       );
 
+
       toast.success("The order is in shipping!");
+
 
       // Only post progress if the new order status is SHIPPING
       if (newOrderStatus === "SHIPPING") {

@@ -406,6 +406,7 @@ function OrderHistoryPage() {
                   Fish status: {progress.healthFishStatus}
                 </span>
               )}
+              {image}
             </div>
           }
           icon={icon}
@@ -422,7 +423,7 @@ function OrderHistoryPage() {
   }, []);
 
   const Order = ({ order }) => {
-  const currentStepIndex = order?.progresses.length - 1;
+    const currentStepIndex = order?.progresses.length - 1;
     return (
       <>
         <div className="order my-8">
@@ -872,7 +873,7 @@ function OrderHistoryPage() {
                             {user?.username}
                           </span>
                           <Link
-                            to=""
+                            to="/profileUser"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Profile
@@ -1083,7 +1084,7 @@ function OrderHistoryPage() {
                               {user?.username}
                             </span>
                             <Link
-                              to=""
+                              to="/profileUser"
                               className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                             >
                               Profile

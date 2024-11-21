@@ -6,7 +6,6 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import requestPermissions from "./config/notification";
 
 // Customer
 import LayoutTemplate from "./components/layout/LayoutTemplate";
@@ -38,6 +37,7 @@ import ManageStatistic from "./pages/manager/manage-statistic";
 import StaffProfile from "./pages/sales-staff/staffProfile";
 import ProfileUser from "./pages/ProfileUser/ProfileUser";
 import WareHouseList from "./pages/sales-staff/warehouse";
+import OrderInWarehouse from "./pages/sales-staff/orderInWarehouse";
 // Delivery Staff
 import DeliveryStaff from "./pages/DeliveryStaff/Dashboard_DS/DeliveryStaff";
 import DeliStaffProfile from "./pages/DeliveryStaff/DeliStaffProfile/DeliStaffProfile";
@@ -50,12 +50,9 @@ import BoxDetails from "./pages/DeliveryStaff/ListOrders/OrderDetails/BoxDetails
 import MapComponent from "./pages/DeliveryStaff/MapComponent/MapComponent";
 import MapPlatform from "./pages/DeliveryStaff/MapComponent/MapPlatform/MapPlatform";
 import OrderRouting from "./pages/DeliveryStaff/MapComponent/OrderRouting/OrderRouting";
+import BookingOrder from "./pages/sales-staff/bookingOrder";
 
 function App() {
-  useEffect(() => {
-    requestPermissions();
-  }, []);
-
   const ProtectRouteManagerAuth = ({ children }) => {
     const user = useSelector((store) => store);
     console.log(user);
@@ -186,6 +183,14 @@ function App() {
         {
           path: "boxDetails/:id",
           element: <BoxDetailsStaff />,
+        },
+        {
+          path: "warehouse/:id",
+          element: <OrderInWarehouse />,
+        },
+        {
+          path: "bookingOrder/:id",
+          element: <BookingOrder />,
         },
       ],
     },

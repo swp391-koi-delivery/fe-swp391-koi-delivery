@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
 import { Button, Form, Input, Pagination, Steps } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 import FooterComponent from "../../components/FooterComponent";
@@ -24,7 +24,6 @@ function OrderListPage() {
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
-
   const { Step } = Steps;
 
   const handleDarkMode = () => {
@@ -399,10 +398,10 @@ function OrderListPage() {
           description={
             <div>
               {progress.healthFishStatus !== null && (
-              <span className="dark:text-white">
-                Fish status: {progress.healthFishStatus}
-              </span>
-               )}
+                <span className="dark:text-white">
+                  Fish status: {progress.healthFishStatus}
+                </span>
+              )}
               {image}
             </div>
           }
@@ -425,10 +424,18 @@ function OrderListPage() {
       body.body === "SALE BOOKING SLOT WAREHOUSE" ||
       body.body === "DELIVERY CREATE PROGRESS" ||
       body.body === "DELIVERY UPDATE PROGRESS" ||
-      body.body === "DELIVERY UPDATE ORDER SUCCESS"
+      body.body === "DELIVERY UPDATE ORDER SUCCESS" ||
+      body.body === "ORDER HAS BEEN CANCELED"
     ) {
       const savedPage = parseInt(localStorage.getItem("currentPage")) || 1;
       fetchOrder(savedPage);
+    }
+    if (body.body === "SALE UPDATE ORDER") {
+      toast.success("YOUR ORDER IS UPDATED");
+    } else if (body.body === "DELIVERY UPDATE ORDER SUCCESS") {
+      toast.success(`YOUR ORDER IS IN SHIPPING PROGRESS`);
+    } else if (body.body === "ORDER HAS BEEN CANCELED") {
+      toast.error(`YOUR ORDER HAS BEEN CANCELED`);
     }
   });
 
@@ -598,24 +605,24 @@ function OrderListPage() {
                           className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                         />
                       </Form.Item>
-                         {order?.orderStatus === "SHIPPING" && (
-                      <Form.Item
-                        label={
-                          <span className="dark:text-white">
-                            Tracking Order
-                          </span>
-                        }
-                        initialValue={order?.trackingOrder}
-                        name="trackingOrder"
-                        className="mb-1 w-full md:w-1/2 md:pr-4"
-                      >
-                        <Input
-                          readOnly
-                          placeholder="Tracking Order"
-                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                        />
-                      </Form.Item>
-                         )}
+                      {order?.orderStatus === "SHIPPING" && (
+                        <Form.Item
+                          label={
+                            <span className="dark:text-white">
+                              Tracking Order
+                            </span>
+                          }
+                          initialValue={order?.trackingOrder}
+                          name="trackingOrder"
+                          className="mb-1 w-full md:w-1/2 md:pr-4"
+                        >
+                          <Input
+                            readOnly
+                            placeholder="Tracking Order"
+                            className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                          />
+                        </Form.Item>
+                      )}
                     </div>
                   </Form>
                 </div>
@@ -793,9 +800,7 @@ function OrderListPage() {
                         </Button>
                       )}
                       {(order.orderStatus === "PENDING" ||
-                        order.orderStatus === "AWAITING_PAYMENT" ||
-                        order.orderStatus === "PAID" ||
-                        order.orderStatus === "BOOKING") && (
+                        order.orderStatus === "AWAITING_PAYMENT") && (
                         <Button
                           style={{ color: "#ff4d4f" }}
                           danger
@@ -883,7 +888,7 @@ function OrderListPage() {
                             {user?.username}
                           </span>
                           <Link
-                            to=""
+                            to="/profileUser"
                             className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                           >
                             Profile
@@ -1094,7 +1099,7 @@ function OrderListPage() {
                               {user?.username}
                             </span>
                             <Link
-                              to=""
+                              to="/profileUser"
                               className="block rounded px-4 py-[10px] text-sm text-body-color hover:text-primary dark:text-dark-6 dark:hover:text-primary"
                             >
                               Profile
