@@ -13,15 +13,16 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaList,
-  FaWarehouse
+  FaWarehouse,
 } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import api from "../../../config/axios";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
-import {  FiTruck } from "react-icons/fi";
-import useRealTime from "../../../hooks/useRealTime";
+
+import { FiTruck } from "react-icons/fi";
+
 
 const { Option } = Select;
 
@@ -36,7 +37,7 @@ const OrderList = () => {
   const [newOrderStatus, setNewOrderStatus] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("BOOKING");
+  const [selectedOption, setSelectedOption] = useState("SHIPPING");
   const dropdownRef = useRef(null);
   const ordersPerPage = 3;
 
@@ -62,7 +63,7 @@ const OrderList = () => {
   const fetchOrders = async () => {
     try {
       let endpoint;
-      switch (selectedOption) {      
+      switch (selectedOption) {
         case "SHIPPING":
           endpoint = `order/listOrderShipping?page=${currentPage}&size=${ordersPerPage}`;
           break;
@@ -210,7 +211,9 @@ const OrderList = () => {
         ),
       );
 
-      toast.success("Order is in shipping!");
+
+      toast.success("The order is in shipping!");
+
 
       // Only post progress if the new order status is SHIPPING
       if (newOrderStatus === "SHIPPING") {
