@@ -143,7 +143,7 @@ const OrderList = () => {
       body.body === "SALE BOOKING SLOT WAREHOUSE"
     ) {
       fetchOrders();
-      toast.success("SALE BOOKED ORDER SUCCESSFULLY, READY TO SHIP");
+      toast.success("SALE BOOKED ORDER SUCCESSFULLY");
     }
   });
 

@@ -34,7 +34,7 @@ function OrderInWarehouse() {
         );
         const fetchedOrders = response.data.orders;
         const totalElements = response.data?.totalBox || 0;
-        const title = response.data?.description || 0;
+        const title = response.data?.locationWareHouse;
         console.log("Fetched Orders:", fetchedOrders);
         setOrders(fetchedOrders);
         setFilteredOrders(fetchedOrders);

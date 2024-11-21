@@ -62,22 +62,22 @@ const Dashboard = () => {
   };
 
   // Tạo các breadcrumb items từ path snippets
-  const breadcrumbItems = [
-    <Breadcrumb.Item>
-      <Link to="/dashboard">
-        {/* <DesktopOutlined style={{ fontSize: '20px' }} /> */}
-      </Link>
-    </Breadcrumb.Item>,
-    ...pathSnippets.map((snippet, index) => {
-      const url = `/${pathSnippets.slice(0, index + 1).join("/")}`; // Tạo URL cho từng breadcrumb
+  // const breadcrumbItems = [
+  //   <Breadcrumb.Item>
+  //     <Link to="/dashboard">
+  //       {/* <DesktopOutlined style={{ fontSize: '20px' }} /> */}
+  //     </Link>
+  //   </Breadcrumb.Item>,
+  //   ...pathSnippets.map((snippet, index) => {
+  //     const url = `/${pathSnippets.slice(0, index + 1).join("/")}`; // Tạo URL cho từng breadcrumb
 
-      return (
-        <Breadcrumb.Item key={url} className="breadcrumb-link">
-          <Link to={url}>{snippet}</Link>
-        </Breadcrumb.Item>
-      );
-    }),
-  ];
+  //     return (
+  //       <Breadcrumb.Item key={url} className="breadcrumb-link">
+  //         <Link to={url}>{snippet}</Link>
+  //       </Breadcrumb.Item>
+  //     );
+  //   }),
+  // ];
   let items = [];
   items.push(getItem("Logout", "logout", <LogoutOutlined />, null, handleLogout));
 
@@ -124,11 +124,11 @@ const Dashboard = () => {
         </div> */}
       </Sider>
       <Layout className="bg-gray-100">
-        <Header className="bg-white shadow-md">
+        {/* <Header className="bg-white shadow-md">
           <Breadcrumb separator=">" style={{ padding: "10px 20px" }}>
             {breadcrumbItems}
           </Breadcrumb>
-        </Header>
+        </Header> */}
         <Content className="m-4">
           <Breadcrumb className="mb-4">
             {/* <Breadcrumb.Item>User</Breadcrumb.Item>
