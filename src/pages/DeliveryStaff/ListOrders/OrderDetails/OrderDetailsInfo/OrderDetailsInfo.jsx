@@ -39,24 +39,59 @@ const OrderDetailsInfo = () => {
 
   const fetchOrder = async () => {
     try {
+      // Fetch the first API response for orders
       const responses = await Promise.all([
         api.get("order/allOrder?page=1&size=100000000"),
       ]);
 
-      const fetchedOrders = responses
-        .map((response) => response?.data.content || []) // Use an empty array if data is undefined
-        .flat(); // Flatten the resulting array of arrays
+      // Try to fetch the second API response
+      let progressData = null;
+      try {
+        const response2 = await api.get(`delivery/progress/${id}`);
+        progressData = response2.data;
+      } catch (error) {
+        console.error("API response2 error:", error);
+        // If `response2` fails, set healthFish directly to "Unhealthy"
+        const fetchedOrders = responses
+          .map((response) => response?.data.content || []) // Handle undefined data
+          .flat();
 
-      console.log(fetchedOrders);
+        const foundOrder = fetchedOrders.find((item) =>
+          item.orderDetails.some((detail) => detail.id === parseInt(id)),
+        );
+
+        if (foundOrder) {
+          const matchingDetails = foundOrder.orderDetails.map((detail) => ({
+            ...detail,
+            healthFish: "Unhealthy",
+          }));
+
+          setOrder({ ...foundOrder, orderDetails: matchingDetails });
+        } else {
+          setOrder(null);
+        }
+        setLoading(false);
+        return; // Exit early
+      }
+
+      // Default handling if API response2 succeeds
+      const fetchedOrders = responses
+        .map((response) => response?.data.content || []) // Handle undefined data
+        .flat();
 
       const foundOrder = fetchedOrders.find((item) =>
         item.orderDetails.some((detail) => detail.id === parseInt(id)),
       );
 
       if (foundOrder) {
-        const matchingDetails = foundOrder.orderDetails.filter(
-          (detail) => detail.id === parseInt(id),
-        );
+        const matchingDetails = foundOrder.orderDetails.map((detail) => ({
+          ...detail,
+          healthFish:
+            progressData[1]?.healthFishStatus === null
+              ? "Unknown" // Default to "Unknown" if no status
+              : "Healthy", // Set to "Healthy" for other cases
+        }));
+
         setOrder({ ...foundOrder, orderDetails: matchingDetails });
       } else {
         setOrder(null);
@@ -368,7 +403,7 @@ const OrderDetailsInfo = () => {
                 <div className="flex w-2/3 items-center">
                   <input
                     type="text"
-                    value={detail.healthFishStatus}
+                    value={detail.healthFish}
                     readOnly
                     className="w-full rounded-l-md bg-gray-100 p-2 text-black transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     aria-label="Health Fish Status"

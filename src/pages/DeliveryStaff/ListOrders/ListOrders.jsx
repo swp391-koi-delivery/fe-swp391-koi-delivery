@@ -35,7 +35,7 @@ const OrderList = () => {
   const [newOrderStatus, setNewOrderStatus] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("BOOKING");
+  const [selectedOption, setSelectedOption] = useState("SHIPPING");
   const dropdownRef = useRef(null);
   const ordersPerPage = 3;
 
