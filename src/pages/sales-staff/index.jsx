@@ -32,6 +32,7 @@ import api from "../../config/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
 import { FiTruck } from "react-icons/fi";
+import useRealTime from "../../hooks/useRealTime";
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -122,11 +123,9 @@ const OrderList = () => {
         default:
           endpoint = `order/allOrder?page=${currentPage}&size=${ordersPerPage}`;
       }
-
       const response = await api.get(endpoint);
       const fetchedOrders = response.data?.content || [];
       const totalElements = response.data?.totalElements || 0;
-
       setOrders(fetchedOrders);
       setFilteredOrders(fetchedOrders);
       console.log(fetchedOrders);
@@ -157,7 +156,17 @@ const OrderList = () => {
     fetchOrders();
   }, [currentPage, ordersPerPage, selectedOption]); // Chỉ gọi lại khi currentPage hoặc ordersPerPage thay đổi
 
-  const handleBookingSubmit = async (order) => {
+  useRealTime((body) => {
+    if (
+      body.body === "CUSTOMER CREATE ORDER" ||
+      body.body === "CUSTOMER PAYMENT SUCCESS"
+    ) {
+      fetchOrders();
+      toast.success(body.body);
+    }
+  });
+
+  const handleBookingSubmit = async (warehouseId, orderId) => {
     setSubmitting(true);
     try {
       await api.post(
@@ -168,7 +177,7 @@ const OrderList = () => {
       fetchOrders();
     } catch (error) {
       console.error("Error booking slot:", error);
-      toast.error("Fail to booking");
+      toast.warning(error.response.data);
     } finally {
       setSubmitting(false);
     }
@@ -207,9 +216,11 @@ const OrderList = () => {
     }
   };
 
-  const toggleBookingForm = (orderId) => {
+  const toggleBookingForm = async (orderId) => {
     setExpandedBookingId(orderId);
     setIsModalVisible(true); // Mở modal
+    const response = await api.get(`sale/suggestWareHouse?orderId=${orderId}`);
+    toast.success(response.data);
   };
 
   const handleModalClose = () => {
@@ -441,6 +452,7 @@ const OrderList = () => {
                         order.orderStatus !== "BOOKING" &&
                         order.orderStatus !== "SHIPPING" &&
                         order.orderStatus !== "DELIVERED" &&
+                        order.orderStatus !== "PAID" &&
                         order.orderStatus !== "CANCELED" ? (
                           <FaEdit
                             className="cursor-pointer text-gray-500"
@@ -454,10 +466,10 @@ const OrderList = () => {
                             }}
                           />
                         ) : null}
-                        <FaTrash
+                        {/* <FaTrash
                           className="cursor-pointer text-gray-500 hover:text-blue-500"
                           onClick={() => handleDeleteOrder(order.id)} // Trigger delete
-                        />
+                        /> */}
                       </div>
                     </div>
                     <div className="mt-0.5 flex items-center justify-between">

@@ -118,7 +118,7 @@ const AddressAutocomplete = ({
         <div className="flex items-center">
           <img
             src={yourLocation} // Use the yourLocation image
-            alt="Your Location"
+            alt="null"
             className="mr-2 h-6 w-6" // Adjust the size if needed
           />
           <strong>{suggestion.display_name}</strong>

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import locationIcon from "./location.png"; // Icon add in map
+import locationIcon from "./location.png"; // Icon add in map 
 
 // Tọa độ Huế
 const hueCoord = { lat: 16.4634, lon: 107.5858 };
