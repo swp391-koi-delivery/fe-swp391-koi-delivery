@@ -157,7 +157,7 @@ const OrderList = () => {
     fetchOrders();
   }, [currentPage, ordersPerPage, selectedOption]); // Chỉ gọi lại khi currentPage hoặc ordersPerPage thay đổi
 
-  const handleBookingSubmit = async (warehouseId, orderId) => {
+  const handleBookingSubmit = async (order) => {
     setSubmitting(true);
     try {
       await api.post(
