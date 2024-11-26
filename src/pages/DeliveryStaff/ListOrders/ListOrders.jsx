@@ -20,9 +20,8 @@ import api from "../../../config/axios";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
-
+import useRealTime from "../../../hooks/useRealTime";
 import { FiTruck } from "react-icons/fi";
-
 
 const { Option } = Select;
 
@@ -140,9 +139,7 @@ const OrderList = () => {
   }, [currentPage, ordersPerPage, selectedOption]); // Dependency array should include only dependencies that control the fetch logic
 
   useRealTime((body) => {
-    if (
-      body.body === "SALE BOOKING SLOT WAREHOUSE"
-    ) {
+    if (body.body === "SALE BOOKING SLOT WAREHOUSE") {
       fetchOrders();
       toast.success("SALE BOOKED ORDER SUCCESSFULLY");
     }
@@ -211,9 +208,7 @@ const OrderList = () => {
         ),
       );
 
-
       toast.success("The order is in shipping!");
-
 
       // Only post progress if the new order status is SHIPPING
       if (newOrderStatus === "SHIPPING") {
