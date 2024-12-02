@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, Select, Radio } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +14,7 @@ function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [hasShownToast, setHasShownToast] = useState(false);
   const [form] = useForm();
+  const [selectedForm, setSelectedForm] = useState("personalOption");
 
   const handleDarkMode = () => {
     // ======= Sticky Header and Back-to-Top Button Scroll Behavior
@@ -169,17 +170,9 @@ function OrderPage() {
     handleDarkMode();
   }, []);
 
-  const [orderDetails, setOrderDetails] = useState([
-    {
-      priceOfFish: "",
-      nameFarm: "",
-      farmAddress: "",
-      origin: "",
-      fishSpecies: "",
-      numberOfFish: "",
-      sizeOfFish: "",
-    },
-  ]);
+  const handleRadioChange = (e) => {
+    setSelectedForm(e.target.value);
+  };
 
   const validateRecipientInfo = (_, value) => {
     const emailRegex = /\S+@\S+\.\S+/;
@@ -222,70 +215,73 @@ function OrderPage() {
     }
   };
 
-  const handleOrderDetailChange = (index, field, value) => {
-    const updatedDetails = [...orderDetails];
-    updatedDetails[index][field] = value;
-    setOrderDetails(updatedDetails);
-  };
-
-  const handleSubmitOrder = async (values) => {
-    const orderData = {
-      originLocation: values.originLocation,
-      destinationLocation: values.destinationLocation,
-      describeOrder: values.describeOrder,
-      recipientInfo: values.recipientInfo,
-      methodTransPort: values.methodTransPort,
-      customerNotes: values.customerNotes,
-      orderDetailRequestList: orderDetails.map((detail) => ({
-        priceOfFish: parseInt(detail.priceOfFish),
-        nameFarm: detail.nameFarm,
-        farmAddress: detail.farmAddress,
-        origin: detail.origin,
-        fishSpecies: detail.fishSpecies,
-        numberOfFish: parseInt(detail.numberOfFish),
-        sizeOfFish: parseFloat(detail.sizeOfFish),
-      })),
-    };
-
-    console.log(orderData);
-
+  const handleSubmitOptimalOrder = async (values) => {
     try {
       setLoading(true);
-      const response = await api.post("/customer/order", orderData);
-      console.log(response);
+
+      const { orderDetails } = values;
+
+      if (!orderDetails || orderDetails.length === 0) {
+        toast.error("Please add at least one fish before submitting!");
+        return;
+      }
+
+      // Parse sizeOfFish và numberOfFish thành số
+      const processedOrderDetails = orderDetails.map((detail) => ({
+        ...detail,
+        sizeOfFish: parseFloat(detail.sizeOfFish), // Đảm bảo sizeOfFish là số thập phân
+        numberOfFish: parseInt(detail.numberOfFish, 10), // Đảm bảo numberOfFish là số nguyên
+      }));
+
+      const orderData = { ...values, orderDetails: processedOrderDetails };
+
+      console.log(orderData);
+
+      // Gửi API (bỏ ghi chú nếu cần thiết)
+      // const response = await api.post("/customer/order", orderData);
+
       toast.success("Successfully created order");
       form.resetFields();
-      setOrderDetails([
-        {
-          priceOfFish: "",
-          nameFarm: "",
-          farmAddress: "",
-          origin: "",
-          fishSpecies: "",
-          numberOfFish: "",
-          sizeOfFish: "",
-        },
-      ]);
-    } catch (err) {
-      toast.error(err.response.data);
+    } catch (error) {
+      toast.error("Failed to create order: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const addFishOrder = () => {
-    setOrderDetails([
-      ...orderDetails,
-      {
-        priceOfFish: "",
-        nameFarm: "",
-        farmAddress: "",
-        origin: "",
-        fishSpecies: "",
-        numberOfFish: "",
-        sizeOfFish: "",
-      },
-    ]);
+  const handleSubmitPersonalOrder = async (values) => {
+    try {
+      setLoading(true);
+      const orderDetails = values.orderDetails;
+
+      if (!orderDetails || orderDetails.length === 0) {
+        toast.error("Please add at least one box before submitting!");
+        return;
+      }
+
+      // Process each fish item to ensure the size and number are numbers
+      const updatedOrderDetails = orderDetails.map((box) => {
+        const updatedFishes = box.fishes.map((fish) => ({
+          ...fish,
+          sizeOfFish: parseFloat(fish.sizeOfFish),
+          numberOfFish: parseInt(fish.numberOfFish, 10),
+          quantityEachBox: parseInt(fish.quantityEachBox, 10),
+        }));
+        return { ...box, fishes: updatedFishes };
+      });
+
+      const orderData = { ...values, orderDetails: updatedOrderDetails };
+
+      // const response = await api.post("/customer/order", orderData);
+      console.log(orderData);
+
+      toast.success("Successfully created order");
+      form.resetFields();
+    } catch (error) {
+      toast.error("Failed to create order: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -639,7 +635,7 @@ function OrderPage() {
                 className="wow fadeInUp relative mx-auto max-w-[825px] overflow-hidden rounded-xl bg-white px-8 py-14 text-center shadow-form dark:bg-dark-2 sm:px-12 md:px-[60px]"
                 data-wow-delay=".15s"
               >
-                <div className="mb-10 text-center">
+                <div className="mb-8 text-center">
                   <a
                     href="javascript:void(0)"
                     className="mx-auto flex max-w-[160px] justify-center"
@@ -651,442 +647,951 @@ function OrderPage() {
                     />
                   </a>
                 </div>
-                <Form
-                  title="Order"
-                  form={form}
-                  onFinish={handleSubmitOrder}
-                  layout="vertical"
+                <Radio.Group
+                  onChange={handleRadioChange}
+                  value={selectedForm}
+                  style={{ marginBottom: "20px" }}
                 >
-                  <div className="flex w-full flex-wrap">
-                    <Form.Item
-                      label={
-                        <span className="dark:text-white">Origin Location</span>
-                      }
-                      name="originLocation"
-                      className="mb-4 w-full px-2 md:w-1/2"
-                      onChange={handleLocationChange}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input destination location",
-                        },
-                      ]}
-                      style={{ textAlign: "left" }}
-                    >
-                      <Input
-                        placeholder="Origin Location"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label={
-                        <span className="dark:text-white">
-                          Destination Location
-                        </span>
-                      }
-                      name="destinationLocation"
-                      className="mb-4 w-full px-2 md:w-1/2"
-                      onChange={handleLocationChange}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input destination location",
-                        },
-                        ({ getFieldValue }) => ({
-                          validator(_, value) {
-                            if (
-                              !value ||
-                              getFieldValue("originLocation") !== value
-                            ) {
-                              return Promise.resolve();
-                            }
-                            return Promise.reject(
-                              new Error(
-                                "Origin location and destination location cannot be the same.",
-                              ),
-                            );
-                          },
-                        }),
-                      ]}
-                      style={{ textAlign: "left" }}
-                    >
-                      <Input
-                        placeholder="Destination Location"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label={
-                        <span className="dark:text-white">Customer Notes</span>
-                      }
-                      name="customerNotes"
-                      className="mb-4 w-full px-2 md:w-1/2"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input customer notes",
-                        },
-                      ]}
-                      style={{ textAlign: "left" }}
-                    >
-                      <Input.TextArea
-                        placeholder="Customer Notes"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label={
-                        <span className="dark:text-white">Recipient Info</span>
-                      }
-                      name="recipientInfo"
-                      className="mb-4 w-full px-2 md:w-1/2"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input recipient info",
-                        },
-                        {
-                          validator: validateRecipientInfo, // custom validation rule with the updated phone regex
-                        },
-                      ]}
-                      style={{ textAlign: "left" }}
-                    >
-                      <Input.TextArea
-                        placeholder="Recipient Info"
-                        className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label={
-                        <span className="dark:text-white">Order Type</span>
-                      }
-                      name="describeOrder"
-                      className="mb-4 w-full px-2 md:w-1/2"
-                      rules={[
-                        { required: true, message: "Please select order type" },
-                      ]}
-                      style={{ textAlign: "left" }}
-                    >
-                      <Select
-                        placeholder="Select order type"
-                        onChange={handleOrderDescribeChange}
-                        options={[
-                          { value: "RETAIL_ORDER", label: "Retail Order" },
+                  <Radio value="personalOption" style={{ padding: "0 5px" }}>
+                    Personal Option
+                  </Radio>
+                  <Radio value="optimalOption" style={{ padding: "0 5px" }}>
+                    Optimal Option
+                  </Radio>
+                </Radio.Group>
+                {selectedForm === "personalOption" && (
+                  <Form
+                    name="personalOption"
+                    form={form}
+                    onFinish={handleSubmitPersonalOrder}
+                    layout="vertical"
+                  >
+                    <div className="flex w-full flex-wrap">
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Origin Location
+                          </span>
+                        }
+                        name="originLocation"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        onChange={handleLocationChange}
+                        rules={[
                           {
-                            value: "WHOLESALE_ORDER",
-                            label: "Wholesale Order",
+                            required: true,
+                            message: "Please input destination location",
                           },
                         ]}
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label={
-                        <span className="dark:text-white">
-                          Transport Method
-                        </span>
-                      }
-                      name="methodTransPort"
-                      className="mb-4 w-full px-2 md:w-1/2"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select transport method",
-                        },
-                      ]}
-                      style={{ textAlign: "left" }}
-                    >
-                      <Select
-                        placeholder="Select transport method"
-                        onChange={handleOrderDescribeChange}
-                        options={[
-                          { value: "FAST_DELIVERY", label: "Fast Delivery" },
-                          {
-                            value: "NORMAL_DELIVERY",
-                            label: "Normal Delivery",
-                          },
-                        ]}
-                      />
-                    </Form.Item>
-                  </div>
-
-                  <div className="flex w-full flex-wrap">
-                    {orderDetails.map((detail, index) => (
-                      <div
-                        key={index}
-                        className={`${
-                          orderDetails.length === 1 ? "md:w-full" : "md:w-1/2"
-                        } w-full`}
+                        style={{ textAlign: "left" }}
                       >
-                        <Form.Item
-                          label={
-                            <span className="dark:text-white">
-                              Price Of Fish ($)
-                            </span>
-                          }
-                          name={`orderDetails[${index}].priceOfFish`}
-                          onChange={(e) =>
-                            handleOrderDetailChange(
-                              index,
-                              "priceOfFish",
-                              e.target.value.replace(",", "."),
-                            )
-                          }
-                          className="mb-4 w-full px-2"
-                          rules={[
+                        <Input
+                          placeholder="Origin Location"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Destination Location
+                          </span>
+                        }
+                        name="destinationLocation"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        onChange={handleLocationChange}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input destination location",
+                          },
+                          ({ getFieldValue }) => ({
+                            validator(_, value) {
+                              if (
+                                !value ||
+                                getFieldValue("originLocation") !== value
+                              ) {
+                                return Promise.resolve();
+                              }
+                              return Promise.reject(
+                                new Error(
+                                  "Origin location and destination location cannot be the same.",
+                                ),
+                              );
+                            },
+                          }),
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Destination Location"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Customer Notes
+                          </span>
+                        }
+                        name="customerNotes"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input customer notes",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input.TextArea
+                          placeholder="Customer Notes"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Recipient Info
+                          </span>
+                        }
+                        name="recipientInfo"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input recipient info",
+                          },
+                          {
+                            validator: validateRecipientInfo, // custom validation rule with the updated phone regex
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input.TextArea
+                          placeholder="Recipient Info"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">Order Type</span>
+                        }
+                        name="describeOrder"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please select order type",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Select
+                          placeholder="Select order type"
+                          onChange={handleOrderDescribeChange}
+                          options={[
+                            { value: "RETAIL_ORDER", label: "Retail Order" },
                             {
-                              required: true,
-                              message: "Please input price of fish in $",
+                              value: "WHOLESALE_ORDER",
+                              label: "Wholesale Order",
                             },
                           ]}
-                          style={{ textAlign: "left" }}
-                        >
-                          <Input
-                            type="number"
-                            min="1"
-                            pattern="[0-9]+(\.[0-9]+)?"
-                            placeholder="Price Of Fish In $"
-                            className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          label={
-                            <span className="dark:text-white">Farm Name</span>
-                          }
-                          name={`orderDetails[${index}].nameFarm`}
-                          onChange={(e) =>
-                            handleOrderDetailChange(
-                              index,
-                              "nameFarm",
-                              e.target.value,
-                            )
-                          }
-                          className="mb-4 w-full px-2"
-                          rules={[
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Transport Method
+                          </span>
+                        }
+                        name="methodTransPort"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please select transport method",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Select
+                          placeholder="Select transport method"
+                          onChange={handleOrderDescribeChange}
+                          options={[
+                            { value: "FAST_DELIVERY", label: "Fast Delivery" },
                             {
-                              required: true,
-                              message: "Please input name farm",
+                              value: "NORMAL_DELIVERY",
+                              label: "Normal Delivery",
                             },
                           ]}
-                          style={{ textAlign: "left" }}
-                        >
-                          <Input
-                            placeholder="Name Farm"
-                            className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          label={
-                            <span className="dark:text-white">
-                              Farm Address
-                            </span>
-                          }
-                          name={`orderDetails[${index}].farmAddress`}
-                          onChange={(e) =>
-                            handleOrderDetailChange(
-                              index,
-                              "farmAddress",
-                              e.target.value,
-                            )
-                          }
-                          className="mb-4 w-full px-2"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input farm address",
-                            },
-                          ]}
-                          style={{ textAlign: "left" }}
-                        >
-                          <Input
-                            placeholder="Farm Address"
-                            className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          label={
-                            <span className="dark:text-white">Origin</span>
-                          }
-                          name={`orderDetails[${index}].origin`}
-                          onChange={(e) =>
-                            handleOrderDetailChange(
-                              index,
-                              "origin",
-                              e.target.value,
-                            )
-                          }
-                          className="mb-4 w-full px-2"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input origin",
-                            },
-                          ]}
-                          style={{ textAlign: "left" }}
-                        >
-                          <Input
-                            placeholder="Origin"
-                            className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          label={
-                            <span className="dark:text-white">
-                              Fish Species
-                            </span>
-                          }
-                          name={`orderDetails[${index}].fishSpecies`}
-                          onChange={(e) =>
-                            handleOrderDetailChange(
-                              index,
-                              "fishSpecies",
-                              e.target.value,
-                            )
-                          }
-                          className="mb-4 w-full px-2"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input fish species",
-                            },
-                          ]}
-                          style={{ textAlign: "left" }}
-                        >
-                          <Input
-                            placeholder="Fish Species"
-                            className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          label={
-                            <span className="dark:text-white">
-                              Number Of Fish
-                            </span>
-                          }
-                          name={`orderDetails[${index}].numberOfFish`}
-                          onChange={(e) =>
-                            handleOrderDetailChange(
-                              index,
-                              "numberOfFish",
-                              e.target.value,
-                            )
-                          }
-                          className="mb-4 w-full px-2"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input number of fish",
-                            },
-                            {
-                              validator: (_, value) => {
-                                if (value > 100) {
-                                  return Promise.reject(
-                                    new Error(
-                                      "Number of fish must be less than or eqaul to 100!",
-                                    ),
-                                  );
-                                }
-                                return Promise.resolve(); // No error if value is valid
-                              },
-                            },
-                          ]}
-                          style={{ textAlign: "left" }}
-                        >
-                          <Input
-                            type="number"
-                            min="1"
-                            step="1"
-                            placeholder="Number of Fish"
-                            className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          label={
-                            <span className="dark:text-white">
-                              Size Of Fish (Cm)
-                            </span>
-                          }
-                          name={`orderDetails[${index}].sizeOfFish`}
-                          onChange={(e) =>
-                            handleOrderDetailChange(
-                              index,
-                              "sizeOfFish",
-                              e.target.value.replace(",", "."),
-                            )
-                          }
-                          className="mb-4 w-full px-2"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input size of fish in cm",
-                            },
-                            {
-                              validator: (_, value) => {
-                                if (value < 19.9 || value > 83) {
-                                  return Promise.reject(
-                                    new Error(
-                                      "Size of fish must be from 19.9 to 83 cm!",
-                                    ),
-                                  );
-                                }
-                                return Promise.resolve(); // No error if value is valid
-                              },
-                            },
-                          ]}
-                          style={{ textAlign: "left" }}
-                        >
-                          <Input
-                            type="number"
-                            min="19.9"
-                            pattern="[0-9]+(\.[0-9]+)?"
-                            placeholder="Size Of Fish In Cm"
-                            className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
-                          />
-                        </Form.Item>
-                      </div>
-                    ))}
-                  </div>
-                  <Form.Item className="mb-4">
-                    <Button
-                      style={{ marginLeft: "8px" }}
-                      onClick={addFishOrder}
-                    >
-                      Add Another Fish
-                    </Button>
-                  </Form.Item>
-                  <Form.Item className="mb-4 px-2">
-                    <Button
-                      onClick={() => form.submit()}
-                      className="primaryButton"
-                      loading={loading}
-                      style={{
-                        margin: "0px",
-                        width: "100%",
-                        color: "#fff",
-                        border: "none",
-                        padding: "1.25rem 1.75rem",
-                        fontSize: "1rem",
-                        lineHeight: "1.5rem",
-                        transitionDuration: "300ms",
-                        fontWeight: "500",
-                        transitionProperty:
-                          "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
-                        transitionTimingFunction:
-                          "cubic-bezier(0.4, 0, 0.2, 1)",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor =
-                          "rgba(234, 88, 12, 1)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor =
-                          "rgba(249, 115, 22, 1)";
-                      }}
-                    >
-                      Order
-                    </Button>
-                  </Form.Item>
-                </Form>
+                        />
+                      </Form.Item>
+                    </div>
 
+                    <div className="flex w-full flex-wrap">
+                      <Form.List name="orderDetails">
+                        {(fields, { add, remove }) => (
+                          <>
+                            {fields.map(
+                              ({ key, name, fieldKey, ...restField }) => {
+                                // Get the list of fishes for the current box
+                                const currentBoxFishes =
+                                  form.getFieldValue([
+                                    "orderDetails",
+                                    name,
+                                    "fishes",
+                                  ]) || [];
+
+                                return (
+                                  <div
+                                    key={key}
+                                    className="flex w-full flex-col md:flex-row"
+                                  >
+                                    <div className="flex w-full flex-row flex-wrap">
+                                      {/* Size Of Fish and Number Of Fish */}
+                                      {currentBoxFishes.map(
+                                        (fish, fishIndex) => (
+                                          <div
+                                            key={fishIndex}
+                                            className="flex w-full flex-row"
+                                          >
+                                            {/* Species Of Fish */}
+                                            <Form.Item
+                                              label={
+                                                <span className="inline-block w-16 dark:text-white">
+                                                  Fish Species
+                                                </span>
+                                              }
+                                              {...restField}
+                                              name={[
+                                                name,
+                                                "fishes",
+                                                fishIndex,
+                                                "fishSpecies",
+                                              ]}
+                                              fieldKey={[
+                                                fieldKey,
+                                                "fishes",
+                                                fishIndex,
+                                                "fishSpecies",
+                                              ]}
+                                              rules={[
+                                                {
+                                                  required: true,
+                                                  message:
+                                                    "Please input fish species",
+                                                },
+                                              ]}
+                                              className="mb-4 px-2"
+                                            >
+                                              <Input
+                                                placeholder="Fish Species"
+                                                className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                                              />
+                                            </Form.Item>
+
+                                            {/* Size Of Fish */}
+                                            <Form.Item
+                                              label={
+                                                <span className="inline-block w-16 dark:text-white">
+                                                  Size Of Fish (cm)
+                                                </span>
+                                              }
+                                              {...restField}
+                                              name={[
+                                                name,
+                                                "fishes",
+                                                fishIndex,
+                                                "sizeOfFish",
+                                              ]}
+                                              fieldKey={[
+                                                fieldKey,
+                                                "fishes",
+                                                fishIndex,
+                                                "sizeOfFish",
+                                              ]}
+                                              rules={[
+                                                {
+                                                  required: true,
+                                                  message:
+                                                    "Please input size of fish",
+                                                },
+                                                {
+                                                  validator: (_, value) =>
+                                                    value >= 19.9 && value <= 83
+                                                      ? Promise.resolve()
+                                                      : Promise.reject(
+                                                          new Error(
+                                                            "Size must be between 19.9 and 83 cm",
+                                                          ),
+                                                        ),
+                                                },
+                                              ]}
+                                              className="mb-4 px-2"
+                                            >
+                                              <Input
+                                                step="0.1"
+                                                min="19.9"
+                                                type="number"
+                                                placeholder="Size Of Fish"
+                                                className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                                              />
+                                            </Form.Item>
+
+                                            {/* Number Of Fish */}
+                                            <Form.Item
+                                              label={
+                                                <span className="inline-block w-16 dark:text-white">
+                                                  Number Of Fish
+                                                </span>
+                                              }
+                                              {...restField}
+                                              name={[
+                                                name,
+                                                "fishes",
+                                                fishIndex,
+                                                "numberOfFish",
+                                              ]}
+                                              fieldKey={[
+                                                fieldKey,
+                                                "fishes",
+                                                fishIndex,
+                                                "numberOfFish",
+                                              ]}
+                                              rules={[
+                                                {
+                                                  required: true,
+                                                  message:
+                                                    "Please input number of fish",
+                                                },
+                                                {
+                                                  validator: (_, value) =>
+                                                    value > 0 && value <= 100
+                                                      ? Promise.resolve()
+                                                      : Promise.reject(
+                                                          new Error(
+                                                            "Number must be greater than 0 and less than or equal to 100",
+                                                          ),
+                                                        ),
+                                                },
+                                              ]}
+                                              className="mb-4 px-2"
+                                            >
+                                              <Input
+                                                min="1"
+                                                step="1"
+                                                type="number"
+                                                placeholder="Number Of Fish"
+                                                className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                                              />
+                                            </Form.Item>
+
+                                            {/* Conditional rendering of Quantity Each Box input */}
+                                            {form.getFieldValue("orderDetails")[
+                                              name
+                                            ]?.isMultiple ? (
+                                              <Form.Item
+                                                label={
+                                                  <span className="inline-block w-16 dark:text-white">
+                                                    Quantity Each Box
+                                                  </span>
+                                                }
+                                                {...restField}
+                                                name={[
+                                                  name,
+                                                  "fishes",
+                                                  fishIndex,
+                                                  "quantityEachBox",
+                                                ]}
+                                                fieldKey={[
+                                                  fieldKey,
+                                                  "fishes",
+                                                  fishIndex,
+                                                  "quantityEachBox",
+                                                ]}
+                                                rules={[
+                                                  {
+                                                    required: true,
+                                                    message:
+                                                      "Please input quantity each box",
+                                                  },
+                                                  {
+                                                    validator: (_, value) =>
+                                                      value > 0 && value <= 100
+                                                        ? Promise.resolve()
+                                                        : Promise.reject(
+                                                            new Error(
+                                                              "Number must be greater than 0 and less than or equal to 100",
+                                                            ),
+                                                          ),
+                                                  },
+                                                ]}
+                                                className="mb-4 px-2"
+                                              >
+                                                <Input
+                                                  min="1"
+                                                  step="1"
+                                                  type="number"
+                                                  placeholder="Quantity Each Box"
+                                                  className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                                                />
+                                              </Form.Item>
+                                            ) : null}
+                                          </div>
+                                        ),
+                                      )}
+                                    </div>
+
+                                    {/* Select Box Type, Add Fish and Delete Fish */}
+                                    <div className="flex w-1/2 flex-col justify-center md:w-auto">
+                                      {/* Select Fish */}
+                                      <Form.Item
+                                        label={
+                                          <span className="dark:text-white">
+                                            Box Type
+                                          </span>
+                                        }
+                                        name={[name, "boxType"]}
+                                        fieldKey={[fieldKey, "boxType"]}
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "Please select a box type",
+                                          },
+                                        ]}
+                                        className="mb-4 px-2"
+                                      >
+                                        <Select
+                                          placeholder="Select Box Type"
+                                          options={[
+                                            {
+                                              value: "small",
+                                              label: "Small Box",
+                                            },
+                                            {
+                                              value: "medium",
+                                              label: "Medium Box",
+                                            },
+                                            {
+                                              value: "large",
+                                              label: "Large Box",
+                                            },
+                                          ]}
+                                          className="w-full"
+                                        />
+                                      </Form.Item>
+
+                                      {/* Add Fish */}
+                                      <Button
+                                        style={{ margin: "8px" }}
+                                        type="primary"
+                                        onClick={() => {
+                                          const currentBoxes =
+                                            form.getFieldValue(
+                                              "orderDetails",
+                                            ) || [];
+                                          const updatedFishes = [
+                                            ...(currentBoxes[name]?.fishes ||
+                                              []),
+                                            {
+                                              fishSpecies: "",
+                                              sizeOfFish: null,
+                                              numberOfFish: null,
+                                            },
+                                          ];
+
+                                          currentBoxes[name] = {
+                                            ...currentBoxes[name],
+                                            fishes: updatedFishes,
+                                          };
+                                          form.setFieldsValue({
+                                            orderDetails: currentBoxes,
+                                          });
+                                        }}
+                                      >
+                                        Add Fish
+                                      </Button>
+
+                                      {/* Delete Fish */}
+                                      <Button
+                                        style={{
+                                          color: "#ff4d4f",
+                                          margin: "8px",
+                                          backgroundColor: "transparent",
+                                        }}
+                                        danger
+                                        onClick={() => {
+                                          const currentBoxes =
+                                            form.getFieldValue(
+                                              "orderDetails",
+                                            ) || [];
+                                          const updatedFishes = (
+                                            currentBoxes[name]?.fishes || []
+                                          ).slice(0, -1);
+                                          currentBoxes[name] = {
+                                            ...currentBoxes[name],
+                                            fishes: updatedFishes,
+                                          };
+                                          form.setFieldsValue({
+                                            orderDetails: currentBoxes,
+                                          });
+                                        }}
+                                      >
+                                        Delete Fish
+                                      </Button>
+                                    </div>
+                                  </div>
+                                );
+                              },
+                            )}
+
+                            {/* Add Box and Delete Single Box */}
+                            <div className="mb-4 flex">
+                              <Button
+                                style={{ marginLeft: "8px" }}
+                                onClick={() =>
+                                  add({
+                                    fishes: [],
+                                    boxType: null,
+                                    isMultiple: false, // For single box, no quantity input
+                                  })
+                                }
+                                type="primary"
+                              >
+                                Add Single Box
+                              </Button>
+
+                              {fields.length > 0 && (
+                                <Button
+                                  style={{
+                                    color: "#ff4d4f",
+                                    marginLeft: "8px",
+                                    backgroundColor: "transparent",
+                                  }}
+                                  danger
+                                  onClick={() => remove(fields.length - 1)}
+                                >
+                                  Delete Single Box
+                                </Button>
+                              )}
+                            </div>
+                            {/* Add Box and Delete Multiple Box */}
+                            <div className="mb-4 flex">
+                              <Button
+                                style={{ marginLeft: "8px" }}
+                                onClick={() =>
+                                  add({
+                                    fishes: [],
+                                    boxType: null,
+                                    isMultiple: true, // For multiple box, includes quantity input
+                                  })
+                                }
+                                type="primary"
+                              >
+                                Add Multiple Box
+                              </Button>
+                              {fields.length > 0 && (
+                                <Button
+                                  style={{
+                                    color: "#ff4d4f",
+                                    marginLeft: "8px",
+                                    backgroundColor: "transparent",
+                                  }}
+                                  danger
+                                  onClick={() => {
+                                    const currentBoxes =
+                                      form.getFieldValue("orderDetails") || [];
+                                    const lastBox =
+                                      currentBoxes[currentBoxes.length - 1];
+
+                                    if (lastBox?.isMultiple) {
+                                      // Remove last multiple box
+                                      const updatedBoxes = currentBoxes.slice(
+                                        0,
+                                        -1,
+                                      );
+                                      form.setFieldsValue({
+                                        orderDetails: updatedBoxes,
+                                      });
+                                    }
+                                  }}
+                                >
+                                  Delete Multiple Box
+                                </Button>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </Form.List>
+                    </div>
+
+                    <Form.Item className="mb-4 px-2">
+                      <Button
+                        onClick={() => form.submit()}
+                        className="primaryButton"
+                        loading={loading}
+                        style={{
+                          margin: "0px",
+                          width: "100%",
+                          color: "#fff",
+                          border: "none",
+                          padding: "1.25rem 1.75rem",
+                          fontSize: "1rem",
+                          lineHeight: "1.5rem",
+                          transitionDuration: "300ms",
+                          fontWeight: "500",
+                          transitionProperty:
+                            "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                          transitionTimingFunction:
+                            "cubic-bezier(0.4, 0, 0.2, 1)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(234, 88, 12, 1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(249, 115, 22, 1)";
+                        }}
+                      >
+                        Order
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                )}
+                {selectedForm === "optimalOption" && (
+                  <Form
+                    name="optimalOption"
+                    form={form}
+                    onFinish={handleSubmitOptimalOrder}
+                    layout="vertical"
+                  >
+                    <div className="flex w-full flex-wrap">
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Origin Location
+                          </span>
+                        }
+                        name="originLocation"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        onChange={handleLocationChange}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input destination location",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Origin Location"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Destination Location
+                          </span>
+                        }
+                        name="destinationLocation"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        onChange={handleLocationChange}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input destination location",
+                          },
+                          ({ getFieldValue }) => ({
+                            validator(_, value) {
+                              if (
+                                !value ||
+                                getFieldValue("originLocation") !== value
+                              ) {
+                                return Promise.resolve();
+                              }
+                              return Promise.reject(
+                                new Error(
+                                  "Origin location and destination location cannot be the same.",
+                                ),
+                              );
+                            },
+                          }),
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input
+                          placeholder="Destination Location"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Customer Notes
+                          </span>
+                        }
+                        name="customerNotes"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input customer notes",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input.TextArea
+                          placeholder="Customer Notes"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Recipient Info
+                          </span>
+                        }
+                        name="recipientInfo"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input recipient info",
+                          },
+                          {
+                            validator: validateRecipientInfo, // custom validation rule with the updated phone regex
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Input.TextArea
+                          placeholder="Recipient Info"
+                          className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">Order Type</span>
+                        }
+                        name="describeOrder"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please select order type",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Select
+                          placeholder="Select order type"
+                          onChange={handleOrderDescribeChange}
+                          options={[
+                            { value: "RETAIL_ORDER", label: "Retail Order" },
+                            {
+                              value: "WHOLESALE_ORDER",
+                              label: "Wholesale Order",
+                            },
+                          ]}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <span className="dark:text-white">
+                            Transport Method
+                          </span>
+                        }
+                        name="methodTransPort"
+                        className="mb-4 w-full px-2 md:w-1/2"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please select transport method",
+                          },
+                        ]}
+                        style={{ textAlign: "left" }}
+                      >
+                        <Select
+                          placeholder="Select transport method"
+                          onChange={handleOrderDescribeChange}
+                          options={[
+                            { value: "FAST_DELIVERY", label: "Fast Delivery" },
+                            {
+                              value: "NORMAL_DELIVERY",
+                              label: "Normal Delivery",
+                            },
+                          ]}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    <div className="flex w-full flex-wrap">
+                      <Form.List name="orderDetails">
+                        {(fields, { add, remove }) => (
+                          <>
+                            {fields.map(
+                              ({ key, name, fieldKey, ...restField }) => (
+                                <div
+                                  key={key}
+                                  className="grid w-full grid-cols-3 grid-rows-[auto,auto] items-center gap-2 md:grid-cols-[1fr,1fr,1fr,auto]"
+                                >
+                                  <Form.Item
+                                    label={
+                                      <span className="inline-block w-16 dark:text-white">
+                                        Fish Species
+                                      </span>
+                                    }
+                                    {...restField}
+                                    name={[name, "fishSpecies"]}
+                                    fieldKey={[fieldKey, "fishSpecies"]}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Please input fish species",
+                                      },
+                                    ]}
+                                    className="px-2"
+                                  >
+                                    <Input
+                                      placeholder="Fish Species"
+                                      className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                                    />
+                                  </Form.Item>
+
+                                  <Form.Item
+                                    label={
+                                      <span className="inline-block w-16 dark:text-white">
+                                        Size Of Fish (cm)
+                                      </span>
+                                    }
+                                    {...restField}
+                                    name={[name, "sizeOfFish"]}
+                                    fieldKey={[fieldKey, "sizeOfFish"]}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Please input size of fish",
+                                      },
+                                      {
+                                        validator: (_, value) =>
+                                          value >= 19.9 && value <= 83
+                                            ? Promise.resolve()
+                                            : Promise.reject(
+                                                "Size must be between 19.9 and 83 cm",
+                                              ),
+                                      },
+                                    ]}
+                                    className="px-2"
+                                  >
+                                    <Input
+                                      type="number"
+                                      placeholder="Size Of Fish"
+                                      className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                                    />
+                                  </Form.Item>
+
+                                  <Form.Item
+                                    label={
+                                      <span className="inline-block w-16 dark:text-white">
+                                        Number Of Fish
+                                      </span>
+                                    }
+                                    {...restField}
+                                    name={[name, "numberOfFish"]}
+                                    fieldKey={[fieldKey, "numberOfFish"]}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Please input number of fish",
+                                      },
+                                      {
+                                        validator: (_, value) =>
+                                          value > 0 && value <= 100
+                                            ? Promise.resolve()
+                                            : Promise.reject(
+                                                "Number must be greater than 0 and less than or equal to 100",
+                                              ),
+                                      },
+                                    ]}
+                                    className="px-2"
+                                  >
+                                    <Input
+                                      type="number"
+                                      placeholder="Number Of Fish"
+                                      className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
+                                    />
+                                  </Form.Item>
+
+                                  <Button
+                                    danger
+                                    onClick={() => remove(name)}
+                                    className="col-span-1 mb-4"
+                                    style={{
+                                      color: "#ff4d4f",
+                                      backgroundColor: "transparent",
+                                      marginLeft: "8px",
+                                    }}
+                                  >
+                                    Delete Fish
+                                  </Button>
+                                </div>
+                              ),
+                            )}
+
+                            <Form.Item className="">
+                              <Button
+                                onClick={() =>
+                                  add({
+                                    fishSpecies: "",
+                                    sizeOfFish: null,
+                                    numberOfFish: null,
+                                  })
+                                }
+                                style={{ marginLeft: "8px" }}
+                              >
+                                Add Fish
+                              </Button>
+                            </Form.Item>
+                          </>
+                        )}
+                      </Form.List>
+                    </div>
+
+                    <div className="mb-4 px-2">
+                      <Button
+                        onClick={() => form.submit()}
+                        className="primaryButton"
+                        loading={loading}
+                        style={{
+                          margin: "0px",
+                          width: "100%",
+                          color: "#fff",
+                          border: "none",
+                          padding: "1.25rem 1.75rem",
+                          fontSize: "1rem",
+                          lineHeight: "1.5rem",
+                          transitionDuration: "300ms",
+                          fontWeight: "500",
+                          transitionProperty:
+                            "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                          transitionTimingFunction:
+                            "cubic-bezier(0.4, 0, 0.2, 1)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(234, 88, 12, 1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(249, 115, 22, 1)";
+                        }}
+                      >
+                        Order
+                      </Button>
+                    </div>
+                  </Form>
+                )}
                 <div>
                   <span className="absolute right-1 top-1">
                     <svg

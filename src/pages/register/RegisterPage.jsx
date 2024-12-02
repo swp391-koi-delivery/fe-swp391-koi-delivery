@@ -287,7 +287,7 @@ function RegisterPage() {
                       {fileList.length >= 8 ? null : uploadButton}
                     </Upload>
                   </Form.Item>
-                  <Form.Item className="mb-4">
+                  <div className="mb-4">
                     <Button
                       onClick={() => form.submit()}
                       className="primaryButton"
@@ -318,7 +318,7 @@ function RegisterPage() {
                     >
                       Register
                     </Button>
-                  </Form.Item>
+                  </div>
                   {previewImage && (
                     <Image
                       wrapperStyle={{

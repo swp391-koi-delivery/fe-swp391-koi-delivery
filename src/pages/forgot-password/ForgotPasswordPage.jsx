@@ -111,7 +111,7 @@ function ForgotPasswordPage() {
                       className="w-full rounded-md border border-stroke bg-transparent px-5 py-3 text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                     />
                   </Form.Item>
-                  <Form.Item className="mb-4">
+                  <div className="mb-4">
                     <Button
                       onClick={() => form.submit()}
                       className="primaryButton"
@@ -142,7 +142,7 @@ function ForgotPasswordPage() {
                     >
                       Verify
                     </Button>
-                  </Form.Item>
+                  </div>
                 </Form>
                 <div>
                   <span className="absolute right-1 top-1">

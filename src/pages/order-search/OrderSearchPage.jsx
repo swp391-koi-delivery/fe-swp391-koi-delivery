@@ -20,9 +20,8 @@ function OrderSearchPage() {
   const { Step } = Steps;
 
   const handleSearch = async (value) => {
-    setLoading(true);
-    console.log(value);
     try {
+      setLoading(true);
       const response = await api.get(
         `/free-access/trackingOrder?trackingOrder=${value.trackingOrder}`,
       );
@@ -81,9 +80,9 @@ function OrderSearchPage() {
           description={
             <div>
               {progress.healthFishStatus !== null && (
-              <span className="dark:text-white">
-                Fish status: {progress.healthFishStatus || "Unknown"}
-              </span>
+                <span className="dark:text-white">
+                  Fish status: {progress.healthFishStatus || "Unknown"}
+                </span>
               )}
               {image}
             </div>
@@ -168,7 +167,7 @@ function OrderSearchPage() {
                         }}
                       />
                     </Form.Item>
-                    <Form.Item>
+                    <div>
                       <Button
                         onClick={() => form.submit()}
                         className="primaryButton rounded-r-md"
@@ -200,7 +199,7 @@ function OrderSearchPage() {
                       >
                         Estimate
                       </Button>
-                    </Form.Item>
+                    </div>
                   </Form>
                 </div>
                 <ul className="flex items-center justify-center gap-[10px]">

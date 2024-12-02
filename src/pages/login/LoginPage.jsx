@@ -203,7 +203,7 @@ function LoginPage() {
                       Forgot password
                     </Link>
                   </div>
-                  <Form.Item className="mb-4">
+                  <div className="mb-4">
                     <Button
                       onClick={() => form.submit()}
                       className="primaryButton"
@@ -234,7 +234,7 @@ function LoginPage() {
                     >
                       Login
                     </Button>
-                  </Form.Item>
+                  </div>
                 </Form>
                 <span className="z-1 relative mb-7 block text-center">
                   <span className="-z-1 absolute left-0 top-1/2 block h-px w-full bg-stroke dark:bg-dark-3"></span>
