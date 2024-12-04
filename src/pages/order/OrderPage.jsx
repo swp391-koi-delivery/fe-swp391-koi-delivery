@@ -233,7 +233,11 @@ function OrderPage() {
         numberOfFish: parseInt(detail.numberOfFish, 10), // Đảm bảo numberOfFish là số nguyên
       }));
 
-      const orderData = { ...values, orderDetails: processedOrderDetails };
+      const orderData = {
+        ...values,
+        orderOption: selectedForm,
+        orderDetails: processedOrderDetails,
+      };
 
       console.log(orderData);
 
@@ -259,7 +263,15 @@ function OrderPage() {
         return;
       }
 
-      // Process each fish item to ensure the size and number are numbers
+      // Kiểm tra tất cả các box đã estimate hay chưa
+      const unEstimatedBoxes = orderDetails.filter((box) => !box.isEstimated);
+
+      if (unEstimatedBoxes.length > 0) {
+        toast.error("Please estimate all boxes before submitting the order!");
+        return;
+      }
+
+      // Xử lý các bước còn lại
       const updatedOrderDetails = orderDetails.map((box) => {
         const updatedFishes = box.fishes.map((fish) => ({
           ...fish,
@@ -270,7 +282,11 @@ function OrderPage() {
         return { ...box, fishes: updatedFishes };
       });
 
-      const orderData = { ...values, orderDetails: updatedOrderDetails };
+      const orderData = {
+        ...values,
+        orderOption: selectedForm,
+        orderDetails: updatedOrderDetails,
+      };
 
       // const response = await api.post("/customer/order", orderData);
       console.log(orderData);
@@ -279,6 +295,65 @@ function OrderPage() {
       form.resetFields();
     } catch (error) {
       toast.error("Failed to create order: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEstimateBox = async (boxIndex) => {
+    try {
+      setLoading(true);
+
+      const allOrderDetails = form.getFieldValue("orderDetails");
+      const selectedBox = allOrderDetails?.[boxIndex];
+
+      if (!selectedBox) {
+        toast.error("The selected box does not exist!");
+        return;
+      }
+
+      if (!selectedBox.fishes || selectedBox.fishes.length === 0) {
+        toast.error("The selected box must contain at least one fish!");
+        return;
+      }
+
+      // Validate only the current box fields
+      const fieldsToValidate = [
+        ["orderDetails", boxIndex, "boxType"], // Box type field
+        ...selectedBox.fishes
+          .map((_, fishIndex) => [
+            ["orderDetails", boxIndex, "fishes", fishIndex, "fishSpecies"],
+            ["orderDetails", boxIndex, "fishes", fishIndex, "sizeOfFish"],
+            ["orderDetails", boxIndex, "fishes", fishIndex, "numberOfFish"],
+            ...(selectedBox.isMultiple
+              ? [
+                  [
+                    "orderDetails",
+                    boxIndex,
+                    "fishes",
+                    fishIndex,
+                    "quantityEachBox",
+                  ],
+                ]
+              : []),
+          ])
+          .flat(),
+      ];
+
+      await form.validateFields(fieldsToValidate);
+
+      // If validation passes
+      console.log("Validated box: ", selectedBox);
+
+      toast.success("Box estimated successfully!");
+
+      // Mark the current box as estimated
+      const newOrderDetails = [...allOrderDetails];
+      newOrderDetails[boxIndex].isEstimated = true;
+      form.setFieldsValue({ orderDetails: newOrderDetails });
+    } catch (error) {
+      console.error("Validation Error: ", error);
+      toast.error("Failed to estimate box: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -833,6 +908,13 @@ function OrderPage() {
                           <>
                             {fields.map(
                               ({ key, name, fieldKey, ...restField }) => {
+                                // Check if the box is estimated
+                                const isBoxEstimated = form.getFieldValue([
+                                  "orderDetails",
+                                  name,
+                                  "isEstimated",
+                                ]);
+
                                 // Get the list of fishes for the current box
                                 const currentBoxFishes =
                                   form.getFieldValue([
@@ -844,7 +926,7 @@ function OrderPage() {
                                 return (
                                   <div
                                     key={key}
-                                    className="flex w-full flex-col md:flex-row"
+                                    className="mx-2 mb-5 flex w-full flex-col rounded-md border border-solid border-gray-200 text-start md:flex-row"
                                   >
                                     <div className="flex w-full flex-row flex-wrap">
                                       {/* Size Of Fish and Number Of Fish */}
@@ -884,6 +966,7 @@ function OrderPage() {
                                               className="mb-4 px-2"
                                             >
                                               <Input
+                                                disabled={isBoxEstimated}
                                                 placeholder="Fish Species"
                                                 className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                                               />
@@ -929,6 +1012,7 @@ function OrderPage() {
                                               className="mb-4 px-2"
                                             >
                                               <Input
+                                                disabled={isBoxEstimated}
                                                 step="0.1"
                                                 min="19.9"
                                                 type="number"
@@ -977,6 +1061,7 @@ function OrderPage() {
                                               className="mb-4 px-2"
                                             >
                                               <Input
+                                                disabled={isBoxEstimated}
                                                 min="1"
                                                 step="1"
                                                 type="number"
@@ -1028,6 +1113,7 @@ function OrderPage() {
                                                 className="mb-4 px-2"
                                               >
                                                 <Input
+                                                  disabled={isBoxEstimated}
                                                   min="1"
                                                   step="1"
                                                   type="number"
@@ -1058,9 +1144,10 @@ function OrderPage() {
                                             message: "Please select a box type",
                                           },
                                         ]}
-                                        className="mb-4 px-2"
+                                        className="mb-3 px-2"
                                       >
                                         <Select
+                                          disabled={isBoxEstimated}
                                           placeholder="Select Box Type"
                                           options={[
                                             {
@@ -1102,7 +1189,9 @@ function OrderPage() {
                                           currentBoxes[name] = {
                                             ...currentBoxes[name],
                                             fishes: updatedFishes,
+                                            isEstimated: false, // Reset the estimated flag
                                           };
+
                                           form.setFieldsValue({
                                             orderDetails: currentBoxes,
                                           });
@@ -1130,13 +1219,46 @@ function OrderPage() {
                                           currentBoxes[name] = {
                                             ...currentBoxes[name],
                                             fishes: updatedFishes,
+                                            isEstimated: false, // Reset the estimated flag
                                           };
+
                                           form.setFieldsValue({
                                             orderDetails: currentBoxes,
                                           });
                                         }}
                                       >
                                         Delete Fish
+                                      </Button>
+
+                                      {/* Estimate Box */}
+                                      <Button
+                                        onClick={() => handleEstimateBox(name)}
+                                        className="primaryButton"
+                                        disabled={isBoxEstimated}
+                                        loading={loading}
+                                        style={{
+                                          margin: "8px",
+                                          color: "#fff",
+                                          border: "none",
+                                          fontSize: "1rem",
+                                          lineHeight: "1.5rem",
+                                          transitionDuration: "300ms",
+                                          fontWeight: "500",
+                                          transitionProperty:
+                                            "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                                          transitionTimingFunction:
+                                            "cubic-bezier(0.4, 0, 0.2, 1)",
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.backgroundColor =
+                                            "rgba(234, 88, 12, 1)";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor =
+                                            "rgba(249, 115, 22, 1)";
+                                        }}
+                                      >
+                                        Estimate
                                       </Button>
                                     </div>
                                   </div>
@@ -1224,7 +1346,7 @@ function OrderPage() {
                       </Form.List>
                     </div>
 
-                    <Form.Item className="mb-4 px-2">
+                    <div className="mb-4 px-2">
                       <Button
                         onClick={() => form.submit()}
                         className="primaryButton"
@@ -1255,7 +1377,7 @@ function OrderPage() {
                       >
                         Order
                       </Button>
-                    </Form.Item>
+                    </div>
                   </Form>
                 )}
                 {selectedForm === "optimalOption" && (
