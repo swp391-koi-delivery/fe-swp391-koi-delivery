@@ -902,7 +902,18 @@ function OrderPage() {
                       </Form.Item>
                     </div>
 
-                    <div className="flex w-full flex-wrap">
+                    <div className="mb-4 flex w-full flex-wrap px-2 text-left">
+                      <h6 className="text-wrap text-base font-medium leading-relaxed text-dark dark:text-white">
+                        Order Note:
+                      </h6>
+                      <p className="text-sm font-normal leading-normal text-dark dark:text-dark-6">
+                        After estimate successfully, if you want to adjust box
+                        or fish information, you should click button `Add Fish`
+                        or `Delete Fish`
+                      </p>
+                    </div>
+
+                    <div className="flex w-full flex-wrap text-left">
                       <Form.List name="orderDetails">
                         {(fields, { add, remove }) => (
                           <>
@@ -926,7 +937,7 @@ function OrderPage() {
                                 return (
                                   <div
                                     key={key}
-                                    className="mx-2 mb-5 flex w-full flex-col rounded-md border border-solid border-gray-200 text-start md:flex-row"
+                                    className="mx-2 mb-5 flex w-full flex-col rounded-md border border-solid border-gray-200 p-2 md:flex-row"
                                   >
                                     <div className="flex w-full flex-row flex-wrap">
                                       {/* Size Of Fish and Number Of Fish */}
@@ -966,7 +977,7 @@ function OrderPage() {
                                               className="mb-4 px-2"
                                             >
                                               <Input
-                                                disabled={isBoxEstimated}
+                                                readOnly={isBoxEstimated}
                                                 placeholder="Fish Species"
                                                 className="w-full rounded-md border border-stroke bg-transparent text-base text-body-color outline-none transition placeholder:text-dark-6 focus:border-primary dark:border-dark-3 dark:text-dark-6 dark:focus:border-primary"
                                               />
@@ -1012,7 +1023,7 @@ function OrderPage() {
                                               className="mb-4 px-2"
                                             >
                                               <Input
-                                                disabled={isBoxEstimated}
+                                                readOnly={isBoxEstimated}
                                                 step="0.1"
                                                 min="19.9"
                                                 type="number"
@@ -1061,7 +1072,7 @@ function OrderPage() {
                                               className="mb-4 px-2"
                                             >
                                               <Input
-                                                disabled={isBoxEstimated}
+                                                readOnly={isBoxEstimated}
                                                 min="1"
                                                 step="1"
                                                 type="number"
@@ -1113,7 +1124,7 @@ function OrderPage() {
                                                 className="mb-4 px-2"
                                               >
                                                 <Input
-                                                  disabled={isBoxEstimated}
+                                                  readOnly={isBoxEstimated}
                                                   min="1"
                                                   step="1"
                                                   type="number"
